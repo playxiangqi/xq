@@ -43,6 +43,3 @@ erl_crash.dump
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# generated
-src/styles/main.css

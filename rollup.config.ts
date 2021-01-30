@@ -1,3 +1,4 @@
+import typescript from '@rollup/plugin-typescript';
 import svelte from 'rollup-plugin-svelte';
 import autoPreprocess from 'svelte-preprocess';
 import resolve from '@rollup/plugin-node-resolve';
@@ -11,7 +12,7 @@ const STATIC_ASSET_DIR = 'xq_portal/xq_web/priv/static';
 
 export default {
   // Main entry point
-  input: 'xq_app/svelte/main.js',
+  input: 'xq_app/svelte/main.ts',
 
   // Output path/format and request sourcemaps
   output: {
@@ -27,6 +28,8 @@ export default {
   },
 
   plugins: [
+    typescript({ sourceMap: !production }),
+
     // Converts .svelte files to .js equivalent
     svelte({
       // Enables <style type="scss"> or <script lang="typescript">
