@@ -20,7 +20,9 @@ config :xq_web, XQWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: []
+  watchers: [
+    yarn: ["watch", cd: Path.expand("../xq_app", __DIR__)]
+  ]
 
 # ## SSL Support
 #
