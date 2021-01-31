@@ -1,13 +1,23 @@
 import { writable } from 'svelte/store';
-import { RED, BLACK, Side, getGlyph, Glyph, GUARD } from './pieces';
+import {
+  RED,
+  BLACK,
+  Side,
+  getGlyph,
+  Glyph,
+  GUARD,
+  CHARIOT,
+  HORSE,
+  SOLDIER,
+} from './pieces';
 
 export class Point {
   constructor(
     public readonly side: Side,
-    public readonly file: number,
     public readonly rank: number,
+    public readonly file: number,
     public readonly glyph: Glyph,
-    public grabbed: boolean = false
+    public grabbing: boolean = false
   ) {}
 }
 
@@ -33,22 +43,22 @@ const INITIAL_STATE: BoardState = {
     // new Point(BLACK, 3, 4, Soldier),
     // new Point(BLACK, 3, 6, Soldier),
     // new Point(BLACK, 3, 8, Soldier),
-    // new Point(RED, 6, 0, Soldier),
-    // new Point(RED, 6, 2, Soldier),
-    // new Point(RED, 6, 4, Soldier),
-    // new Point(RED, 6, 6, Soldier),
-    // new Point(RED, 6, 8, Soldier),
+    new Point(RED, 6, 0, getGlyph(RED, SOLDIER)),
+    new Point(RED, 6, 2, getGlyph(RED, SOLDIER)),
+    new Point(RED, 6, 4, getGlyph(RED, SOLDIER)),
+    new Point(RED, 6, 6, getGlyph(RED, SOLDIER)),
+    new Point(RED, 6, 8, getGlyph(RED, SOLDIER)),
     // new Point(RED, 7, 1, Cannon),
     // new Point(RED, 7, 7, Cannon),
-    // new Point(RED, 9, 0, Chariot),
-    // new Point(RED, 9, 1, Horse),
+    new Point(RED, 9, 0, getGlyph(RED, CHARIOT)),
+    new Point(RED, 9, 1, getGlyph(RED, HORSE)),
     // new Point(RED, 9, 2, Elephant),
     new Point(RED, 9, 3, getGlyph(RED, GUARD)),
     // new Point(RED, 9, 4, General),
-    // new Point(RED, 9, 5, Guard),
+    new Point(RED, 9, 5, getGlyph(RED, GUARD)),
     // new Point(RED, 9, 6, Elephant),
-    // new Point(RED, 9, 7, Horse),
-    // new Point(RED, 9, 8, Chariot),
+    new Point(RED, 9, 7, getGlyph(RED, HORSE)),
+    new Point(RED, 9, 8, getGlyph(RED, CHARIOT)),
   ],
 };
 

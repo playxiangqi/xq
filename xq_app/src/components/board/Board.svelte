@@ -11,6 +11,7 @@
   });
   onDestroy(unsubscribe);
 
+  // Dimensions
   const DEFAULT_SCALE = 1.0;
   const {
     height,
@@ -25,11 +26,15 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
+    maxY,
+    maxX,
+    pieceScale: scale,
     pieceSize: size,
     pieceBorderRadius: borderRadius,
     pieceOuterRadius: outerRadius,
     pieceInnerRadius: innerRadius,
     pieceStrokeWidth: strokeWidth,
+    instance: dimensions,
   } = new Dimensions(DEFAULT_SCALE);
 
   // Utils
@@ -90,10 +95,16 @@
         <Piece
           side={point.side}
           glyph={point.glyph}
+          {scale}
           {size}
           {borderRadius}
           {outerRadius}
           {innerRadius}
+          {strokeWidth}
+          {maxY}
+          {maxX}
+          position={dimensions.pointToCoords(point.rank, point.file)}
+          grabbing={point.grabbing}
         />
       {/each}
     </g>

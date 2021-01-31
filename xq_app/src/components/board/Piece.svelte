@@ -4,19 +4,21 @@
   // Dimensions
   export let side: Side;
   export let glyph: string;
-  export let scale = 1.0;
+  export let scale = 0.58;
   export let size = 100;
   export let borderRadius = 50;
   export let outerRadius = 48;
   export let innerRadius = 43;
   export let strokeWidth = 2.2;
+  export let maxY: number;
+  export let maxX: number;
+  export let position: readonly [number, number];
+  export let grabbing: boolean;
 
-  const computedSize = size * scale;
-  const computedBorder = borderRadius * scale;
-  const computedOuter = outerRadius * scale;
-  const computedInner = innerRadius * scale;
-  const computedStrokeWidth = strokeWidth * scale;
   const computedColor = side === 'red' ? '#cc0000' : 'black';
+
+  const [offsetY, offsetX] = [0, 0];
+  const [posY, posX] = position;
 
   // Events
   function onPointerDown() {}
@@ -29,9 +31,11 @@
 </script>
 
 <svg
-  class="piece"
-  height={computedSize}
-  width={computedSize}
+  class={`piece ${grabbing && 'grabbing'}`}
+  height={size}
+  width={size}
+  x={posX}
+  y={posY}
   on:pointerdown={onPointerDown}
   on:pointerenter={onPointerEnter}
   on:pointermove={onPointerMove}
@@ -39,30 +43,36 @@
 >
   <circle
     class="outer"
-    r={computedOuter}
-    cx={computedBorder}
-    cy={computedBorder}
+    r={outerRadius}
+    cx={borderRadius}
+    cy={borderRadius}
     stroke="black"
-    stroke-width={computedStrokeWidth}
+    stroke-width={strokeWidth}
   />
   <circle
     class="inner"
-    r={computedInner}
-    cx={computedBorder}
-    cy={computedBorder}
+    r={innerRadius}
+    cx={borderRadius}
+    cy={borderRadius}
     stroke={computedColor}
-    stroke-width={computedStrokeWidth}
+    stroke-width={strokeWidth}
   />
   <path
     class="glyph"
     fill={computedColor}
     d={glyph}
-    transform={`translate(15, 15) scale(1.0)`}
+    transform={`translate(${15 * scale}, ${15 * scale}) scale(${scale})`}
   />
 </svg>
 
 <style lang="scss">
   svg.piece {
+    cursor: grab;
+
+    &.grabbing {
+      cursor: grabbing;
+    }
+
     circle {
       shape-rendering: geometricPrecision;
     }

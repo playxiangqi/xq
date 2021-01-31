@@ -1,4 +1,9 @@
-import { GUARD_RED } from './glyphs/traditional';
+import {
+  TRAD_HORSE_RED,
+  TRAD_CHARIOT_RED,
+  TRAD_GUARD_RED,
+  TRAD_SOLDIER_RED,
+} from './glyphs';
 
 // Piece
 export const RED = 'red';
@@ -31,12 +36,28 @@ export function getGlyph(
   ch: Character,
   style: GlyphStyle = TRADITIONAL
 ): Glyph {
-  switch (style) {
-    case TRADITIONAL:
-      switch (ch) {
-        case GUARD:
-          return side === RED ? GUARD_RED : GUARD_RED;
-      }
-  }
-  return '';
+  const glyphs: {
+    [style: string]: {
+      [ch: string]: {
+        [side: string]: Glyph;
+      };
+    };
+  } = {
+    [TRADITIONAL]: {
+      [GUARD]: {
+        [RED]: TRAD_GUARD_RED,
+      },
+      [CHARIOT]: {
+        [RED]: TRAD_CHARIOT_RED,
+      },
+      [HORSE]: {
+        [RED]: TRAD_HORSE_RED,
+      },
+      [SOLDIER]: {
+        [RED]: TRAD_SOLDIER_RED,
+      },
+    },
+  };
+
+  return glyphs[style][ch][side] ?? '';
 }
