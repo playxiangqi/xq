@@ -1,5 +1,5 @@
 <script lang="ts">
-  type Side = 'red' | 'black';
+  import type { Side } from './pieces';
 
   // Dimensions
   export let side: Side;
@@ -29,6 +29,7 @@
 </script>
 
 <svg
+  class="piece"
   height={computedSize}
   width={computedSize}
   on:pointerdown={onPointerDown}
@@ -53,6 +54,7 @@
     stroke-width={computedStrokeWidth}
   />
   <path
+    class="glyph"
     fill={computedColor}
     d={glyph}
     transform={`translate(15, 15) scale(1.0)`}
@@ -60,15 +62,21 @@
 </svg>
 
 <style lang="scss">
-  circle {
-    shape-rendering: geometricPrecision;
-  }
+  svg.piece {
+    circle {
+      shape-rendering: geometricPrecision;
+    }
 
-  circle.outer {
-    fill: #ffddaa;
-  }
+    circle.outer {
+      fill: #ffddaa;
+    }
 
-  circle.inner {
-    fill: none;
+    circle.inner {
+      fill: none;
+    }
+
+    path.glyph {
+      stroke: none;
+    }
   }
 </style>

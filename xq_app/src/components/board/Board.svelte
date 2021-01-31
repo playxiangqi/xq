@@ -1,16 +1,24 @@
 <script lang="ts">
+  import Piece from './Piece.svelte';
+  import { Point, store } from './store';
+
+  let layout: Point[];
+  const unsubscribe = store.subscribe((state) => {
+    layout = state.layout;
+  });
+
   // Board Dimensions
-  const apsectRatio = 1.1;
-  const height = 800;
-  const width = height / apsectRatio;
+  const ASPECT_RATIO = 1.1;
+  export let height = 800;
+  const width = height / ASPECT_RATIO;
 
   // Frame Dimensions
-  const frameRatio = 0.96;
-  const [frameHeight, frameWidth] = [height * frameRatio, width * frameRatio];
-  const innerFrameRatio = 0.85;
+  const FRAME_RATIO = 0.96;
+  const [frameHeight, frameWidth] = [height * FRAME_RATIO, width * FRAME_RATIO];
+  const INNER_FRAME_RATIO = 0.85;
   const [innerFrameHeight, innerFrameWidth] = [
-    height * innerFrameRatio,
-    width * innerFrameRatio,
+    height * INNER_FRAME_RATIO,
+    width * INNER_FRAME_RATIO,
   ];
 
   // Positions
@@ -23,13 +31,14 @@
     (frameHeight - innerFrameHeight) / 2 + frameOffsetY,
   ];
 
-  const [maxFile, maxRank] = [8, 9];
+  const [FILE_MAX, RANK_MAX] = [8, 9];
   const [fileEnd, rankEnd] = [
-    innerFrameRatio * width,
-    innerFrameRatio * height,
+    INNER_FRAME_RATIO * width,
+    INNER_FRAME_RATIO * height,
   ];
-  const [fileSpacing, rankSpacing] = [fileEnd / maxFile, rankEnd / maxRank];
+  const [fileSpacing, rankSpacing] = [fileEnd / FILE_MAX, rankEnd / RANK_MAX];
 
+  // Utils
   function generateLinePath(
     [fromFile, fromRank]: [number, number],
     [toFile, toRank]: [number, number]
@@ -50,6 +59,7 @@
 
 <div class="board-container">
   <svg class="board" {height} {width}>
+    <!-- Frame -->
     <rect
       class="frame-outer"
       height={frameHeight}
@@ -68,16 +78,21 @@
       <!-- Palace -->
       <path d={generateLinePath([3, 0], [5, 2])} />
       <path d={generateLinePath([5, 0], [3, 2])} />
-      <path d={generateLinePath([3, maxRank], [5, maxRank - 2])} />
-      <path d={generateLinePath([5, maxRank], [3, maxRank - 2])} />
+      <path d={generateLinePath([3, RANK_MAX], [5, RANK_MAX - 2])} />
+      <path d={generateLinePath([5, RANK_MAX], [3, RANK_MAX - 2])} />
 
       <!-- Ranks & Files -->
-      {#each Array(maxFile - 1) as _, i}
+      {#each Array(FILE_MAX - 1) as _, i}
         <path d={generateLinePath([i + 1, 0], [i + 1, 4])} />
-        <path d={generateLinePath([i + 1, maxRank], [i + 1, 5])} />
+        <path d={generateLinePath([i + 1, RANK_MAX], [i + 1, 5])} />
       {/each}
-      {#each Array(maxRank - 1) as _, i}
-        <path d={generateLinePath([0, i + 1], [maxFile, i + 1])} />
+      {#each Array(RANK_MAX - 1) as _, i}
+        <path d={generateLinePath([0, i + 1], [FILE_MAX, i + 1])} />
+      {/each}
+    </g>
+    <g class="layout">
+      {#each layout as point}
+        <Piece side={point.side} glyph={point.glyph} />
       {/each}
     </g>
   </svg>
