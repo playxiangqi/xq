@@ -4,7 +4,7 @@
   // Dimensions
   export let side: Side;
   export let glyph: string;
-  export let scale = 0.58;
+  export let scale = 0.6;
   export let size = 100;
   export let borderRadius = 50;
   export let outerRadius = 48;
@@ -61,7 +61,7 @@
     class="glyph"
     fill={computedColor}
     d={glyph}
-    transform={`translate(${15 * scale}, ${15 * scale}) scale(${scale})`}
+    transform={`translate(${15 * scale}, ${14 * scale}) scale(${scale})`}
   />
 </svg>
 
