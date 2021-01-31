@@ -1,56 +1,45 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import Piece from './Piece.svelte';
+  import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { Point, store } from './store';
 
-  let layout: Point[];
+  // State + Lifecycle
+  let layout: Point[] = [];
   const unsubscribe = store.subscribe((state) => {
     layout = state.layout;
   });
+  onDestroy(unsubscribe);
 
-  // Board Dimensions
-  const ASPECT_RATIO = 1.1;
-  export let height = 800;
-  const width = height / ASPECT_RATIO;
-
-  // Frame Dimensions
-  const FRAME_RATIO = 0.96;
-  const [frameHeight, frameWidth] = [height * FRAME_RATIO, width * FRAME_RATIO];
-  const INNER_FRAME_RATIO = 0.85;
-  const [innerFrameHeight, innerFrameWidth] = [
-    height * INNER_FRAME_RATIO,
-    width * INNER_FRAME_RATIO,
-  ];
-
-  // Positions
-  const [frameOffsetX, frameOffsetY] = [
-    (width - frameWidth) / 2,
-    (height - frameHeight) / 2,
-  ];
-  const [innerFrameOffsetX, innerFrameOffsetY] = [
-    (frameWidth - innerFrameWidth) / 2 + frameOffsetX,
-    (frameHeight - innerFrameHeight) / 2 + frameOffsetY,
-  ];
-
-  const [FILE_MAX, RANK_MAX] = [8, 9];
-  const [fileEnd, rankEnd] = [
-    INNER_FRAME_RATIO * width,
-    INNER_FRAME_RATIO * height,
-  ];
-  const [fileSpacing, rankSpacing] = [fileEnd / FILE_MAX, rankEnd / RANK_MAX];
+  const DEFAULT_SCALE = 1.0;
+  const {
+    height,
+    width,
+    frameHeight,
+    frameWidth,
+    innerFrameHeight,
+    innerFrameWidth,
+    frameOffsetY,
+    frameOffsetX,
+    innerFrameOffsetY,
+    innerFrameOffsetX,
+    rankSpacing,
+    fileSpacing,
+  } = new Dimensions(DEFAULT_SCALE);
 
   // Utils
   function generateLinePath(
-    [fromFile, fromRank]: [number, number],
-    [toFile, toRank]: [number, number]
+    [fromRank, fromFile]: [number, number],
+    [toRank, toFile]: [number, number]
   ): string {
-    const [startX, startY] = [
-      innerFrameOffsetX + fileSpacing * fromFile,
+    const [startY, startX] = [
       innerFrameOffsetY + rankSpacing * fromRank,
+      innerFrameOffsetX + fileSpacing * fromFile,
     ];
 
-    const [deltaX, deltaY] = [
-      fileSpacing * (toFile - fromFile),
+    const [deltaY, deltaX] = [
       rankSpacing * (toRank - fromRank),
+      fileSpacing * (toFile - fromFile),
     ];
 
     return `m ${startX},${startY} ${deltaX},${deltaY}`;
@@ -76,18 +65,19 @@
     />
     <g class="lines">
       <!-- Palace -->
-      <path d={generateLinePath([3, 0], [5, 2])} />
-      <path d={generateLinePath([5, 0], [3, 2])} />
-      <path d={generateLinePath([3, RANK_MAX], [5, RANK_MAX - 2])} />
-      <path d={generateLinePath([5, RANK_MAX], [3, RANK_MAX - 2])} />
+      <path d={generateLinePath([0, 3], [2, 5])} />
+      <path d={generateLinePath([0, 5], [2, 3])} />
+      <path d={generateLinePath([RANK_MAX, 3], [RANK_MAX - 2, 5])} />
+      <path d={generateLinePath([RANK_MAX, 5], [RANK_MAX - 2, 3])} />
 
       <!-- Ranks & Files -->
       {#each Array(FILE_MAX - 1) as _, i}
-        <path d={generateLinePath([i + 1, 0], [i + 1, 4])} />
-        <path d={generateLinePath([i + 1, RANK_MAX], [i + 1, 5])} />
+        <!-- River disconnected -->
+        <path d={generateLinePath([0, i + 1], [4, i + 1])} />
+        <path d={generateLinePath([RANK_MAX, i + 1], [5, i + 1])} />
       {/each}
       {#each Array(RANK_MAX - 1) as _, i}
-        <path d={generateLinePath([0, i + 1], [FILE_MAX, i + 1])} />
+        <path d={generateLinePath([i + 1, 0], [i + 1, FILE_MAX])} />
       {/each}
     </g>
     <g class="layout">
