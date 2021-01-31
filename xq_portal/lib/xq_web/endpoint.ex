@@ -1,13 +1,13 @@
 defmodule XQWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :xq_web
+  use Phoenix.Endpoint, otp_app: :xq
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_xq_web_key",
-    signing_salt: "UgNL58KB"
+    key: "_xq_key",
+    signing_salt: "RGmzZ8k7"
   ]
 
   socket "/socket", XQWeb.UserSocket,
@@ -22,7 +22,7 @@ defmodule XQWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :xq_web,
+    from: :xq,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
 
@@ -32,7 +32,7 @@ defmodule XQWeb.Endpoint do
     socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :xq_web
+    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :xq
   end
 
   plug Phoenix.LiveDashboard.RequestLogger,

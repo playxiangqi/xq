@@ -20,5 +20,5 @@ defmodule XQWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :xq_web
+  use Gettext, otp_app: :xq
 end

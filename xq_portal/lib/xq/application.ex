@@ -1,4 +1,4 @@
-defmodule XQWeb.Application do
+defmodule XQ.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -7,17 +7,21 @@ defmodule XQWeb.Application do
 
   def start(_type, _args) do
     children = [
+      # Start the Ecto repository
+      XQ.Repo,
       # Start the Telemetry supervisor
       XQWeb.Telemetry,
+      # Start the PubSub system
+      {Phoenix.PubSub, name: XQ.PubSub},
       # Start the Endpoint (http/https)
       XQWeb.Endpoint
-      # Start a worker by calling: XQWeb.Worker.start_link(arg)
-      # {XQWeb.Worker, arg}
+      # Start a worker by calling: XQ.Worker.start_link(arg)
+      # {XQ.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: XQWeb.Supervisor]
+    opts = [strategy: :one_for_one, name: XQ.Supervisor]
     Supervisor.start_link(children, opts)
   end
 

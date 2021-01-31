@@ -14,7 +14,7 @@ config :xq, XQ.Repo,
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :xq_web, XQWeb.Endpoint,
+config :xq, XQWeb.Endpoint,
   http: [port: 4002],
   server: false
 

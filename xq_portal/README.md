@@ -1,4 +1,4 @@
-# XQWeb
+# XQ
 
 To start your Phoenix server:
 

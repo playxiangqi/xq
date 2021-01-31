@@ -21,3 +21,8 @@ erl_crash.dump
 
 # Ignore package tarball (built via "mix hex.build").
 xq-*.tar
+
+# Since we are building assets from assets/,
+# we ignore priv/static. You may want to comment
+# this depending on your deployment strategy.
+/priv/static/
