@@ -1,5 +1,3 @@
-import 'phoenix_html';
-
 import App from './App.svelte';
 
 new App({
