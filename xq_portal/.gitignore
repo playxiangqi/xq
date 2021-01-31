@@ -1,4 +1,3 @@
-## Elixir
 # The directory Mix will write compiled artifacts to.
 /_build/
 
@@ -20,26 +19,10 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
-## NodeJS
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
+# Ignore package tarball (built via "mix hex.build").
+xq-*.tar
 
-# testing
-/coverage
-
-# production
-/build
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.eslintcache
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Since we are building assets from assets/,
+# we ignore priv/static. You may want to comment
+# this depending on your deployment strategy.
+/priv/static/

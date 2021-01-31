@@ -8,7 +8,7 @@ import json from '@rollup/plugin-json';
 import { terser } from 'rollup-plugin-terser';
 
 const production = process.env.MIX_ENV === 'prod';
-const STATIC_ASSET_DIR = 'xq_portal/xq_web/priv/static';
+const STATIC_ASSET_DIR = 'xq_portal/priv/static';
 
 export default {
   // Main entry point

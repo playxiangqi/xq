@@ -1,3 +1,0 @@
-# XQ
-
-**TODO: Add description**

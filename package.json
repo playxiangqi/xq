@@ -7,6 +7,8 @@
   "license": "AGPL-3.0",
   "private": false,
   "scripts": {
+    "start": "cd xq_portal && mix phx.server",
+    "setup": "cd xq_portal && mix setup",
     "deploy": "rollup -c rollup.config.ts",
     "watch": "rollup -c rollup.config.ts -w"
   },
