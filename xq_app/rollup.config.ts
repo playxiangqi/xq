@@ -5,6 +5,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import postcss from 'rollup-plugin-postcss';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import svelteSVG from 'rollup-plugin-svelte-svg';
 import { terser } from 'rollup-plugin-terser';
 
 const production = process.env.MIX_ENV === 'prod';
@@ -56,6 +57,9 @@ export default {
 
     // JSON resolution
     json(),
+
+    // Allowe importing svgs as ES modules
+    svelteSVG(),
 
     // Minify production builds
     production && terser(),
