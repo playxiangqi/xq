@@ -1,7 +1,7 @@
 <script>
   export let name;
 
-  import Board from './Board.svelte';
+  import Board from './components/Board.svelte';
   import Counter from './Counter.svelte';
 </script>
 

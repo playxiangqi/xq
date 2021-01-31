@@ -3,6 +3,8 @@
   "include": ["src/**/*", ".storybook/**/*"],
   "exclude": ["node_modules/*"],
   "compilerOptions": {
-    "importsNotUsedAsValues": "remove"
+    "baseUrl": "src",
+    "importsNotUsedAsValues": "remove",
+    "strict": true
   }
 }
