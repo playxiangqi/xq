@@ -25,6 +25,11 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
+    pieceSize: size,
+    pieceBorderRadius: borderRadius,
+    pieceOuterRadius: outerRadius,
+    pieceInnerRadius: innerRadius,
+    pieceStrokeWidth: strokeWidth,
   } = new Dimensions(DEFAULT_SCALE);
 
   // Utils
@@ -71,18 +76,25 @@
       <path d={generateLinePath([RANK_MAX, 5], [RANK_MAX - 2, 3])} />
 
       <!-- Ranks & Files -->
+      {#each Array(RANK_MAX - 1) as _, i}
+        <path d={generateLinePath([i + 1, 0], [i + 1, FILE_MAX])} />
+      {/each}
       {#each Array(FILE_MAX - 1) as _, i}
         <!-- River disconnected -->
         <path d={generateLinePath([0, i + 1], [4, i + 1])} />
         <path d={generateLinePath([RANK_MAX, i + 1], [5, i + 1])} />
       {/each}
-      {#each Array(RANK_MAX - 1) as _, i}
-        <path d={generateLinePath([i + 1, 0], [i + 1, FILE_MAX])} />
-      {/each}
     </g>
     <g class="layout">
       {#each layout as point}
-        <Piece side={point.side} glyph={point.glyph} />
+        <Piece
+          side={point.side}
+          glyph={point.glyph}
+          {size}
+          {borderRadius}
+          {outerRadius}
+          {innerRadius}
+        />
       {/each}
     </g>
   </svg>
