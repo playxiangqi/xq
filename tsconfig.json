@@ -1,6 +1,7 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
-  "include": ["xq_app/svelte/**/*", "node_modules/**/*"],
+  "include": ["xq_app/svelte/**/*"],
+  "exclude": ["node_modules/*"],
   "compilerOptions": {
     "importsNotUsedAsValues": "remove"
   }
