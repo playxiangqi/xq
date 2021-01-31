@@ -1,7 +1,7 @@
 <script>
   export let name;
 
-  import Counter from './Counter.svelte';
+  import Counter from './components/Counter.svelte';
 </script>
 
 <h1>Hello {name}!</h1>

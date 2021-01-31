@@ -12,7 +12,7 @@ const STATIC_ASSET_DIR = 'xq_portal/xq_web/priv/static';
 
 export default {
   // Main entry point
-  input: 'xq_app/svelte/main.ts',
+  input: 'xq_app/src/main.ts',
 
   // Output path/format and request sourcemaps
   output: {
@@ -24,7 +24,7 @@ export default {
 
   watch: {
     clearScreen: false,
-    include: 'xq_app/svelte/**',
+    include: 'xq_app/src/**',
   },
 
   plugins: [
