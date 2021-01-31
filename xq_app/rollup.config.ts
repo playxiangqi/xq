@@ -1,8 +1,9 @@
 import typescript from '@rollup/plugin-typescript';
 import svelte from 'rollup-plugin-svelte';
-import autoPreprocess from 'svelte-preprocess';
+import sveltePreprocess from 'svelte-preprocess';
 import resolve from '@rollup/plugin-node-resolve';
 import postcss from 'rollup-plugin-postcss';
+import autoprefixer from 'autoprefixer';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import svelteSVG from 'rollup-plugin-svelte-svg';
@@ -35,7 +36,9 @@ export default {
     svelte({
       // Enables <style type="scss"> or <script lang="typescript">
       // inside .svelte files
-      preprocess: autoPreprocess(),
+      preprocess: sveltePreprocess({
+        sourceMap: !production,
+      }),
       compilerOptions: {
         // Enable run-time checks in non-production environments
         dev: !production,
@@ -50,7 +53,9 @@ export default {
     }),
 
     // CSS preprocessor
-    postcss(),
+    postcss({
+      plugins: [autoprefixer()],
+    }),
 
     // CommonJS import convention
     commonjs(),
