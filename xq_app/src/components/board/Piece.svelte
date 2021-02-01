@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { Dimensions } from './dimensions';
   import type { Side } from './pieces';
-  import { grabPiece, focusPiece } from './store';
+  import { grabPiece, focusPiece, movePiece } from './store';
 
   // Dimensions
   export let index: number;
@@ -14,6 +15,7 @@
   export let strokeWidth = 2.2;
   export let maxY: number;
   export let maxX: number;
+  // export let dimensions: Dimensions;
   export let position: readonly [number, number];
   export let grabbing: boolean;
 
@@ -37,7 +39,16 @@
     focusPiece(index);
   }
 
-  function onPointerMove(e: Event) {}
+  function onPointerMove(e: Event) {
+    const bbox = (e.target as HTMLElement).getBoundingClientRect();
+    const [x, y] = [e.clientX - bbox.left, e.clientY - bbox.top];
+    const [derivedX, derivedY] = [posX - (offset.x - x), posY - (offset.y - y)];
+    grabbing &&
+      movePiece(index, [
+        Math.min(maxX, Math.max(0, derivedX)),
+        Math.min(maxY, Math.max(0, derivedY)),
+      ]);
+  }
 
   function onPointerUp() {}
 </script>

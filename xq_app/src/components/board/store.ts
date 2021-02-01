@@ -68,3 +68,5 @@ export function focusPiece(index: number) {
     return state;
   });
 }
+
+export function movePiece(index: number, coords: [number, number]) {}

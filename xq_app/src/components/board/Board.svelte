@@ -1,17 +1,8 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
   import Piece from './Piece.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { getGlyph, Point } from './pieces';
   import { store } from './store';
-
-  // State + Lifecycle
-  let layout: Point[] = [];
-  const unsubscribe = store.subscribe((state) => {
-    layout = state.layout;
-    console.log(layout);
-  });
-  onDestroy(unsubscribe);
 
   // Dimensions
   const DEFAULT_SCALE = 1.0;
@@ -93,7 +84,7 @@
       {/each}
     </g>
     <g class="layout">
-      {#each layout as { side, ch, grabbing, rank, file }, i}
+      {#each $store.layout as { side, ch, grabbing, rank, file }, i}
         <Piece
           index={i}
           {side}
