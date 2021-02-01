@@ -2,6 +2,7 @@
   import type { Side } from './pieces';
 
   // Dimensions
+  export let index: number;
   export let side: Side;
   export let glyph: string;
   export let scale = 0.6;
@@ -17,11 +18,19 @@
 
   const computedColor = side === 'red' ? '#cc0000' : 'black';
 
-  const [offsetY, offsetX] = [0, 0];
+  let offset = { x: 0, y: 0 };
   const [posY, posX] = position;
 
   // Events
-  function onPointerDown() {}
+  type Event = PointerEvent & { currentTarget: EventTarget & SVGSVGElement };
+
+  function onPointerDown(e: Event) {
+    const el = e.target as HTMLElement;
+    const bbox = el.getBoundingClientRect();
+    el.setPointerCapture(e.pointerId);
+    offset = { x: e.clientX - bbox.left, y: e.clientY - bbox.top };
+    // grabPiece: index
+  }
 
   function onPointerEnter() {}
 

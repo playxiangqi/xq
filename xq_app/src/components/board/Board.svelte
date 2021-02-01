@@ -3,6 +3,7 @@
   import Piece from './Piece.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { Point, store } from './store';
+  import App from 'App.svelte';
 
   // State + Lifecycle
   let layout: Point[] = [];
@@ -91,10 +92,11 @@
       {/each}
     </g>
     <g class="layout">
-      {#each layout as point}
+      {#each layout as { side, glyph, grabbing, rank, file }, i}
         <Piece
-          side={point.side}
-          glyph={point.glyph}
+          index={i}
+          {side}
+          {glyph}
           {scale}
           {size}
           {borderRadius}
@@ -103,8 +105,8 @@
           {strokeWidth}
           {maxY}
           {maxX}
-          position={dimensions.pointToCoords(point.rank, point.file)}
-          grabbing={point.grabbing}
+          position={dimensions.pointToCoords(rank, file)}
+          {grabbing}
         />
       {/each}
     </g>
