@@ -36,6 +36,16 @@ export type Character =
   | typeof CANNON
   | typeof SOLDIER;
 
+export class Point {
+  constructor(
+    public readonly side: Side,
+    public readonly rank: number,
+    public readonly file: number,
+    public readonly ch: Character,
+    public grabbing: boolean = false
+  ) {}
+}
+
 // Glyph
 export const TRADITIONAL = 'traditional';
 export type GlyphStyle = typeof TRADITIONAL;

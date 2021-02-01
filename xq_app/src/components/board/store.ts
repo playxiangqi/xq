@@ -2,9 +2,6 @@ import { writable } from 'svelte/store';
 import {
   RED,
   BLACK,
-  Side,
-  getGlyph,
-  Glyph,
   GUARD,
   CHARIOT,
   HORSE,
@@ -12,19 +9,8 @@ import {
   CANNON,
   ELEPHANT,
   GENERAL,
-  Character,
+  Point,
 } from './pieces';
-
-export class Point {
-  constructor(
-    public readonly side: Side,
-    public readonly rank: number,
-    public readonly file: number,
-    public readonly ch: Character,
-    public readonly glyph: Glyph = getGlyph(side, ch),
-    public grabbing: boolean = false
-  ) {}
-}
 
 export type BoardState = {
   layout: Point[];
@@ -68,3 +54,17 @@ const INITIAL_STATE: BoardState = {
 };
 
 export const store = writable(INITIAL_STATE);
+
+export function grabPiece(index: number) {
+  store.update((state) => {
+    state.layout[index].grabbing = true;
+    return state;
+  });
+}
+
+export function focusPiece(index: number) {
+  store.update((state) => {
+    state.layout[index].grabbing = false;
+    return state;
+  });
+}

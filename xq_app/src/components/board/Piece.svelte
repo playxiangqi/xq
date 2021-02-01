@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Side } from './pieces';
+  import { grabPiece, focusPiece } from './store';
 
   // Dimensions
   export let index: number;
@@ -29,12 +30,14 @@
     const bbox = el.getBoundingClientRect();
     el.setPointerCapture(e.pointerId);
     offset = { x: e.clientX - bbox.left, y: e.clientY - bbox.top };
-    // grabPiece: index
+    grabPiece(index);
   }
 
-  function onPointerEnter() {}
+  function onPointerEnter(e: Event) {
+    focusPiece(index);
+  }
 
-  function onPointerMove() {}
+  function onPointerMove(e: Event) {}
 
   function onPointerUp() {}
 </script>
