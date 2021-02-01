@@ -3,7 +3,6 @@
   import Piece from './Piece.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { Point, store } from './store';
-  import App from 'App.svelte';
 
   // State + Lifecycle
   let layout: Point[] = [];
