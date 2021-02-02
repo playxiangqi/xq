@@ -2,7 +2,8 @@ defmodule XQWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", XQWeb.RoomChannel
+  channel "user:*", XQWeb.AuthChannel
+  channel "match:*", XQWeb.MatchChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
