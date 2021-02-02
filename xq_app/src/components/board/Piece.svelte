@@ -26,6 +26,15 @@
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
 
+  // Sound Effects
+  const audio = new Audio('./sounds/drop-piece.wav');
+
+  function playSound() {
+    audio.currentTime = 0;
+    audio.loop = false;
+    audio.play();
+  }
+
   // Event Props
   export let dropPiece: (index: number) => void;
   export let focusPiece: (index: number) => void;
@@ -61,11 +70,13 @@
     const [y, x] = dimensions.snapCoords(posY, posX);
     movePiece(index, [y, x]);
     dropPiece(index);
+    playSound();
   }
 </script>
 
 <svg
-  class={`piece ${grabbing ? 'grabbing' : ''}`}
+  class="piece"
+  class:grabbing
   height={size}
   width={size}
   y={posY}

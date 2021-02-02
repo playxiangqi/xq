@@ -83,9 +83,9 @@
       {/each}
     </g>
     <g class="layout">
-      {#each $store.layout as { side, ch, grabbing, position }, i}
+      {#each $store.layout as { side, ch, grabbing, position }, index}
         <Piece
-          index={i}
+          {index}
           {side}
           {ch}
           {position}

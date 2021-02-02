@@ -7,6 +7,7 @@ import autoprefixer from 'autoprefixer';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import svelteSVG from 'rollup-plugin-svelte-svg';
+import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser';
 
 const production = process.env.MIX_ENV === 'prod';
@@ -18,10 +19,10 @@ export default {
 
   // Output path/format and request sourcemaps
   output: {
-    sourcemap: true,
-    format: 'cjs',
-    name: 'app',
     file: `${STATIC_ASSET_DIR}/js/app.js`,
+    format: 'iife',
+    name: 'app',
+    sourcemap: true,
   },
 
   watch: {
@@ -63,8 +64,13 @@ export default {
     // JSON resolution
     json(),
 
-    // Allowe importing svgs as ES modules
+    // Allow importing svgs as ES modules
     svelteSVG(),
+
+    // Copy assets to dist
+    copy({
+      targets: [{ src: 'src/assets/sounds', dest: `${STATIC_ASSET_DIR}/` }],
+    }),
 
     // Minify production builds
     production && terser(),

@@ -44,6 +44,7 @@ export type Point = {
   grabbing: boolean;
 };
 
+// TODO: eventually load as parseFEN
 export function createInitialLayout(dimensions: Dimensions): Point[] {
   const layout: [Side, Character, number, number][] = [
     [BLACK, CHARIOT, 0, 0],
