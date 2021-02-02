@@ -21,9 +21,13 @@
     instance: dimensions,
   } = new Dimensions(DEFAULT_SCALE);
 
-  const { store, dropPiece, focusPiece, grabPiece } = createBoardState(
-    dimensions
-  );
+  const {
+    store,
+    dropPiece,
+    focusPiece,
+    grabPiece,
+    movePiece,
+  } = createBoardState(dimensions);
 
   // Utils
   function generateLinePath(
@@ -79,9 +83,7 @@
       {/each}
     </g>
     <g class="layout">
-      {console.log($store.layout[$store.layout.length - 1])}
       {#each $store.layout as { side, ch, grabbing, position }, i}
-        {i === $store.layout.length - 1 && console.log(position, ch)}
         <Piece
           index={i}
           {side}
@@ -92,6 +94,7 @@
           {dropPiece}
           {focusPiece}
           {grabPiece}
+          {movePiece}
         />
       {/each}
     </g>

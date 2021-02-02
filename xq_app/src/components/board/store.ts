@@ -33,6 +33,12 @@ export function createBoardState(dimensions: Dimensions) {
         return state;
       });
     },
+    movePiece: (index: number, position: [number, number]) => {
+      store.update((state) => {
+        state.layout[index].position = position;
+        return state;
+      });
+    },
   };
 }
 
