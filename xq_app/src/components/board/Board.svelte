@@ -1,8 +1,7 @@
 <script lang="ts">
   import Piece from './Piece.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
-  import { getGlyph, Point } from './pieces';
-  import { store } from './store';
+  import { createBoardState } from './store';
 
   // Dimensions
   const DEFAULT_SCALE = 1.0;
@@ -19,16 +18,10 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
-    maxY,
-    maxX,
-    pieceScale: scale,
-    pieceSize: size,
-    pieceBorderRadius: borderRadius,
-    pieceOuterRadius: outerRadius,
-    pieceInnerRadius: innerRadius,
-    pieceStrokeWidth: strokeWidth,
     instance: dimensions,
   } = new Dimensions(DEFAULT_SCALE);
+
+  const { store, focusPiece, grabPiece } = createBoardState(dimensions);
 
   // Utils
   function generateLinePath(
@@ -84,21 +77,18 @@
       {/each}
     </g>
     <g class="layout">
-      {#each $store.layout as { side, ch, grabbing, rank, file }, i}
+      {console.log($store.layout[$store.layout.length - 1])}
+      {#each $store.layout as { side, ch, grabbing, position }, i}
+        {i === $store.layout.length - 1 && console.log(position, ch)}
         <Piece
           index={i}
           {side}
-          glyph={getGlyph(side, ch)}
-          {scale}
-          {size}
-          {borderRadius}
-          {outerRadius}
-          {innerRadius}
-          {strokeWidth}
-          {maxY}
-          {maxX}
-          position={dimensions.pointToCoords(rank, file)}
+          {ch}
+          {position}
           {grabbing}
+          {dimensions}
+          {focusPiece}
+          {grabPiece}
         />
       {/each}
     </g>
