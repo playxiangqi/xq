@@ -1,41 +1,77 @@
 <script lang="ts">
-  import type { Side } from './pieces';
+  import { Dimensions } from './dimensions';
+  import { getGlyph, Character, Side } from './pieces';
 
-  // Dimensions
+  // Piece Props
+  export let index: number;
   export let side: Side;
-  export let glyph: string;
-  export let scale = 0.6;
-  export let size = 100;
-  export let borderRadius = 50;
-  export let outerRadius = 48;
-  export let innerRadius = 43;
-  export let strokeWidth = 2.2;
-  export let maxY: number;
-  export let maxX: number;
+  export let ch: Character;
   export let position: readonly [number, number];
   export let grabbing: boolean;
+  export let dimensions: Dimensions;
+
+  $: glyph = getGlyph(side, ch);
+
+  // Event Props
+  export let focusPiece: (index: number) => void;
+  export let grabPiece: (index: number) => void;
+
+  // let offset = { y: 0, x: 0 };
+  const {
+    pieceScale: scale,
+    pieceSize: size,
+    pieceBorderRadius: borderRadius,
+    pieceOuterRadius: outerRadius,
+    pieceInnerRadius: innerRadius,
+    pieceStrokeWidth: strokeWidth,
+  } = dimensions;
+  const [posY, posX] = position;
+  console.log(position);
 
   const computedColor = side === 'red' ? '#cc0000' : 'black';
 
-  const [offsetY, offsetX] = [0, 0];
-  const [posY, posX] = position;
-
   // Events
-  function onPointerDown() {}
+  type Event = PointerEvent & { currentTarget: EventTarget & SVGSVGElement };
 
-  function onPointerEnter() {}
+  function onPointerDown(e: Event) {
+    const el = e.target as HTMLElement;
+    // const bbox = el.getBoundingClientRect();
+    el.setPointerCapture(e.pointerId);
+    // offset = { y: e.clientY - bbox.top, x: e.clientX - bbox.left };
+    grabPiece(index);
+  }
 
-  function onPointerMove() {}
+  function onPointerEnter() {
+    focusPiece(index);
+  }
 
-  function onPointerUp() {}
+  function onPointerMove() {
+    // function onPointerMove(e: Event) {
+    // const bbox = (e.target as HTMLElement).getBoundingClientRect();
+    // const [x, y] = [e.clientX - bbox.left, e.clientY - bbox.top];
+    // const [derivedX, derivedY] = [posX - (offset.x - x), posY - (offset.y - y)];
+    // const [toRank, toFile] = dimensions.clampCoords(derivedY, derivedX);
+    // if (grabbing) {
+    // movePiece(index, dimensions.coordsToPoint(toRank, toFile), [
+    //   toRank,
+    //   toFile,
+    // ]);
+    // }
+  }
+
+  function onPointerUp() {
+    // const [y, x] = dimensions.clampCoords(posY, posX);
+    // movePiece(index, [y, x]);
+    // dropPiece(index);
+  }
 </script>
 
 <svg
-  class={`piece ${grabbing && 'grabbing'}`}
+  class={`piece ${grabbing ? 'grabbing' : ''}`}
   height={size}
   width={size}
-  x={posX}
   y={posY}
+  x={posX}
   on:pointerdown={onPointerDown}
   on:pointerenter={onPointerEnter}
   on:pointermove={onPointerMove}

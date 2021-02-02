@@ -1,15 +1,7 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
   import Piece from './Piece.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
-  import { Point, store } from './store';
-
-  // State + Lifecycle
-  let layout: Point[] = [];
-  const unsubscribe = store.subscribe((state) => {
-    layout = state.layout;
-  });
-  onDestroy(unsubscribe);
+  import { createBoardState } from './store';
 
   // Dimensions
   const DEFAULT_SCALE = 1.0;
@@ -26,16 +18,10 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
-    maxY,
-    maxX,
-    pieceScale: scale,
-    pieceSize: size,
-    pieceBorderRadius: borderRadius,
-    pieceOuterRadius: outerRadius,
-    pieceInnerRadius: innerRadius,
-    pieceStrokeWidth: strokeWidth,
     instance: dimensions,
   } = new Dimensions(DEFAULT_SCALE);
+
+  const { store, focusPiece, grabPiece } = createBoardState(dimensions);
 
   // Utils
   function generateLinePath(
@@ -91,20 +77,18 @@
       {/each}
     </g>
     <g class="layout">
-      {#each layout as point}
+      {console.log($store.layout[$store.layout.length - 1])}
+      {#each $store.layout as { side, ch, grabbing, position }, i}
+        {i === $store.layout.length - 1 && console.log(position, ch)}
         <Piece
-          side={point.side}
-          glyph={point.glyph}
-          {scale}
-          {size}
-          {borderRadius}
-          {outerRadius}
-          {innerRadius}
-          {strokeWidth}
-          {maxY}
-          {maxX}
-          position={dimensions.pointToCoords(point.rank, point.file)}
-          grabbing={point.grabbing}
+          index={i}
+          {side}
+          {ch}
+          {position}
+          {grabbing}
+          {dimensions}
+          {focusPiece}
+          {grabPiece}
         />
       {/each}
     </g>

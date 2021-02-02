@@ -87,6 +87,18 @@ export class Dimensions {
   }
 
   /**
+   * clampCoords
+   * @param y
+   * @param x
+   */
+  public clampCoords(y: number, x: number): readonly [number, number] {
+    return [
+      Math.min(this.maxY, Math.max(0, y)),
+      Math.min(this.maxX, Math.max(0, x)),
+    ] as const;
+  }
+
+  /**
    * pointToCoords
    */
   public pointToCoords(rank: number, file: number): readonly [number, number] {
