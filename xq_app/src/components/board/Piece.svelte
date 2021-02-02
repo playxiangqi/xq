@@ -1,22 +1,17 @@
 <script lang="ts">
   import { Dimensions } from './dimensions';
-  import { getGlyph, Character, Side } from './pieces';
+  import { getGlyph } from './pieces';
+  import type { Character, Side } from './pieces';
+  import { debug } from 'svelte/internal';
 
   // Piece Props
   export let index: number;
   export let side: Side;
   export let ch: Character;
-  export let position: readonly [number, number];
+  export let position: [number, number];
   export let grabbing: boolean;
   export let dimensions: Dimensions;
 
-  $: glyph = getGlyph(side, ch);
-
-  // Event Props
-  export let focusPiece: (index: number) => void;
-  export let grabPiece: (index: number) => void;
-
-  // let offset = { y: 0, x: 0 };
   const {
     pieceScale: scale,
     pieceSize: size,
@@ -25,10 +20,17 @@
     pieceInnerRadius: innerRadius,
     pieceStrokeWidth: strokeWidth,
   } = dimensions;
-  const [posY, posX] = position;
-  console.log(position);
 
-  const computedColor = side === 'red' ? '#cc0000' : 'black';
+  // let offset = { y: 0, x: 0 };
+  // Reactive
+  $: glyph = getGlyph(side, ch);
+  $: [posY, posX] = position;
+  $: computedColor = side === 'red' ? '#cc0000' : 'black';
+
+  // Event Props
+  export let dropPiece: (index: number) => void;
+  export let focusPiece: (index: number) => void;
+  export let grabPiece: (index: number) => void;
 
   // Events
   type Event = PointerEvent & { currentTarget: EventTarget & SVGSVGElement };
@@ -62,7 +64,7 @@
   function onPointerUp() {
     // const [y, x] = dimensions.clampCoords(posY, posX);
     // movePiece(index, [y, x]);
-    // dropPiece(index);
+    dropPiece(index);
   }
 </script>
 
