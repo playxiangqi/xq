@@ -21,7 +21,9 @@
     instance: dimensions,
   } = new Dimensions(DEFAULT_SCALE);
 
-  const { store, focusPiece, grabPiece } = createBoardState(dimensions);
+  const { store, dropPiece, focusPiece, grabPiece } = createBoardState(
+    dimensions
+  );
 
   // Utils
   function generateLinePath(
@@ -87,6 +89,7 @@
           {position}
           {grabbing}
           {dimensions}
+          {dropPiece}
           {focusPiece}
           {grabPiece}
         />

@@ -11,6 +11,12 @@ export function createBoardState(dimensions: Dimensions) {
   const store = writable<BoardState>({ layout });
   return {
     store,
+    dropPiece: (index: number) => {
+      store.update((state) => {
+        state.layout[index].grabbing = false;
+        return state;
+      });
+    },
     focusPiece: (index: number) => {
       store.update((state) => {
         const lastIndex = state.layout.length - 1;

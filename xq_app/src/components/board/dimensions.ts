@@ -1,5 +1,3 @@
-import { debug } from 'svelte/internal';
-
 const ASPECT_RATIO = 1.1;
 const FRAME_RATIO = 0.96;
 const INNER_FRAME_RATIO = 0.85;
