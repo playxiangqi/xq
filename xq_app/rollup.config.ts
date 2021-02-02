@@ -67,6 +67,7 @@ export default {
     // Allow importing svgs as ES modules
     svelteSVG(),
 
+    // Copy assets to dist
     copy({
       targets: [{ src: 'src/assets/sounds', dest: `${STATIC_ASSET_DIR}/` }],
     }),
