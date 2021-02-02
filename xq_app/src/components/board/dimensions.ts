@@ -64,7 +64,7 @@ export class Dimensions {
     this.maxY = this.innerFrameOffsetY + this.rankEnd;
     this.maxX = this.innerFrameOffsetX + this.fileEnd;
 
-    this.pieceScale = 0.6 * scale;
+    this.pieceScale = 0.65 * scale;
     this.pieceSize = 100 * this.pieceScale;
     this.pieceBorderRadius = 50 * this.pieceScale;
     this.pieceOuterRadius = 48 * this.pieceScale;
@@ -116,5 +116,15 @@ export class Dimensions {
       (x - this.pieceOffsetX) / this.fileSpacing,
     ];
     return this.clampPoint(rank, file);
+  }
+
+  /**
+   * snapCoords
+   * @param y
+   * @param x
+   */
+  public snapCoords(y: number, x: number): readonly [number, number] {
+    const [clampedRank, clampedFile] = this.coordsToPoint(y, x);
+    return this.pointToCoords(clampedRank, clampedFile);
   }
 }

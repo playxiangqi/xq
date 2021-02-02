@@ -20,7 +20,7 @@
     pieceStrokeWidth: strokeWidth,
   } = dimensions;
 
-  // let offset = { y: 0, x: 0 };
+  let offset = { y: 0, x: 0 };
   // Reactive
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
@@ -30,15 +30,16 @@
   export let dropPiece: (index: number) => void;
   export let focusPiece: (index: number) => void;
   export let grabPiece: (index: number) => void;
+  export let movePiece: (index: number, position: [number, number]) => void;
 
   // Events
   type Event = PointerEvent & { currentTarget: EventTarget & SVGSVGElement };
 
   function onPointerDown(e: Event) {
     const el = e.target as HTMLElement;
-    // const bbox = el.getBoundingClientRect();
+    const bbox = el.getBoundingClientRect();
     el.setPointerCapture(e.pointerId);
-    // offset = { y: e.clientY - bbox.top, x: e.clientX - bbox.left };
+    offset = { y: e.clientY - bbox.top, x: e.clientX - bbox.left };
     grabPiece(index);
   }
 
@@ -46,23 +47,19 @@
     focusPiece(index);
   }
 
-  function onPointerMove() {
-    // function onPointerMove(e: Event) {
-    // const bbox = (e.target as HTMLElement).getBoundingClientRect();
-    // const [x, y] = [e.clientX - bbox.left, e.clientY - bbox.top];
-    // const [derivedX, derivedY] = [posX - (offset.x - x), posY - (offset.y - y)];
-    // const [toRank, toFile] = dimensions.clampCoords(derivedY, derivedX);
-    // if (grabbing) {
-    // movePiece(index, dimensions.coordsToPoint(toRank, toFile), [
-    //   toRank,
-    //   toFile,
-    // ]);
-    // }
+  function onPointerMove(e: Event) {
+    const bbox = (e.target as HTMLElement).getBoundingClientRect();
+    const [y, x] = [e.clientY - bbox.top, e.clientX - bbox.left];
+    const [derivedY, derivedX] = [posY - (offset.y - y), posX - (offset.x - x)];
+    const [toRank, toFile] = dimensions.clampCoords(derivedY, derivedX);
+    if (grabbing) {
+      movePiece(index, [toRank, toFile]);
+    }
   }
 
   function onPointerUp() {
-    // const [y, x] = dimensions.clampCoords(posY, posX);
-    // movePiece(index, [y, x]);
+    const [y, x] = dimensions.snapCoords(posY, posX);
+    movePiece(index, [y, x]);
     dropPiece(index);
   }
 </script>

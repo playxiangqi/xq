@@ -40,8 +40,6 @@ export type Character =
 export type Point = {
   side: Side;
   ch: Character;
-  rank: number;
-  file: number;
   position: [number, number];
   grabbing: boolean;
 };
@@ -87,8 +85,6 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
       ({
         side,
         ch,
-        rank,
-        file,
         position: dimensions.pointToCoords(rank, file),
         grabbing: false,
       } as Point)
