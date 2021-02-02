@@ -69,7 +69,7 @@ export default {
 
     // Copy assets to dist
     copy({
-      targets: [{ src: 'src/assets/sounds', dest: `${STATIC_ASSET_DIR}/` }],
+      targets: [{ src: 'assets/sounds', dest: `${STATIC_ASSET_DIR}/` }],
     }),
 
     // Minify production builds

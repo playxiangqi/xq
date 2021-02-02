@@ -41,6 +41,7 @@ export type Point = {
   side: Side;
   ch: Character;
   position: [number, number];
+  prevPosition: [number, number];
   grabbing: boolean;
 };
 
@@ -81,15 +82,16 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
     [RED, CHARIOT, 9, 8],
   ];
 
-  return layout.map(
-    ([side, ch, rank, file]) =>
-      ({
-        side,
-        ch,
-        position: dimensions.pointToCoords(rank, file),
-        grabbing: false,
-      } as Point)
-  );
+  return layout.map(([side, ch, rank, file]) => {
+    const position = dimensions.pointToCoords(rank, file);
+    return {
+      side,
+      ch,
+      position,
+      prevPosition: position,
+      grabbing: false,
+    } as Point;
+  });
 }
 
 // Glyph
