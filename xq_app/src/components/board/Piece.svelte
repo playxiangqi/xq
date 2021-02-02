@@ -2,7 +2,6 @@
   import { Dimensions } from './dimensions';
   import { getGlyph } from './pieces';
   import type { Character, Side } from './pieces';
-  import { debug } from 'svelte/internal';
 
   // Piece Props
   export let index: number;
