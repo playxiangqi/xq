@@ -1,5 +1,5 @@
 const ASPECT_RATIO = 1.1;
-const FRAME_RATIO = 0.96;
+const FRAME_RATIO = 0.975;
 const INNER_FRAME_RATIO = 0.85;
 
 export const [FILE_MAX, RANK_MAX] = [8, 9];

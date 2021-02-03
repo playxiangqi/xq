@@ -1,21 +1,19 @@
 <script lang="ts">
   import 'bulma/bulma.sass';
 
+  import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
   import Board from './components/board/Board.svelte';
-  import { createAuthStore } from './services/auth/store';
-
-  const { store: authStore, broadcast: sendAuthRequest } = createAuthStore();
+  import Navbar from './components/nav/Navbar.svelte';
 </script>
 
 <div class="app">
-  <div class="col-1" />
-  <div class="col-2">
-    <Board />
-  </div>
-  <div class="col-3">
-    <div class="card">
-      <div class="card-content">Joined lobby as: {$authStore.username}</div>
+  <Navbar />
+  <div class="content-container">
+    <div class="col-1" />
+    <div class="col-2">
+      <Board />
     </div>
+    <div class="col-3"><AnalysisPanel /></div>
   </div>
 </div>
 
@@ -42,8 +40,9 @@
   .app {
     height: 100%;
     width: 100%;
-
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    .content-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+    }
   }
 </style>
