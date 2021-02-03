@@ -22,10 +22,10 @@ export function createChannel(topic: string, onMessage: PhoenixEvent) {
   channel
     .join()
     .receive('ok', ({ messages }) => {
-      console.log(`successfully joined channel ${topic}, ${messages}`);
+      console.log(`successfully joined channel ${topic}`);
     })
     .receive('error', ({ reason }) => {
-      console.error(`failed to join channel ${topic}, ${reason}`);
+      console.error(`failed to join channel ${topic}: ${reason}`);
     });
 
   return (event: string, payload: Record<string, any>) =>

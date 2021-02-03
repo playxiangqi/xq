@@ -64,7 +64,7 @@ export class Dimensions {
     this.maxY = this.innerFrameOffsetY + this.rankEnd;
     this.maxX = this.innerFrameOffsetX + this.fileEnd;
 
-    this.pieceScale = 0.65 * scale;
+    this.pieceScale = 0.675 * scale;
     this.pieceSize = 100 * this.pieceScale;
     this.pieceBorderRadius = 50 * this.pieceScale;
     this.pieceOuterRadius = 48 * this.pieceScale;
