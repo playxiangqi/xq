@@ -1,4 +1,4 @@
-defmodule XiangqiServer.AuthChannel do
+defmodule XQWeb.AuthChannel do
   use Phoenix.Channel
 
   @impl true
