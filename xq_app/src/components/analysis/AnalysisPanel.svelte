@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { toHanzi } from 'components/board';
   import type { Dimensions, Move } from 'components/board';
   import { createAuthStore } from 'services/auth/store';
 
@@ -28,10 +29,8 @@
     const [prevY, prevX] = move.prevPosition;
     const [y, x] = move.position;
     const [rank, file] = dimensions.coordsToPoint(y, x);
-    const abbrev = move.ch[0].toUpperCase();
-    return `${index + 1}. ${abbrev !== 'S' ? abbrev : ''}${numberToLetter(
-      file
-    )}${10 - rank}`;
+    const abbrev = toHanzi[move.ch][move.side];
+    return `${index + 1}. ${abbrev}${numberToLetter(file)}${10 - rank}`;
   }
 </script>
 
