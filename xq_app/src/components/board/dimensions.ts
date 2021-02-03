@@ -38,8 +38,6 @@ export class Dimensions {
   pieceOffsetY: number;
   pieceOffsetX: number;
 
-  instance = this;
-
   constructor(public readonly scale: number = 1.0) {
     this.height = 800 * this.scale;
     this.width = this.height / ASPECT_RATIO;

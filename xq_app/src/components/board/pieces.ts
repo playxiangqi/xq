@@ -45,6 +45,8 @@ export type Point = {
   grabbing: boolean;
 };
 
+export type Move = Omit<Point, 'grabbing'>;
+
 // TODO: eventually load as parseFEN
 export function createInitialLayout(dimensions: Dimensions): Point[] {
   const layout: [Side, Character, number, number][] = [

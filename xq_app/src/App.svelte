@@ -1,9 +1,19 @@
 <script lang="ts">
   import 'bulma/bulma.sass';
 
+  // Components
   import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
   import Board from './components/board/Board.svelte';
   import Navbar from './components/nav/Navbar.svelte';
+
+  // Modules
+  // TODO: Move dimensions to utilities
+  // TODO: Turn boardState into matchState
+  import { createBoardState, Dimensions } from 'components/board';
+
+  const DEFAULT_SCALE = 1.0;
+  const dimensions = new Dimensions(DEFAULT_SCALE);
+  const { store, ...boardState } = createBoardState(dimensions);
 </script>
 
 <div class="app">
@@ -11,9 +21,9 @@
   <div class="content-container">
     <div class="col-1" />
     <div class="col-2">
-      <Board />
+      <Board {dimensions} boardState={{ store, ...boardState }} />
     </div>
-    <div class="col-3"><AnalysisPanel /></div>
+    <div class="col-3"><AnalysisPanel {dimensions} moves={$store.moves} /></div>
   </div>
 </div>
 
