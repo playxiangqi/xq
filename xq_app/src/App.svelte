@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+  import 'bulma/bulma.sass';
+
   import Board from './components/board/Board.svelte';
   import { createAuthStore } from './services/auth/store';
 
@@ -10,7 +12,11 @@
   <div class="col-2">
     <Board />
   </div>
-  <div class="col-3" />
+  <div class="col-3">
+    <div class="card">
+      <div class="card-content">Joined lobby as: {$authStore.username}</div>
+    </div>
+  </div>
 </div>
 
 <style lang="scss">
@@ -38,6 +44,6 @@
     width: 100%;
 
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 2fr 1fr;
   }
 </style>
