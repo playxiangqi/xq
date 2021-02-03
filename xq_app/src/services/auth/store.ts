@@ -1,10 +1,10 @@
 import { writable } from 'svelte/store';
-import { createChannel } from '../../utils/channels';
+import { createChannel } from '../../utils/channel';
 
 export function createAuthStore() {
   const store = writable({ username: '' });
 
-  const broadcast = createChannel(
+  const { broadcast, leaveChannel } = createChannel(
     'user:guest',
     (event: string, payload: any) => {
       if (event === 'phx_reply' && payload.status === 'ok') {

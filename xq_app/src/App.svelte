@@ -13,8 +13,9 @@
     <Board />
   </div>
   <div class="col-3">
-    <div class="card">
-      <div class="card-content">Joined lobby as: {$authStore.username}</div>
+    <div class="box lobby">
+      <p>Joined lobby as: {$authStore.username}</p>
+      <button class="button is-primary">Create Match</button>
     </div>
   </div>
 </div>
@@ -45,5 +46,9 @@
 
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
+
+    .col-3 {
+      justify-self: center;
+    }
   }
 </style>
