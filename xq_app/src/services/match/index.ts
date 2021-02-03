@@ -2,8 +2,7 @@ import { Push } from 'phoenix';
 import { writable } from 'svelte/store';
 import { createChannel, PhoenixEvent } from 'utils/channel';
 
-type MatchState = {};
-
+// TODO: create, find, (quit?), options - rated/unrated/time controls/variants
 export class MatchService {
   /**
    * createNewMatch
@@ -12,6 +11,8 @@ export class MatchService {
     return new Match('testMatchID');
   }
 }
+
+type MatchState = {};
 
 export class Match {
   private store: MatchState;
