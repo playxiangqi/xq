@@ -10,9 +10,7 @@
     "start": "cd xq_portal && mix phx.server",
     "setup": "cd xq_portal && mix setup",
     "deploy": "cd xq_app && rollup -c rollup.config.ts",
-    "watch": "cd xq_app && rollup -c rollup.config.ts -w",
-    "storybook": "cd xq_app && start-storybook -p 6006",
-    "build-storybook": "xq_app && build-storybook"
+    "watch": "cd xq_app && rollup -c rollup.config.ts -w"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -20,16 +18,12 @@
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.1.1",
     "@rollup/plugin-typescript": "^8.1.1",
-    "@storybook/addon-actions": "^6.1.15",
-    "@storybook/addon-essentials": "^6.1.15",
-    "@storybook/addon-links": "^6.1.15",
-    "@storybook/preset-typescript": "^3.0.0",
-    "@storybook/svelte": "^6.1.15",
     "@tsconfig/svelte": "^1.0.10",
     "@types/node": "^14.14.22",
     "@types/phoenix": "^1.5.1",
     "autoprefixer": "^10.2.4",
     "babel-loader": "^8.2.2",
+    "bulma": "^0.9.2",
     "eslint": "^7.18.0",
     "eslint-plugin-svelte3": "^3.0.0",
     "node-sass": "^5.0.0",
