@@ -1,18 +1,24 @@
 import { writable } from 'svelte/store';
 import { Dimensions } from './dimensions';
-import { createInitialLayout, Point } from './pieces';
+import { createInitialLayout, Move, Point, Side, RED, BLACK } from './pieces';
 
 export type BoardState = {
   layout: Point[];
+  moves: Move[];
+  turn: Side;
 };
 
 export function createBoardState(dimensions: Dimensions) {
   const layout = createInitialLayout(dimensions);
-  const store = writable<BoardState>({ layout });
+  const store = writable<BoardState>({ layout, moves: [], turn: RED });
+
+  const isValidMove = (movingSide: Side, turn: Side) => {
+    return movingSide === turn;
+  };
 
   return {
     store,
-    dropPiece: (index: number): boolean => {
+    dropPiece: (index: number, side: Side): boolean => {
       let movedFromPrev = false;
 
       store.update((state) => {
@@ -27,13 +33,20 @@ export function createBoardState(dimensions: Dimensions) {
             state.layout[index].prevPosition[1];
 
         // Confirm drop by updating prevPosition
-        // TODO: do the reverse of this assignment if not a valid move
-        state.layout[index].prevPosition = state.layout[index].position;
+        if (isValidMove(side, state.turn) && movedFromPrev) {
+          state.layout[index].prevPosition = state.layout[index].position;
+
+          const { side, ch, position, prevPosition } = state.layout[index];
+          state.moves = [...state.moves, { side, ch, position, prevPosition }];
+          state.turn = state.turn === RED ? BLACK : RED;
+        } else {
+          movedFromPrev = false;
+          state.layout[index].position = state.layout[index].prevPosition;
+        }
+        console.log(state.moves);
         return state;
       });
 
-      // TODO: to be AND'd with isValidMove and if invalid, for the position
-      //       to be updated BACK to previous
       return movedFromPrev;
     },
     focusPiece: (index: number) => {

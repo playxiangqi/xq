@@ -3,8 +3,10 @@
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { createBoardState } from './store';
 
+  export let dimensions: Dimensions;
+  export let boardState: ReturnType<typeof createBoardState>;
+
   // Dimensions
-  const DEFAULT_SCALE = 1.0;
   const {
     height,
     width,
@@ -18,16 +20,9 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
-    instance: dimensions,
-  } = new Dimensions(DEFAULT_SCALE);
+  } = dimensions;
 
-  const {
-    store,
-    dropPiece,
-    focusPiece,
-    grabPiece,
-    movePiece,
-  } = createBoardState(dimensions);
+  const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
 
   // Utils
   function generateLinePath(

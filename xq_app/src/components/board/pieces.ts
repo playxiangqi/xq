@@ -37,6 +37,16 @@ export type Character =
   | typeof CANNON
   | typeof SOLDIER;
 
+export const toHanzi: { [ch: string]: { [side: string]: string } } = {
+  chariot: { red: '俥', black: '車' },
+  cannon: { red: '炮', black: '砲' },
+  elephant: { red: '相', black: '象' },
+  general: { red: '帥', black: '將' },
+  guard: { red: '仕', black: '士' },
+  horse: { red: '傌', black: '馬' },
+  soldier: { red: '', black: '' },
+};
+
 export type Point = {
   side: Side;
   ch: Character;
@@ -44,6 +54,8 @@ export type Point = {
   prevPosition: [number, number];
   grabbing: boolean;
 };
+
+export type Move = Omit<Point, 'grabbing'>;
 
 // TODO: eventually load as parseFEN
 export function createInitialLayout(dimensions: Dimensions): Point[] {

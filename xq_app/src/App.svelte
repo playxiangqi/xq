@@ -1,20 +1,32 @@
 <script lang="ts">
   import 'bulma/bulma.sass';
 
+  // Components
+  import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
   import Board from './components/board/Board.svelte';
-  import { createAuthStore } from './services/auth/store';
+  import Navbar from './components/nav/Navbar.svelte';
 
-  const { store: authStore, broadcast: sendAuthRequest } = createAuthStore();
+  // Modules
+  // TODO: Move dimensions to utilities
+  // TODO: Turn boardState into matchState
+  import { createBoardState, Dimensions } from 'components/board';
+
+  const DEFAULT_SCALE = 1.0;
+  const dimensions = new Dimensions(DEFAULT_SCALE);
+  const boardState = createBoardState(dimensions);
+
+  const { store } = boardState;
 </script>
 
 <div class="app">
-  <div class="col-1" />
-  <div class="col-2">
-    <Board />
-  </div>
-  <div class="col-3">
-    <div class="card">
-      <div class="card-content">Joined lobby as: {$authStore.username}</div>
+  <Navbar />
+  <div class="content-container">
+    <div class="col-1" />
+    <div class="col-2">
+      <Board {dimensions} {boardState} />
+    </div>
+    <div class="col-3">
+      <AnalysisPanel {dimensions} moves={$store.moves} />
     </div>
   </div>
 </div>
@@ -42,8 +54,9 @@
   .app {
     height: 100%;
     width: 100%;
-
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    .content-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+    }
   }
 </style>
