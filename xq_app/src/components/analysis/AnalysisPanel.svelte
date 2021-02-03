@@ -9,6 +9,8 @@
   export let dimensions: Dimensions;
   export let moves: Move[];
 
+  $: moveEndIndex = moves.length;
+
   type Notation = 'algebraic';
 
   function numberToLetter(num: number) {
@@ -32,23 +34,41 @@
     const abbrev = toHanzi[move.ch][move.side];
     return `${index + 1}. ${abbrev}${numberToLetter(file)}${10 - rank}`;
   }
+
+  function skipToBeginning() {
+    // moveEndIndex = 0;
+  }
 </script>
 
 <div class="panel analysis-panel">
   <!-- <p>Joined lobby as: {$authStore.username}</p> -->
   <p class="panel-heading">Openings Database</p>
   <div class="panel-block opening-name">Elephant Opening</div>
-  {#each moves as move, i}
-    <div class="panel-block">
-      <div>
-        {generateMoveNotation(move, i)}
+  <div class="moves-container">
+    {#each moves.slice(0, moveEndIndex) as move, i}
+      <div class="panel-block move">
+        <span>
+          {generateMoveNotation(move, i)}
+        </span>
       </div>
-    </div>
-  {/each}
+    {/each}
+  </div>
+  <div class="panel-block move-buttons">
+    <button class="button" on:click={skipToBeginning}>{'⏮'}</button>
+    <button class="button">{'<'}</button>
+    <button class="button">{'>'}</button>
+    <button class="button">{'>>'}</button>
+  </div>
 </div>
 
 <style lang="scss">
   .analysis-panel {
-    margin-right: 15px;
+    margin-top: 15px;
+    margin-right: 50px;
+
+    .moves-container {
+      height: 600px;
+      overflow-y: scroll;
+    }
   }
 </style>

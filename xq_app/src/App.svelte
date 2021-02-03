@@ -13,7 +13,9 @@
 
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
-  const { store, ...boardState } = createBoardState(dimensions);
+  const boardState = createBoardState(dimensions);
+
+  const { store } = boardState;
 </script>
 
 <div class="app">
@@ -21,9 +23,11 @@
   <div class="content-container">
     <div class="col-1" />
     <div class="col-2">
-      <Board {dimensions} boardState={{ store, ...boardState }} />
+      <Board {dimensions} {boardState} />
     </div>
-    <div class="col-3"><AnalysisPanel {dimensions} moves={$store.moves} /></div>
+    <div class="col-3">
+      <AnalysisPanel {dimensions} moves={$store.moves} />
+    </div>
   </div>
 </div>
 

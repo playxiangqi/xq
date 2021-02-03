@@ -36,7 +36,7 @@
   }
 
   // Event Props
-  export let dropPiece: (index: number) => boolean;
+  export let dropPiece: (index: number, side: Side) => boolean;
   export let focusPiece: (index: number) => void;
   export let grabPiece: (index: number) => void;
   export let movePiece: (index: number, position: [number, number]) => void;
@@ -69,7 +69,7 @@
   function onPointerUp() {
     const [y, x] = dimensions.snapCoords(posY, posX);
     movePiece(index, [y, x]);
-    if (dropPiece(index)) {
+    if (dropPiece(index, side)) {
       playSound();
     }
   }
