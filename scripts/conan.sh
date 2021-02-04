@@ -2,11 +2,13 @@
 BUILD_DIR=${PROJECT_DIR}/cmake/build
 
 usage() {
-  echo "$0 usage: \n
+  echo "$0 usage: ./conan.sh -s -b -c -h
     -s setup conan remotes
     -b build and install dependencies via conan
     -c clean conan build info
-  "
+  " 1>&2
+
+  exit 1
 }
 
 while getopts "sbch" arg; do

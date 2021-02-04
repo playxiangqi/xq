@@ -5,8 +5,7 @@ CXX=g++-8
 # Environments
 #------------------------------------------------------------------------------
 BUILD_DIR=cmake/build
-
-SOURCE_ENV=CC=${CC} CXX=${CXX}
+SOURCE_ENV=PROJECT_DIR=${PWD} CC=${CC} CXX=${CXX}
 
 #------------------------------------------------------------------------------
 # Targets
@@ -26,4 +25,4 @@ docker:
 
 .PHONY: conan
 conan:
-	@${SOURCE_ENV} ./scripts/conan.sh
+	@${SOURCE_ENV} ./scripts/conan.sh -b
