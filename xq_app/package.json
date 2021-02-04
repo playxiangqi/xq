@@ -7,10 +7,8 @@
   "license": "AGPL-3.0",
   "private": false,
   "scripts": {
-    "start": "cd xq_portal && mix phx.server",
-    "setup": "cd xq_portal && mix setup",
-    "deploy": "cd xq_app && rollup -c rollup.config.ts",
-    "watch": "cd xq_app && rollup -c rollup.config.ts -w"
+    "deploy": "rollup -c rollup.config.ts",
+    "watch": "rollup -c rollup.config.ts -w"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
