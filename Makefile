@@ -33,4 +33,3 @@ gen:
 .PHONY: build
 build:
 	@${SOURCE_ENV} ./scripts/cmake.sh -b
-	@cd xq_portal && mix compile.cmake
