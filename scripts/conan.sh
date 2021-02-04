@@ -6,9 +6,7 @@ usage() {
     -s setup conan remotes
     -b build and install dependencies via conan
     -c clean conan build info
-  " 1>&2
-
-  exit 1
+  "
 }
 
 while getopts "sbch" arg; do
@@ -22,9 +20,13 @@ while getopts "sbch" arg; do
   c)
     rm -rf ${BUILD_DIR}/conanbuildinfo.cmake
     ;;
-  h | *)
+  h)
     usage
     exit 0
+    ;;
+  *)
+    usage
+    exit 1
     ;;
   esac
 done

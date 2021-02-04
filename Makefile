@@ -4,7 +4,6 @@ CXX=g++-8
 #------------------------------------------------------------------------------
 # Environments
 #------------------------------------------------------------------------------
-BUILD_DIR=cmake/build
 SOURCE_ENV=PROJECT_DIR=${PWD} CC=${CC} CXX=${CXX}
 
 #------------------------------------------------------------------------------
@@ -26,3 +25,12 @@ docker:
 .PHONY: conan
 conan:
 	@${SOURCE_ENV} ./scripts/conan.sh -b
+
+.PHONY: gen
+gen:
+	@${SOURCE_ENV} ./scripts/cmake.sh -g
+
+.PHONY: build
+build:
+	@${SOURCE_ENV} ./scripts/cmake.sh -b
+	@cd xq_portal && mix compile.cmake
