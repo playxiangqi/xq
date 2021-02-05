@@ -1,3 +1,5 @@
+"use strict";
+
 import cheerio from "cheerio";
 import fetch from "node-fetch";
 import fs, { promises } from "fs";
@@ -22,12 +24,22 @@ function extractOpenings(html) {
     if (code) {
       openings.push({
         code,
-        name: link.text(),
+        name: link.text().replace(/[^a-zA-Z ]/g, ""),
         link: link.attr("href"),
       });
     }
   });
   return openings;
+}
+
+async function* downloadGameData(openings) {
+  for (const { link } of openings) {
+    const response = await fetch(`${BASE_URL}/${link}`);
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    yield response.text();
+  }
 }
 
 function saveOpeningsData(data) {
@@ -37,6 +49,10 @@ function saveOpeningsData(data) {
 async function main() {
   const data = await loadOpeningsPage();
   const openings = extractOpenings(data);
+  const games = downloadGameData(openings);
+  for await (const page of downloadGameData(openings)) {
+    console.log(page);
+  }
   saveOpeningsData(openings);
 }
 
