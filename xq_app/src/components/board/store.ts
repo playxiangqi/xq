@@ -1,6 +1,14 @@
 import { writable } from 'svelte/store';
 import { Dimensions } from './dimensions';
-import { createInitialLayout, Move, Point, Side, RED, BLACK } from './pieces';
+import {
+  createInitialLayout,
+  Move,
+  Point,
+  Side,
+  RED,
+  BLACK,
+  Character,
+} from './pieces';
 
 export type BoardState = {
   layout: Point[];
@@ -24,6 +32,9 @@ export function createBoardState(dimensions: Dimensions) {
       store.update((state) => {
         state.layout[index].grabbing = false;
 
+        // BUG: movedFromPrev returning false when dropping pieces
+        // that don't actually move after call to slidePiece
+
         // TODO: helper type + function for tuples
         // Track if piece was moved
         movedFromPrev =
@@ -37,7 +48,14 @@ export function createBoardState(dimensions: Dimensions) {
           state.layout[index].prevPosition = state.layout[index].position;
 
           const { side, ch, position, prevPosition } = state.layout[index];
-          state.moves = [...state.moves, { side, ch, position, prevPosition }];
+          const [rank, file] = dimensions.coordsToPoint(
+            position[0],
+            position[1]
+          );
+          state.moves = [
+            ...state.moves,
+            { side, ch, rank, file, position, prevPosition },
+          ];
           state.turn = state.turn === RED ? BLACK : RED;
         } else {
           movedFromPrev = false;
@@ -68,6 +86,54 @@ export function createBoardState(dimensions: Dimensions) {
     movePiece: (index: number, position: [number, number]) => {
       store.update((state) => {
         state.layout[index].position = position;
+        return state;
+      });
+    },
+    slidePiece: (move: {
+      ch: Character;
+      side: Side;
+      file?: number;
+      newFile: number;
+      diffRank: number;
+      isFront: boolean;
+    }) => {
+      store.update((state) => {
+        // movePiece/dropPiece combined, but set by specific rank/file
+        // TODO: use flatmap of indices to index front/rear (default 0/front when only a single piece)
+        const pieces = state.layout
+          .filter((v) => v.ch === move.ch && v.side === move.side)
+          .filter((v) => (move.file != null ? v.file === move.file : true))
+          .sort((a, b) =>
+            move.side === RED ? a.rank - b.rank : b.rank - a.rank
+          );
+
+        let piece = move.isFront ? pieces[0] : pieces[1];
+
+        const index = state.layout.indexOf(piece);
+        const computedRank = piece.rank + move.diffRank;
+        const computedFile = move.newFile;
+
+        console.log('computedRank', computedRank);
+        console.log('computedFile', move.newFile);
+
+        const newPoint = [computedRank, computedFile];
+        console.log('newPoint:', newPoint);
+        state.layout[index].rank = newPoint[0];
+        state.layout[index].file = newPoint[1];
+        state.layout[index].prevPosition = state.layout[index].position;
+        const [newY, newX] = dimensions.pointToCoords(newPoint[0], newPoint[1]);
+        console.log('newPosition:', [newY, newX]);
+        state.layout[index].position = [newY, newX];
+
+        // Potential capture
+        state.layout = state.layout.filter(
+          (v) =>
+            !(
+              v.side !== move.side &&
+              v.file === computedFile &&
+              v.rank === computedRank
+            )
+        );
         return state;
       });
     },

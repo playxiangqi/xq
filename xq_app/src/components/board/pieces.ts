@@ -2,13 +2,13 @@ import { Dimensions } from './dimensions';
 import {
   TRAD_HORSE_RED,
   TRAD_CHARIOT_RED,
-  TRAD_GUARD_RED,
+  TRAD_ADVISOR_RED,
   TRAD_SOLDIER_RED,
   TRAD_CANNON_RED,
   TRAD_ELEPHANT_RED,
   TRAD_GENERAL_RED,
   TRAD_SOLDIER_BLACK,
-  TRAD_GUARD_BLACK,
+  TRAD_ADVISOR_BLACK,
   TRAD_CANNON_BLACK,
   TRAD_ELEPHANT_BLACK,
   TRAD_CHARIOT_BLACK,
@@ -24,7 +24,7 @@ export type Side = typeof RED | typeof BLACK;
 export const CHARIOT = 'chariot';
 export const HORSE = 'horse';
 export const ELEPHANT = 'elephant';
-export const GUARD = 'guard';
+export const ADVISOR = 'advisor';
 export const GENERAL = 'general';
 export const CANNON = 'cannon';
 export const SOLDIER = 'soldier';
@@ -32,17 +32,17 @@ export type Character =
   | typeof CHARIOT
   | typeof HORSE
   | typeof ELEPHANT
-  | typeof GUARD
+  | typeof ADVISOR
   | typeof GENERAL
   | typeof CANNON
   | typeof SOLDIER;
 
 export const toHanzi: { [ch: string]: { [side: string]: string } } = {
+  advisor: { red: '仕', black: '士' },
   chariot: { red: '俥', black: '車' },
   cannon: { red: '炮', black: '砲' },
   elephant: { red: '相', black: '象' },
   general: { red: '帥', black: '將' },
-  guard: { red: '仕', black: '士' },
   horse: { red: '傌', black: '馬' },
   soldier: { red: '', black: '' },
 };
@@ -50,6 +50,8 @@ export const toHanzi: { [ch: string]: { [side: string]: string } } = {
 export type Point = {
   side: Side;
   ch: Character;
+  rank: number;
+  file: number;
   position: [number, number];
   prevPosition: [number, number];
   grabbing: boolean;
@@ -63,9 +65,9 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
     [BLACK, CHARIOT, 0, 0],
     [BLACK, HORSE, 0, 1],
     [BLACK, ELEPHANT, 0, 2],
-    [BLACK, GUARD, 0, 3],
+    [BLACK, ADVISOR, 0, 3],
     [BLACK, GENERAL, 0, 4],
-    [BLACK, GUARD, 0, 5],
+    [BLACK, ADVISOR, 0, 5],
     [BLACK, ELEPHANT, 0, 6],
     [BLACK, HORSE, 0, 7],
     [BLACK, CHARIOT, 0, 8],
@@ -86,9 +88,9 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
     [RED, CHARIOT, 9, 0],
     [RED, HORSE, 9, 1],
     [RED, ELEPHANT, 9, 2],
-    [RED, GUARD, 9, 3],
+    [RED, ADVISOR, 9, 3],
     [RED, GENERAL, 9, 4],
-    [RED, GUARD, 9, 5],
+    [RED, ADVISOR, 9, 5],
     [RED, ELEPHANT, 9, 6],
     [RED, HORSE, 9, 7],
     [RED, CHARIOT, 9, 8],
@@ -100,6 +102,8 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
       side,
       ch,
       position,
+      rank,
+      file,
       prevPosition: position,
       grabbing: false,
     } as Point;
@@ -124,9 +128,9 @@ export function getGlyph(
     };
   } = {
     [TRADITIONAL]: {
-      [GUARD]: {
-        [RED]: TRAD_GUARD_RED,
-        [BLACK]: TRAD_GUARD_BLACK,
+      [ADVISOR]: {
+        [RED]: TRAD_ADVISOR_RED,
+        [BLACK]: TRAD_ADVISOR_BLACK,
       },
       [CHARIOT]: {
         [RED]: TRAD_CHARIOT_RED,
@@ -156,4 +160,125 @@ export function getGlyph(
   };
 
   return glyphs[style][ch][side] ?? '';
+}
+
+// TODO: classify this notation as "relative" and move towards
+// move notation - "relative" | "absolute"
+// piece notation - "typographic" | "calligraphic" | "pictographic"
+export function notationToMove(notation: string) {
+  const sideFacing = RED;
+
+  const calcAbsoluteFile = (relativeFile: number, side: Side) => {
+    const resolvedFile = side === sideFacing ? 10 - relativeFile : relativeFile;
+    return resolvedFile - 1;
+  };
+
+  const defaultMover = (
+    ch: Character,
+    side: Side,
+    range: [number, number] = [0, 0]
+  ) => (prev: number, next: number, rawSign: string) => {
+    const absoluteFile = calcAbsoluteFile(prev, side);
+    const absoluteNewFile = calcAbsoluteFile(next, side);
+    const sign = rawSign === '+' ? 1 : -1;
+    const absoluteSign = side === sideFacing ? -sign : sign;
+    let diffRank = absoluteSign * range[0];
+
+    // Vertical movement is only 1, not 2 in this instance
+    if (ch === HORSE && Math.abs(absoluteNewFile - absoluteFile) === 2) {
+      diffRank = absoluteSign * range[1];
+    }
+
+    console.log('file', absoluteFile);
+    console.log('newFile', absoluteNewFile);
+    console.log('diffRank', diffRank);
+
+    return {
+      ch,
+      side,
+      file: absoluteFile,
+      newFile: absoluteNewFile,
+      diffRank,
+    };
+  };
+
+  const axisMover = (
+    ch: Character,
+    side: Side,
+    range: [number, number] = [0, 0]
+  ) => (prev: number, delta: number, rawSign: string) => {
+    const absoluteFile = calcAbsoluteFile(prev, side);
+    const absoluteSign = side === sideFacing ? -1 : 1;
+    let absoluteNewFile = absoluteFile;
+    let diffRank = 0;
+
+    // Horizontal - delta is absolute when horizontal
+    if (rawSign === '=') {
+      absoluteNewFile = calcAbsoluteFile(delta, side);
+    } else if (rawSign === '+' || rawSign === '-') {
+      // Vertical
+      const sign = rawSign === '+' ? 1 : -1;
+      diffRank = delta * absoluteSign * sign;
+    }
+
+    console.log('file', absoluteFile);
+    console.log('newFile', absoluteNewFile);
+    console.log('diffRank', diffRank);
+    return {
+      ch,
+      side,
+      file: absoluteFile,
+      newFile: absoluteNewFile,
+      diffRank,
+    };
+  };
+
+  // 'A4+5'
+  const abbrevToMover: {
+    [ch: string]: (
+      prev: number,
+      next: number,
+      sign: string
+    ) => {
+      ch: Character;
+      side: Side;
+      file: number;
+      newFile: number;
+      diffRank: number;
+    };
+  } = {
+    A: defaultMover(ADVISOR, RED, [1, 1]),
+    P: axisMover(SOLDIER, RED, [1, 0]),
+    p: axisMover(SOLDIER, BLACK, [1, 0]),
+    C: axisMover(CANNON, RED),
+    c: axisMover(CANNON, BLACK),
+    B: defaultMover(ELEPHANT, RED, [2, 2]),
+    b: defaultMover(ELEPHANT, BLACK, [2, 2]),
+    N: defaultMover(HORSE, RED, [2, 1]), // TODO: can be 1 or 2 depending on file diff
+    n: defaultMover(HORSE, BLACK, [2, 1]),
+    R: axisMover(CHARIOT, RED),
+    r: axisMover(CHARIOT, BLACK),
+  };
+  const matches = /([a-z])([0-9])([+=-])([0-9])/gi.exec(notation);
+  if (matches) {
+    const ch = matches?.[1] ?? '';
+    const rawFile = Number(matches?.[2]) ?? 0;
+    const rawNewFile = Number(matches?.[4]) ?? 0;
+    const rawSign = matches?.[3] ?? '';
+    return {
+      ...abbrevToMover[ch](rawFile, rawNewFile, rawSign),
+      isFront: true,
+    };
+  } else {
+    const matches = /([+-])([a-z])([+=-])([0-9])/gi.exec(notation);
+    const ch = matches?.[2] ?? '';
+    const rawFile = 0;
+    const rawNewFile = Number(matches?.[4]);
+    const rawSign = matches?.[3] ?? '';
+    return {
+      ...abbrevToMover[ch](rawFile, rawNewFile, rawSign),
+      file: undefined,
+      isFront: matches?.[1] === '+',
+    };
+  }
 }

@@ -14,8 +14,6 @@
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
-
-  const { store } = boardState;
 </script>
 
 <div class="app">
@@ -26,7 +24,7 @@
       <Board {dimensions} {boardState} />
     </div>
     <div class="col-3">
-      <AnalysisPanel {dimensions} moves={$store.moves} />
+      <AnalysisPanel {dimensions} {boardState} />
     </div>
   </div>
 </div>
@@ -56,7 +54,7 @@
     width: 100%;
     .content-container {
       display: grid;
-      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-columns: 1fr 1.5fr 1fr;
     }
   }
 </style>
