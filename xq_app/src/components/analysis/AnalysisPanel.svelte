@@ -53,11 +53,11 @@
   }
 
   function skipToBeginning() {
-    currentTurnIndex = 0;
+    currentTurnIndex = -1;
   }
 
   function previousMove() {
-    currentTurnIndex = Math.max(0, currentTurnIndex - 1);
+    currentTurnIndex = Math.max(-1, currentTurnIndex - 1);
   }
 
   function nextMove() {
@@ -180,12 +180,12 @@
     <button
       class="button"
       on:click={skipToBeginning}
-      disabled={currentTurnIndex <= 0}>{'⏮'}</button
+      disabled={currentTurnIndex < 0}>{'⏮'}</button
     >
     <button
       class="button"
       on:click={previousMove}
-      disabled={currentTurnIndex <= 0}>{'◀️'}</button
+      disabled={currentTurnIndex < 0}>{'◀️'}</button
     >
     <button class="button" on:click={nextMove} disabled={currentTurnIndex >= 58}
       >{'▶️'}</button

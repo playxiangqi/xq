@@ -162,47 +162,115 @@ export function getGlyph(
   return glyphs[style][ch][side] ?? '';
 }
 
+// TODO: classify this notation as "relative" and move towards
+// move notation - "relative" | "absolute"
+// piece notation - "typographic" | "calligraphic" | "pictographic"
 export function notationToMove(notation: string) {
   const sideFacing = RED;
-
-  // 'A4+5'
-  const letterToPiece: {
-    [ch: string]: {
-      ch: Character;
-      side: Side;
-      range: (diffFile: number) => number;
-    };
-  } = {
-    A: { ch: ADVISOR, side: RED, range: () => 1 },
-    p: { ch: SOLDIER, side: BLACK, range: () => 1 },
-    // B: { ch: ELEPHANT, side: RED, range: 2 },
-    // b: { ch: ELEPHANT, side: BLACK, range: 2 },
-    // N: { ch: HORSE, side: RED, range: 2 }, // TODO: can be 1 or 2 depending on file diff
-    // n: { ch: HORSE, side: BLACK, range: 2 },
-  };
 
   const calcAbsoluteFile = (relativeFile: number, side: Side) => {
     const resolvedFile = side === sideFacing ? 10 - relativeFile : relativeFile;
     return resolvedFile - 1;
   };
 
+  const defaultMover = (
+    ch: Character,
+    side: Side,
+    range: [number, number] = [0, 0]
+  ) => (prev: number, next: number, rawSign: string) => {
+    const absoluteFile = calcAbsoluteFile(prev, side);
+    const absoluteNewFile = calcAbsoluteFile(next, side);
+    const sign = rawSign === '+' ? 1 : -1;
+    const absoluteSign = side === sideFacing ? -sign : sign;
+    let diffRank = absoluteSign * range[0];
+
+    // Vertical movement is only 1, not 2 in this instance
+    if (ch === HORSE && Math.abs(absoluteNewFile - absoluteFile) === 2) {
+      diffRank = absoluteSign * range[1];
+    }
+
+    console.log('file', absoluteFile);
+    console.log('newFile', absoluteNewFile);
+    console.log('diffRank', diffRank);
+
+    return {
+      ch,
+      side,
+      file: absoluteFile,
+      newFile: absoluteNewFile,
+      diffRank,
+    };
+  };
+
+  const axisMover = (
+    ch: Character,
+    side: Side,
+    range: [number, number] = [0, 0]
+  ) => (prev: number, delta: number, rawSign: string) => {
+    const absoluteFile = calcAbsoluteFile(prev, side);
+    const absoluteSign = side === sideFacing ? -1 : 1;
+    let absoluteNewFile = absoluteFile;
+    let diffRank = 0;
+
+    // Horizontal
+    if (rawSign === '=') {
+      // delta is actually an absolute when "=" and not a soldier
+      let potentialNewFile = calcAbsoluteFile(delta, side);
+      if (ch === SOLDIER) {
+        potentialNewFile = absoluteNewFile + delta;
+        if (potentialNewFile > 9) {
+          // exceeds max rank, then go in other direction
+          potentialNewFile = absoluteNewFile - delta;
+        }
+      }
+      absoluteNewFile = potentialNewFile;
+    } else if (rawSign === '+') {
+      // Vertical
+      diffRank = delta * absoluteSign;
+    }
+
+    console.log('file', absoluteFile);
+    console.log('newFile', absoluteNewFile);
+    console.log('diffRank', diffRank);
+    return {
+      ch,
+      side,
+      file: absoluteFile,
+      newFile: absoluteNewFile,
+      diffRank,
+    };
+  };
+
+  // 'A4+5'
+  const abbrevToMover: {
+    [ch: string]: (
+      prev: number,
+      next: number,
+      sign: string
+    ) => {
+      ch: Character;
+      side: Side;
+      file: number;
+      newFile: number;
+      diffRank: number;
+    };
+  } = {
+    A: defaultMover(ADVISOR, RED, [1, 1]),
+    P: axisMover(SOLDIER, RED, [1, 0]),
+    p: axisMover(SOLDIER, BLACK, [1, 0]),
+    C: axisMover(CANNON, RED),
+    c: axisMover(CANNON, BLACK),
+    B: defaultMover(ELEPHANT, RED, [2, 2]),
+    b: defaultMover(ELEPHANT, BLACK, [2, 2]),
+    N: defaultMover(HORSE, RED, [2, 1]), // TODO: can be 1 or 2 depending on file diff
+    n: defaultMover(HORSE, BLACK, [2, 1]),
+    R: axisMover(CHARIOT, RED),
+    r: axisMover(CHARIOT, BLACK),
+  };
   const matches = /([a-z])([0-9])([+=])([0-9])/gi.exec(notation);
   const ch = matches?.[1] ?? '';
-  const piece = letterToPiece[ch];
   const rawFile = Number(matches?.[2]) ?? 0;
-  const absoluteFile = calcAbsoluteFile(rawFile, piece.side);
   const rawNewFile = Number(matches?.[4]) ?? 0;
-  const absoluteNewFile = calcAbsoluteFile(rawNewFile, piece.side);
-  const rawSign = matches?.[3] === '+' ? 1 : -1;
-  const absoluteSign = piece.side === sideFacing ? -rawSign : rawSign;
-  const diffRank = absoluteSign * piece.range(absoluteNewFile - absoluteFile);
-  console.log('file', absoluteFile);
-  console.log('newFile', absoluteNewFile);
-  console.log('diffRank', diffRank);
-  return {
-    ...piece,
-    file: absoluteFile,
-    newFile: absoluteNewFile,
-    diffRank,
-  };
+  const rawSign = matches?.[3] ?? '';
+  return abbrevToMover[ch](rawFile, rawNewFile, rawSign);
 }
