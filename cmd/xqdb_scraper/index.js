@@ -50,19 +50,22 @@ function extractMoves(html) {
 
 function extractGameInfo(html) {
   const $ = cheerio.load(html);
-  const gameInfoRows = $("div#movetipsdiv tbody");
-  console.log(gameInfoRows);
+  const gameInfoRows = $("div#movetipsdiv tbody tr");
   let gameInfo = {};
   gameInfoRows.each((i, e) => {
     const cells = $(e).children("td");
+    if (cells.text().split(":").length > 4) {
+      return;
+    }
+
     const key = cells.eq(0).text();
     const value = cells.eq(1).text();
 
     if (key && value) {
-      gameInfo[key] = value;
+      const cleanKey = key.replace(":", "");
+      gameInfo[cleanKey] = value;
     }
   });
-
   return gameInfo;
 }
 
@@ -117,6 +120,7 @@ async function main() {
 
       const moves = extractMoves(html);
       const gameInfo = extractGameInfo(html);
+      console.log(gameInfo);
       const idMatches = gameLink.match(/[A-Z0-9]+/gi);
       const id = idMatches[idMatches.length - 1];
 
