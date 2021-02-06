@@ -64,6 +64,7 @@
     currentTurnIndex = Math.min(58, currentTurnIndex + 1);
     const move = notationToMove(historicalGame.moves[currentTurnIndex]);
     slidePiece(move);
+    playSound();
   }
 
   function skipToEnd() {
@@ -147,6 +148,15 @@
       'N3-5',
     ],
   };
+
+  // Sound Effects
+  const audio = new Audio('./sounds/drop-piece.wav');
+
+  function playSound() {
+    audio.currentTime = 0;
+    audio.loop = false;
+    audio.play();
+  }
 </script>
 
 <div class="panel analysis-panel">
