@@ -1,6 +1,14 @@
 import { writable } from 'svelte/store';
 import { Dimensions } from './dimensions';
-import { createInitialLayout, Move, Point, Side, RED, BLACK } from './pieces';
+import {
+  createInitialLayout,
+  Move,
+  Point,
+  Side,
+  RED,
+  BLACK,
+  Character,
+} from './pieces';
 
 export type BoardState = {
   layout: Point[];
@@ -37,7 +45,14 @@ export function createBoardState(dimensions: Dimensions) {
           state.layout[index].prevPosition = state.layout[index].position;
 
           const { side, ch, position, prevPosition } = state.layout[index];
-          state.moves = [...state.moves, { side, ch, position, prevPosition }];
+          const [rank, file] = dimensions.coordsToPoint(
+            position[0],
+            position[1]
+          );
+          state.moves = [
+            ...state.moves,
+            { side, ch, rank, file, position, prevPosition },
+          ];
           state.turn = state.turn === RED ? BLACK : RED;
         } else {
           movedFromPrev = false;
@@ -68,6 +83,35 @@ export function createBoardState(dimensions: Dimensions) {
     movePiece: (index: number, position: [number, number]) => {
       store.update((state) => {
         state.layout[index].position = position;
+        return state;
+      });
+    },
+    slidePiece: (move: {
+      ch: Character;
+      side: Side;
+      file: number;
+      newFile: number;
+      diffRank: number;
+    }) => {
+      store.update((state) => {
+        // movePiece/dropPiece combined, but set by specific rank/file
+        const index = state.layout.findIndex(
+          (v) =>
+            v.ch === move.ch && v.side === move.side && v.file === move.file
+        );
+        const computedRank = state.layout[index].rank + move.diffRank;
+        const computedFile = move.newFile;
+        console.log('computedRank', computedRank);
+        console.log('computedFile', move.newFile);
+
+        const newPoint = [computedRank, computedFile];
+        console.log('newPoint:', newPoint);
+        state.layout[index].rank = newPoint[0];
+        state.layout[index].file = newPoint[1];
+        state.layout[index].prevPosition = state.layout[index].position;
+        const [newY, newX] = dimensions.pointToCoords(newPoint[0], newPoint[1]);
+        console.log('newPosition:', [newY, newX]);
+        state.layout[index].position = [newY, newX];
         return state;
       });
     },

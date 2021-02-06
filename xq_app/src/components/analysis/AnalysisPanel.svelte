@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { toHanzi } from 'components/board';
+  import { createBoardState, notationToMove, toHanzi } from 'components/board';
   import type { Dimensions, Move } from 'components/board';
   import { createAuthStore } from 'services/auth/store';
 
@@ -7,11 +7,13 @@
   // TODO: moves history in boardstate
 
   export let dimensions: Dimensions;
-  export let moves: Move[];
+  export let boardState: ReturnType<typeof createBoardState>;
 
-  let currentMoveIndex = -1;
+  const { store, slidePiece } = boardState;
 
-  $: moveEndIndex = moves.length;
+  $: moveEndIndex = $store.moves.length;
+
+  let currentTurnIndex = -1;
 
   type Notation = 'algebraic';
 
@@ -40,7 +42,7 @@
   function generateMoveNotationClassical(moves: string[]) {
     let turnNum = 0;
     let moveStrs = [];
-    for (let i = 1; i < moves.length; i += 2) {
+    for (let i = 0; i < moves.length; i += 2) {
       moveStrs.push({
         moveNum: ++turnNum,
         moveRed: moves[i],
@@ -51,14 +53,22 @@
   }
 
   function skipToBeginning() {
-    // moveEndIndex = 0;
+    currentTurnIndex = 0;
   }
 
-  function previousMove() {}
+  function previousMove() {
+    currentTurnIndex = Math.max(0, currentTurnIndex - 1);
+  }
 
-  function nextMove() {}
+  function nextMove() {
+    currentTurnIndex = Math.min(58, currentTurnIndex + 1);
+    const move = notationToMove(historicalGame.moves[currentTurnIndex]);
+    slidePiece(move);
+  }
 
-  function skipToEnd() {}
+  function skipToEnd() {
+    currentTurnIndex = 58;
+  }
 
   // Hard-coded snippet, to be pulled from database with normalized key-values
   const historicalGame = {
@@ -76,7 +86,6 @@
     'Black Club': 'BeiJing',
     'Black player': 'Sun Bo',
     moves: [
-      'Original Position(59)',
       'A4+5',
       'p7+1',
       'C2=3',
@@ -142,7 +151,7 @@
 
 <div class="panel analysis-panel">
   <!-- <p>Joined lobby as: {$authStore.username}</p> -->
-  <p class="panel-heading">Explorer & Database</p>
+  <p class="panel-heading">Database Explorer</p>
   <div class="game-info">
     <div class="players">
       {historicalGame['Red player']} vs. {historicalGame['Black player']}
@@ -158,16 +167,34 @@
       <div class="panel-block move">
         <!-- {generateMoveNotation(move, i)} -->
         <span class="move-num">{moveNum}.</span>
-        <span class="move-red">{moveRed}</span>
-        <span class="move-black">{moveBlack}</span>
+        <span class="move-red" class:current={currentTurnIndex === i * 2}
+          >{moveRed}</span
+        >
+        <span class="move-black" class:current={currentTurnIndex === i * 2 + 1}
+          >{moveBlack}</span
+        >
       </div>
     {/each}
   </div>
   <div class="panel-block move-buttons">
-    <button class="button" on:click={skipToBeginning}>{'⏮'}</button>
-    <button class="button" on:click={previousMove}>{'◀️'}</button>
-    <button class="button" on:click={nextMove}>{'▶️'}</button>
-    <button class="button" on:click={skipToEnd}>{'⏭️'}</button>
+    <button
+      class="button"
+      on:click={skipToBeginning}
+      disabled={currentTurnIndex <= 0}>{'⏮'}</button
+    >
+    <button
+      class="button"
+      on:click={previousMove}
+      disabled={currentTurnIndex <= 0}>{'◀️'}</button
+    >
+    <button class="button" on:click={nextMove} disabled={currentTurnIndex >= 58}
+      >{'▶️'}</button
+    >
+    <button
+      class="button"
+      on:click={skipToEnd}
+      disabled={currentTurnIndex >= 58}>{'⏭️'}</button
+    >
   </div>
 </div>
 
@@ -193,6 +220,10 @@
       span.move-black {
         width: 60px;
         text-align: right;
+      }
+
+      span.current {
+        background-color: #ededed;
       }
     }
   }

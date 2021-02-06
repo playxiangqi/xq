@@ -1,14 +1,14 @@
-import { Dimensions } from './dimensions';
+import { Dimensions, FILE_MAX } from './dimensions';
 import {
   TRAD_HORSE_RED,
   TRAD_CHARIOT_RED,
-  TRAD_GUARD_RED,
+  TRAD_ADVISOR_RED,
   TRAD_SOLDIER_RED,
   TRAD_CANNON_RED,
   TRAD_ELEPHANT_RED,
   TRAD_GENERAL_RED,
   TRAD_SOLDIER_BLACK,
-  TRAD_GUARD_BLACK,
+  TRAD_ADVISOR_BLACK,
   TRAD_CANNON_BLACK,
   TRAD_ELEPHANT_BLACK,
   TRAD_CHARIOT_BLACK,
@@ -24,7 +24,7 @@ export type Side = typeof RED | typeof BLACK;
 export const CHARIOT = 'chariot';
 export const HORSE = 'horse';
 export const ELEPHANT = 'elephant';
-export const GUARD = 'guard';
+export const ADVISOR = 'guard';
 export const GENERAL = 'general';
 export const CANNON = 'cannon';
 export const SOLDIER = 'soldier';
@@ -32,7 +32,7 @@ export type Character =
   | typeof CHARIOT
   | typeof HORSE
   | typeof ELEPHANT
-  | typeof GUARD
+  | typeof ADVISOR
   | typeof GENERAL
   | typeof CANNON
   | typeof SOLDIER;
@@ -50,6 +50,8 @@ export const toHanzi: { [ch: string]: { [side: string]: string } } = {
 export type Point = {
   side: Side;
   ch: Character;
+  rank: number;
+  file: number;
   position: [number, number];
   prevPosition: [number, number];
   grabbing: boolean;
@@ -63,9 +65,9 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
     [BLACK, CHARIOT, 0, 0],
     [BLACK, HORSE, 0, 1],
     [BLACK, ELEPHANT, 0, 2],
-    [BLACK, GUARD, 0, 3],
+    [BLACK, ADVISOR, 0, 3],
     [BLACK, GENERAL, 0, 4],
-    [BLACK, GUARD, 0, 5],
+    [BLACK, ADVISOR, 0, 5],
     [BLACK, ELEPHANT, 0, 6],
     [BLACK, HORSE, 0, 7],
     [BLACK, CHARIOT, 0, 8],
@@ -86,9 +88,9 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
     [RED, CHARIOT, 9, 0],
     [RED, HORSE, 9, 1],
     [RED, ELEPHANT, 9, 2],
-    [RED, GUARD, 9, 3],
+    [RED, ADVISOR, 9, 3],
     [RED, GENERAL, 9, 4],
-    [RED, GUARD, 9, 5],
+    [RED, ADVISOR, 9, 5],
     [RED, ELEPHANT, 9, 6],
     [RED, HORSE, 9, 7],
     [RED, CHARIOT, 9, 8],
@@ -100,6 +102,8 @@ export function createInitialLayout(dimensions: Dimensions): Point[] {
       side,
       ch,
       position,
+      rank,
+      file,
       prevPosition: position,
       grabbing: false,
     } as Point;
@@ -124,9 +128,9 @@ export function getGlyph(
     };
   } = {
     [TRADITIONAL]: {
-      [GUARD]: {
-        [RED]: TRAD_GUARD_RED,
-        [BLACK]: TRAD_GUARD_BLACK,
+      [ADVISOR]: {
+        [RED]: TRAD_ADVISOR_RED,
+        [BLACK]: TRAD_ADVISOR_BLACK,
       },
       [CHARIOT]: {
         [RED]: TRAD_CHARIOT_RED,
@@ -156,4 +160,49 @@ export function getGlyph(
   };
 
   return glyphs[style][ch][side] ?? '';
+}
+
+export function notationToMove(notation: string) {
+  const sideFacing = RED;
+
+  // 'A4+5'
+  const letterToPiece: {
+    [ch: string]: {
+      ch: Character;
+      side: Side;
+      range: (diffFile: number) => number;
+    };
+  } = {
+    A: { ch: ADVISOR, side: RED, range: () => 1 },
+    p: { ch: SOLDIER, side: BLACK, range: () => 1 },
+    // B: { ch: ELEPHANT, side: RED, range: 2 },
+    // b: { ch: ELEPHANT, side: BLACK, range: 2 },
+    // N: { ch: HORSE, side: RED, range: 2 }, // TODO: can be 1 or 2 depending on file diff
+    // n: { ch: HORSE, side: BLACK, range: 2 },
+  };
+
+  const calcAbsoluteFile = (relativeFile: number, side: Side) => {
+    const resolvedFile = side === sideFacing ? 10 - relativeFile : relativeFile;
+    return resolvedFile - 1;
+  };
+
+  const matches = /([a-z])([0-9])([+=])([0-9])/gi.exec(notation);
+  const ch = matches?.[1] ?? '';
+  const piece = letterToPiece[ch];
+  const rawFile = Number(matches?.[2]) ?? 0;
+  const absoluteFile = calcAbsoluteFile(rawFile, piece.side);
+  const rawNewFile = Number(matches?.[4]) ?? 0;
+  const absoluteNewFile = calcAbsoluteFile(rawNewFile, piece.side);
+  const rawSign = matches?.[3] === '+' ? 1 : -1;
+  const absoluteSign = piece.side === sideFacing ? -rawSign : rawSign;
+  const diffRank = absoluteSign * piece.range(absoluteNewFile - absoluteFile);
+  console.log('file', absoluteFile);
+  console.log('newFile', absoluteNewFile);
+  console.log('diffRank', diffRank);
+  return {
+    ...piece,
+    file: absoluteFile,
+    newFile: absoluteNewFile,
+    diffRank,
+  };
 }
