@@ -11,12 +11,12 @@ usage() {
 while getopts "gbh" arg; do
   case $arg in
   g)
-    cd ${BUILD_DIR}
+    mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
     rm -rf CMakeFiles CMakeCache.txt
     cmake ${PROJECT_DIR} -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
     ;;
   b)
-    cd ${BUILD_DIR}
+    mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
     CMAKE_BINARY_DIR=${BUILD_DIR} cmake --build . --target xq_native
     ;;
   h)

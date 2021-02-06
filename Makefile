@@ -15,8 +15,7 @@ start:
 
 .PHONY: setup
 setup:
-	@cd xq_app && yarn
-	@cd xq_portal && mix setup
+	@./scripts/setup.bash
 
 .PHONY: docker
 docker:
@@ -32,4 +31,5 @@ gen:
 
 .PHONY: build
 build:
+	@cd xq_app && yarn
 	@${SOURCE_ENV} ./scripts/cmake.bash -b
