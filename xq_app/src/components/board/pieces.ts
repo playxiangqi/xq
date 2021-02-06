@@ -24,7 +24,7 @@ export type Side = typeof RED | typeof BLACK;
 export const CHARIOT = 'chariot';
 export const HORSE = 'horse';
 export const ELEPHANT = 'elephant';
-export const ADVISOR = 'guard';
+export const ADVISOR = 'advisor';
 export const GENERAL = 'general';
 export const CANNON = 'cannon';
 export const SOLDIER = 'soldier';
@@ -38,11 +38,11 @@ export type Character =
   | typeof SOLDIER;
 
 export const toHanzi: { [ch: string]: { [side: string]: string } } = {
+  advisor: { red: '仕', black: '士' },
   chariot: { red: '俥', black: '車' },
   cannon: { red: '炮', black: '砲' },
   elephant: { red: '相', black: '象' },
   general: { red: '帥', black: '將' },
-  guard: { red: '仕', black: '士' },
   horse: { red: '傌', black: '馬' },
   soldier: { red: '', black: '' },
 };
@@ -214,15 +214,6 @@ export function notationToMove(notation: string) {
 
     // Horizontal - delta is absolute when horizontal
     if (rawSign === '=') {
-      // // delta is actually an absolute when "=" and not a soldier
-      // let potentialNewFile = ;
-      // if (ch === SOLDIER) {
-      //   potentialNewFile = absoluteNewFile + delta;
-      //   if (potentialNewFile > 9) {
-      //     // exceeds max rank, then go in other direction
-      //     potentialNewFile = absoluteNewFile - delta;
-      //   }
-      // }
       absoluteNewFile = calcAbsoluteFile(delta, side);
     } else if (rawSign === '+' || rawSign === '-') {
       // Vertical
