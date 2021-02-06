@@ -1,4 +1,4 @@
-import { Dimensions, FILE_MAX } from './dimensions';
+import { Dimensions } from './dimensions';
 import {
   TRAD_HORSE_RED,
   TRAD_CHARIOT_RED,
@@ -212,21 +212,22 @@ export function notationToMove(notation: string) {
     let absoluteNewFile = absoluteFile;
     let diffRank = 0;
 
-    // Horizontal
+    // Horizontal - delta is absolute when horizontal
     if (rawSign === '=') {
-      // delta is actually an absolute when "=" and not a soldier
-      let potentialNewFile = calcAbsoluteFile(delta, side);
-      if (ch === SOLDIER) {
-        potentialNewFile = absoluteNewFile + delta;
-        if (potentialNewFile > 9) {
-          // exceeds max rank, then go in other direction
-          potentialNewFile = absoluteNewFile - delta;
-        }
-      }
-      absoluteNewFile = potentialNewFile;
-    } else if (rawSign === '+') {
+      // // delta is actually an absolute when "=" and not a soldier
+      // let potentialNewFile = ;
+      // if (ch === SOLDIER) {
+      //   potentialNewFile = absoluteNewFile + delta;
+      //   if (potentialNewFile > 9) {
+      //     // exceeds max rank, then go in other direction
+      //     potentialNewFile = absoluteNewFile - delta;
+      //   }
+      // }
+      absoluteNewFile = calcAbsoluteFile(delta, side);
+    } else if (rawSign === '+' || rawSign === '-') {
       // Vertical
-      diffRank = delta * absoluteSign;
+      const sign = rawSign === '+' ? 1 : -1;
+      diffRank = delta * absoluteSign * sign;
     }
 
     console.log('file', absoluteFile);
@@ -267,10 +268,26 @@ export function notationToMove(notation: string) {
     R: axisMover(CHARIOT, RED),
     r: axisMover(CHARIOT, BLACK),
   };
-  const matches = /([a-z])([0-9])([+=])([0-9])/gi.exec(notation);
-  const ch = matches?.[1] ?? '';
-  const rawFile = Number(matches?.[2]) ?? 0;
-  const rawNewFile = Number(matches?.[4]) ?? 0;
-  const rawSign = matches?.[3] ?? '';
-  return abbrevToMover[ch](rawFile, rawNewFile, rawSign);
+  const matches = /([a-z])([0-9])([+=-])([0-9])/gi.exec(notation);
+  if (matches) {
+    const ch = matches?.[1] ?? '';
+    const rawFile = Number(matches?.[2]) ?? 0;
+    const rawNewFile = Number(matches?.[4]) ?? 0;
+    const rawSign = matches?.[3] ?? '';
+    return {
+      ...abbrevToMover[ch](rawFile, rawNewFile, rawSign),
+      isFront: true,
+    };
+  } else {
+    const matches = /([+-])([a-z])([+=-])([0-9])/gi.exec(notation);
+    const ch = matches?.[2] ?? '';
+    const rawFile = 0;
+    const rawNewFile = Number(matches?.[4]);
+    const rawSign = matches?.[3] ?? '';
+    return {
+      ...abbrevToMover[ch](rawFile, rawNewFile, rawSign),
+      file: undefined,
+      isFront: matches?.[1] === '+',
+    };
+  }
 }

@@ -92,19 +92,25 @@ export function createBoardState(dimensions: Dimensions) {
     slidePiece: (move: {
       ch: Character;
       side: Side;
-      file: number;
+      file?: number;
       newFile: number;
       diffRank: number;
+      isFront: boolean;
     }) => {
       store.update((state) => {
         // movePiece/dropPiece combined, but set by specific rank/file
         // TODO: use flatmap of indices to index front/rear (default 0/front when only a single piece)
-        const index = state.layout.findIndex(
-          (v) =>
-            v.ch === move.ch && v.side === move.side && v.file === move.file
-        );
+        const pieces = state.layout
+          .filter((v) => v.ch === move.ch && v.side === move.side)
+          .filter((v) => (move.file != null ? v.file === move.file : true))
+          .sort((a, b) =>
+            move.side === RED ? a.rank - b.rank : b.rank - a.rank
+          );
 
-        const computedRank = state.layout[index].rank + move.diffRank;
+        let piece = move.isFront ? pieces[0] : pieces[1];
+
+        const index = state.layout.indexOf(piece);
+        const computedRank = piece.rank + move.diffRank;
         const computedFile = move.newFile;
 
         console.log('computedRank', computedRank);
