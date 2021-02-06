@@ -56,7 +56,7 @@
     width: 100%;
     .content-container {
       display: grid;
-      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-columns: 1fr 1.5fr 1fr;
     }
   }
 </style>
