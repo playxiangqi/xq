@@ -16,20 +16,20 @@ start:
 .PHONY: setup
 setup:
 	@cd xq_app && yarn
-	@cd xq_portal && mix phx.setup
+	@cd xq_portal && mix setup
 
 .PHONY: docker
 docker:
-	@./scripts/docker-compose.sh
+	@./scripts/docker-compose.bash
 
 .PHONY: conan
 conan:
-	@${SOURCE_ENV} ./scripts/conan.sh -b
+	@${SOURCE_ENV} ./scripts/conan.bash -b
 
 .PHONY: gen
 gen:
-	@${SOURCE_ENV} ./scripts/cmake.sh -g
+	@${SOURCE_ENV} ./scripts/cmake.bash -g
 
 .PHONY: build
 build:
-	@${SOURCE_ENV} ./scripts/cmake.sh -b
+	@${SOURCE_ENV} ./scripts/cmake.bash -b
