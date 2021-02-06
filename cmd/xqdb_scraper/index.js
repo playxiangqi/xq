@@ -34,8 +34,7 @@ function extractOpenings(html) {
 }
 
 // TODO: Add sample HTML data
-function extractMoves(html) {
-  const $ = cheerio.load(html);
+function extractMoves($) {
   const movesTable = $("table#movecontent tbody tr");
   let moves = [];
   movesTable.each((i, e) => {
@@ -48,8 +47,7 @@ function extractMoves(html) {
   return moves;
 }
 
-function extractGameInfo(html) {
-  const $ = cheerio.load(html);
+function extractGameInfo($) {
   const gameInfoRows = $("div#movetipsdiv tbody tr");
   let gameInfo = {};
   gameInfoRows.each((i, e) => {
@@ -68,6 +66,29 @@ function extractGameInfo(html) {
   });
   return gameInfo;
 }
+
+// function extractPlayerInfo($) {
+//   let playerInfo = [];
+//   const parent = $("div#DHJHtmlXQ").siblings().eq(1).find("tbody tr td table");
+//   console.log(parent.text());
+
+//   parent
+//     .last()
+//     .find("tbody tr")
+//     .eq(1)
+//     .children("td")
+//     .find("a")
+//     .each((i, e) => {
+//       const link = $(e).attr("href");
+//       const playerName = $(e).find("span").text();
+//       if (playerName && link && link.includes("pid")) {
+//         const playerID = link.match(/[0-9]+/g)[0];
+//         console.log(playerName, playerID);
+//         playerInfo.push({ [playerID]: playerName });
+//       }
+//     });
+//   return playerInfo;
+// }
 
 function extractLinks($) {
   let gameLinks = [];
@@ -94,7 +115,7 @@ async function* downloadGameData(openings) {
       const matches = pagination.text().match(/\d+/g);
       const numPages = matches[matches.length - 1];
 
-      for (const i = 2; i <= numPages; i++) {
+      for (let i = 2; i <= numPages; i++) {
         const response = await fetch(`${BASE_URL}/${link}&page=${i}`);
         const html = await response.text();
         const $ = cheerio.load(html);
@@ -118,15 +139,19 @@ async function main() {
       const html = await page.property("content");
       instance.exit();
 
-      const moves = extractMoves(html);
-      const gameInfo = extractGameInfo(html);
+      const $ = cheerio.load(html);
+      const moves = extractMoves($);
+      const gameInfo = extractGameInfo($);
       console.log(gameInfo);
+      // const playerInfo = extractPlayerInfo($);
+      // console.log(playerInfo);
       const idMatches = gameLink.match(/[A-Z0-9]+/gi);
       const id = idMatches[idMatches.length - 1];
 
       await fs.promises.writeFile(
         `./data/game-${id}.json`,
         JSON.stringify({ ...gameInfo, moves })
+        // JSON.stringify({ ...gameInfo, ...playerInfo, moves })
       );
     }
   }
