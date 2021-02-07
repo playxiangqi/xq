@@ -19,10 +19,11 @@ defmodule XQWeb.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", XQWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", XQWeb do
+    pipe_through :api
+
+    get "/analysis/game", AnalysisController, :analyze_game
+  end
 
   # Enables LiveDashboard only for development
   #

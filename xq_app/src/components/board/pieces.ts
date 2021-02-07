@@ -1,3 +1,4 @@
+import { apiClient } from 'services';
 import { Dimensions } from './dimensions';
 import {
   TRAD_HORSE_RED,
@@ -59,8 +60,17 @@ export type Point = {
 
 export type Move = Omit<Point, 'grabbing'>;
 
+export async function fetchBoardState() {
+  const { data } = await apiClient.get('/api/analysis/game');
+  if (data != null) {
+    console.log(data);
+  }
+}
+
 // TODO: eventually load as parseFEN
 export function createInitialLayout(dimensions: Dimensions): Point[] {
+  fetchBoardState();
+
   const layout: [Side, Character, number, number][] = [
     [BLACK, CHARIOT, 0, 0],
     [BLACK, HORSE, 0, 1],
