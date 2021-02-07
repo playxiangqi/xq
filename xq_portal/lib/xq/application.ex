@@ -13,10 +13,10 @@ defmodule XQ.Application do
       XQWeb.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: XQ.PubSub},
-      # Start the Endpoint (http/https)
-      XQWeb.Endpoint
-      # Start a worker by calling: XQ.Worker.start_link(arg)
-      # {XQ.Worker, arg}
+      # Start the Endpoint (HTTP/HTTPS)
+      XQWeb.Endpoint,
+      # Start the Finch HTTP Client pools
+      {Finch, name: XQ.Finch}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

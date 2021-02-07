@@ -1,5 +1,8 @@
 use Mix.Config
 
+config :xq,
+  archive_service: "http://localhost:6391/api"
+
 # Configure your database
 config :xq, XQ.Repo,
   username: "postgres",
