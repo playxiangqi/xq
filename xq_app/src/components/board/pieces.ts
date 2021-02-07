@@ -1,4 +1,3 @@
-import { apiClient } from 'services';
 import { Dimensions } from './dimensions';
 import {
   TRAD_HORSE_RED,
@@ -59,12 +58,6 @@ export type Point = {
 };
 
 export type Move = Omit<Point, 'grabbing'>;
-
-export async function fetchBoardState() {
-  const { data } = await apiClient.get('/api/analysis/game');
-  console.log(data);
-  return data;
-}
 
 // TODO: eventually load as parseFEN
 export function createInitialLayout(dimensions: Dimensions): Point[] {
@@ -291,3 +284,27 @@ export function notationToMove(notation: string) {
     };
   }
 }
+
+// type Notation = 'algebraic';
+
+// function numberToLetter(num: number) {
+//   let letters = '';
+//   while (num >= 0) {
+//     letters = 'abcdefghijklmnopqrstuvwxyz'[num % 26] + letters;
+//     num = Math.floor(num / 26) - 1;
+//   }
+//   return letters;
+// }
+
+// // TODO: move to piece utils
+// function generateMoveNotation(
+//   move: Move,
+//   index: number,
+//   notation = 'algebraic'
+// ) {
+//   const [prevY, prevX] = move.prevPosition;
+//   const [y, x] = move.position;
+//   const [rank, file] = dimensions.coordsToPoint(y, x);
+//   const abbrev = toHanzi[move.ch][move.side];
+//   return `${index + 1}. ${abbrev}${numberToLetter(file)}${10 - rank}`;
+// }
