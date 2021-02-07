@@ -24,7 +24,7 @@
       <Board {dimensions} {boardState} />
     </div>
     <div class="col-3">
-      <AnalysisPanel {dimensions} {boardState} />
+      <AnalysisPanel {boardState} />
     </div>
   </div>
 </div>

@@ -78,7 +78,7 @@
       {/each}
     </g>
     <g class="layout">
-      {#each $store.layout as { side, ch, grabbing, position }, index}
+      {#each $store.activeLayout as { side, ch, grabbing, position }, index}
         <Piece
           {index}
           {side}

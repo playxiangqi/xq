@@ -1,43 +1,12 @@
 <script lang="ts">
-  import {
-    createBoardState,
-    fetchBoardState,
-    notationToMove,
-    toHanzi,
-  } from 'components/board';
-  import type { Dimensions, Move } from 'components/board';
+  import { createBoardState, notationToMove } from 'components/board';
 
-  export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
 
-  const { store, slidePiece } = boardState;
+  const { store, loadGameAnalysis, slidePiece } = boardState;
 
-  let promise = fetchBoardState();
+  let promisedGameAnalysis = loadGameAnalysis();
   let currentTurnIndex = -1;
-
-  type Notation = 'algebraic';
-
-  function numberToLetter(num: number) {
-    let letters = '';
-    while (num >= 0) {
-      letters = 'abcdefghijklmnopqrstuvwxyz'[num % 26] + letters;
-      num = Math.floor(num / 26) - 1;
-    }
-    return letters;
-  }
-
-  // TODO: move to piece utils
-  function generateMoveNotation(
-    move: Move,
-    index: number,
-    notation = 'algebraic'
-  ) {
-    const [prevY, prevX] = move.prevPosition;
-    const [y, x] = move.position;
-    const [rank, file] = dimensions.coordsToPoint(y, x);
-    const abbrev = toHanzi[move.ch][move.side];
-    return `${index + 1}. ${abbrev}${numberToLetter(file)}${10 - rank}`;
-  }
 
   function generateMoveNotationClassical(moves: string[]) {
     let turnNum = 0;
@@ -62,9 +31,7 @@
 
   async function nextMove() {
     currentTurnIndex = Math.min(58, currentTurnIndex + 1);
-    const {
-      game: { moves },
-    } = await promise;
+    const { moves } = await promisedGameAnalysis;
 
     const move = notationToMove(moves[currentTurnIndex]);
     slidePiece(move);
@@ -88,10 +55,10 @@
 <div class="panel analysis-panel">
   <!-- <p>Joined lobby as: {$authStore.username}</p> -->
   <p class="panel-heading">Database Explorer</p>
-  {#await promise}
+  {#await promisedGameAnalysis}
     <div class="game-info loading">Loading Game...</div>
     <div class="moves-container loading" />
-  {:then { game }}
+  {:then game}
     <div class="game-info">
       <div class="players">
         {game.redPlayer} vs. {game.blackPlayer}
@@ -102,13 +69,11 @@
       <div class="date">
         {new Date(game.date).toDateString()}
       </div>
-      <div class="opening-name">{game.data.opening}</div>
+      <div class="opening-name">{game.openingCode}: {game.openingName}</div>
     </div>
     <div class="moves-container">
-      <!-- {#each moves.slice(0, moveEndIndex) as move, i} -->
       {#each generateMoveNotationClassical(game.moves) as { moveNum, moveRed, moveBlack }, i}
         <div class="panel-block move">
-          <!-- {generateMoveNotation(move, i)} -->
           <span class="move-num">{moveNum}.</span>
           <span class="move-red" class:current={currentTurnIndex === i * 2}
             >{moveRed}</span
@@ -153,6 +118,7 @@
     }
 
     .moves-container {
+      min-height: 550px;
       height: 550px;
       overflow-y: scroll;
 

@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import { apiClient } from 'services';
 import { Dimensions } from './dimensions';
 import {
   createInitialLayout,
@@ -10,15 +11,31 @@ import {
   Character,
 } from './pieces';
 
+type Layout = Point[];
+
 export type BoardState = {
-  layout: Point[];
+  activeLayout: Layout;
+  layouts: Layout[];
   moves: Move[];
   turn: Side;
 };
 
+async function fetchGameAnalysis() {
+  const { data } = await apiClient.get('/api/analysis/game');
+  console.log(data);
+  return data;
+}
+
 export function createBoardState(dimensions: Dimensions) {
-  const layout = createInitialLayout(dimensions);
-  const store = writable<BoardState>({ layout, moves: [], turn: RED });
+  const activeLayout = createInitialLayout(dimensions);
+
+  const store = writable<BoardState>({
+    activeLayout,
+    layouts: [],
+    moves: [],
+    turn: RED,
+  });
+  const { update } = store;
 
   const isValidMove = (movingSide: Side, turn: Side) => {
     return movingSide === turn;
@@ -26,11 +43,19 @@ export function createBoardState(dimensions: Dimensions) {
 
   return {
     store,
+    loadGameAnalysis: async () => {
+      const { boardStates, gameInfo } = await fetchGameAnalysis();
+      update((state) => {
+        state.layouts = boardStates;
+        return state;
+      });
+      return gameInfo;
+    },
     dropPiece: (index: number, side: Side): boolean => {
       let movedFromPrev = false;
 
-      store.update((state) => {
-        state.layout[index].grabbing = false;
+      update((state) => {
+        state.activeLayout[index].grabbing = false;
 
         // BUG: movedFromPrev returning false when dropping pieces
         // that don't actually move after call to slidePiece
@@ -38,16 +63,19 @@ export function createBoardState(dimensions: Dimensions) {
         // TODO: helper type + function for tuples
         // Track if piece was moved
         movedFromPrev =
-          state.layout[index].position[0] !==
-            state.layout[index].prevPosition[0] ||
-          state.layout[index].position[1] !==
-            state.layout[index].prevPosition[1];
+          state.activeLayout[index].position[0] !==
+            state.activeLayout[index].prevPosition[0] ||
+          state.activeLayout[index].position[1] !==
+            state.activeLayout[index].prevPosition[1];
 
         // Confirm drop by updating prevPosition
         if (isValidMove(side, state.turn) && movedFromPrev) {
-          state.layout[index].prevPosition = state.layout[index].position;
+          state.activeLayout[index].prevPosition =
+            state.activeLayout[index].position;
 
-          const { side, ch, position, prevPosition } = state.layout[index];
+          const { side, ch, position, prevPosition } = state.activeLayout[
+            index
+          ];
           const [rank, file] = dimensions.coordsToPoint(
             position[0],
             position[1]
@@ -59,7 +87,8 @@ export function createBoardState(dimensions: Dimensions) {
           state.turn = state.turn === RED ? BLACK : RED;
         } else {
           movedFromPrev = false;
-          state.layout[index].position = state.layout[index].prevPosition;
+          state.activeLayout[index].position =
+            state.activeLayout[index].prevPosition;
         }
         console.log(state.moves);
         return state;
@@ -68,24 +97,24 @@ export function createBoardState(dimensions: Dimensions) {
       return movedFromPrev;
     },
     focusPiece: (index: number) => {
-      store.update((state) => {
-        const lastIndex = state.layout.length - 1;
-        [state.layout[index], state.layout[lastIndex]] = [
-          state.layout[lastIndex],
-          state.layout[index],
+      update((state) => {
+        const lastIndex = state.activeLayout.length - 1;
+        [state.activeLayout[index], state.activeLayout[lastIndex]] = [
+          state.activeLayout[lastIndex],
+          state.activeLayout[index],
         ];
         return state;
       });
     },
     grabPiece: (index: number) => {
-      store.update((state) => {
-        state.layout[index].grabbing = true;
+      update((state) => {
+        state.activeLayout[index].grabbing = true;
         return state;
       });
     },
     movePiece: (index: number, position: [number, number]) => {
-      store.update((state) => {
-        state.layout[index].position = position;
+      update((state) => {
+        state.activeLayout[index].position = position;
         return state;
       });
     },
@@ -97,10 +126,10 @@ export function createBoardState(dimensions: Dimensions) {
       diffRank: number;
       isFront: boolean;
     }) => {
-      store.update((state) => {
+      update((state) => {
         // movePiece/dropPiece combined, but set by specific rank/file
         // TODO: use flatmap of indices to index front/rear (default 0/front when only a single piece)
-        const pieces = state.layout
+        const pieces = state.activeLayout
           .filter((v) => v.ch === move.ch && v.side === move.side)
           .filter((v) => (move.file != null ? v.file === move.file : true))
           .sort((a, b) =>
@@ -109,7 +138,7 @@ export function createBoardState(dimensions: Dimensions) {
 
         let piece = move.isFront ? pieces[0] : pieces[1];
 
-        const index = state.layout.indexOf(piece);
+        const index = state.activeLayout.indexOf(piece);
         const computedRank = piece.rank + move.diffRank;
         const computedFile = move.newFile;
 
@@ -118,15 +147,16 @@ export function createBoardState(dimensions: Dimensions) {
 
         const newPoint = [computedRank, computedFile];
         console.log('newPoint:', newPoint);
-        state.layout[index].rank = newPoint[0];
-        state.layout[index].file = newPoint[1];
-        state.layout[index].prevPosition = state.layout[index].position;
+        state.activeLayout[index].rank = newPoint[0];
+        state.activeLayout[index].file = newPoint[1];
+        state.activeLayout[index].prevPosition =
+          state.activeLayout[index].position;
         const [newY, newX] = dimensions.pointToCoords(newPoint[0], newPoint[1]);
         console.log('newPosition:', [newY, newX]);
-        state.layout[index].position = [newY, newX];
+        state.activeLayout[index].position = [newY, newX];
 
         // Potential capture
-        state.layout = state.layout.filter(
+        state.activeLayout = state.activeLayout.filter(
           (v) =>
             !(
               v.side !== move.side &&

@@ -7,8 +7,8 @@ defmodule XQWeb.AnalysisController do
            |> Finch.request(XQ.Finch),
          {:ok, content} <- Jason.decode(content) do
       json(conn, %{
-        game: List.first(content),
-        board_states: XQ.Board.State.get_starting_state()
+        game_info: List.first(content),
+        board_states: [XQ.Board.State.get_starting_state()]
       })
     else
       {:error, _} ->
