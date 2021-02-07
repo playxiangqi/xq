@@ -1,11 +1,12 @@
 import typescript from '@rollup/plugin-typescript';
 import svelte from 'rollup-plugin-svelte';
 import sveltePreprocess from 'svelte-preprocess';
-import resolve from '@rollup/plugin-node-resolve';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import postcss from 'rollup-plugin-postcss';
 import autoprefixer from 'autoprefixer';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import nodePollyfills from 'rollup-plugin-polyfill-node';
 import svelteSVG from 'rollup-plugin-svelte-svg';
 import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser';
@@ -48,8 +49,9 @@ export default {
     }),
 
     // Resolve node modules
-    resolve({
+    nodeResolve({
       browser: true,
+      preferBuiltins: false,
       dedupe: ['svelte'],
     }),
 
@@ -63,6 +65,9 @@ export default {
 
     // JSON resolution
     json(),
+
+    // Node.js builtins and browser globals
+    nodePollyfills(),
 
     // Allow importing svgs as ES modules
     svelteSVG(),
