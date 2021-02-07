@@ -62,14 +62,13 @@ export type Move = Omit<Point, 'grabbing'>;
 
 export async function fetchBoardState() {
   const { data } = await apiClient.get('/api/analysis/game');
-  if (data != null) {
-    console.log(data);
-  }
+  console.log(data);
+  return data;
 }
 
 // TODO: eventually load as parseFEN
 export function createInitialLayout(dimensions: Dimensions): Point[] {
-  fetchBoardState();
+  // fetchBoardState();
 
   const layout: [Side, Character, number, number][] = [
     [BLACK, CHARIOT, 0, 0],
