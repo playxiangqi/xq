@@ -70,7 +70,7 @@
   {:then game}
     <div class="game-info">
       <div class="players">
-        {game.redPlayer} vs. {game.blackPlayer}
+        {game.redPlayer} vs. {game.blackPlayer} — {game.result}
       </div>
       <div class="venue">
         {game.event}

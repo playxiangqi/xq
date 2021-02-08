@@ -218,11 +218,7 @@ defmodule XQ.Board.State do
       board_state
       |> Enum.with_index()
       |> get_matching_points(ch, side, file)
-      |> Enum.sort(fn {a, _}, {b, _} ->
-        if side == :red,
-          do: a.rank < b.rank,
-          else: a.rank > b.rank
-      end)
+      |> sort_front_rear_rank(side)
 
     {point, index} =
       if is_front == true,
@@ -238,11 +234,23 @@ defmodule XQ.Board.State do
     updated_board_state =
       board_state
       |> Enum.with_index()
-      |> Enum.filter(fn {_, i} -> i != index end)
+      |> remove_original_piece(index)
       |> Enum.map(fn {p, _} -> p end)
       |> maybe_capture_piece(new_point)
 
     [new_point | updated_board_state]
+  end
+
+  defp sort_front_rear_rank(board_state, side) do
+    Enum.sort(board_state, fn {a, _}, {b, _} ->
+      if side == :red,
+        do: a.rank < b.rank,
+        else: a.rank > b.rank
+    end)
+  end
+
+  defp remove_original_piece(board_state, orig_index) do
+    Enum.filter(board_state, fn {_, i} -> i != orig_index end)
   end
 
   defp maybe_capture_piece(board_state, point) do
