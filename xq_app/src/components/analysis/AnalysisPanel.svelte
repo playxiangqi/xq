@@ -3,10 +3,11 @@
 
   export let boardState: ReturnType<typeof createBoardState>;
 
-  const { loadGameAnalysis, transitionBoardState } = boardState;
+  const { store, loadGameAnalysis, transitionBoardState } = boardState;
 
   let promisedGameAnalysis = loadGameAnalysis();
-  let currentTurnIndex = -1;
+  let currentTurnIndex = -1; // use -1 as a sentinel
+  $: maxTurnIndex = $store.layouts.length - 1;
 
   function generateMoveNotationClassical(moves: string[]) {
     let turnNum = 0;
@@ -23,22 +24,31 @@
 
   function skipToBeginning() {
     currentTurnIndex = -1;
+    transitionBoardState(0);
+    // TODO: reset turn to red
   }
 
+  // TODO: in prevMove and nextMove, need to toggle turns as well
+  //       also need to support grab/drop piece actions that generate
+  //       separate moves/board state array that branches off from the
+  //       prepared game analysis board state
   function previousMove() {
     currentTurnIndex = Math.max(-1, currentTurnIndex - 1);
+    transitionBoardState(currentTurnIndex + 1);
+    playSound();
   }
 
   async function nextMove() {
-    currentTurnIndex = Math.min(58, currentTurnIndex + 1);
-    const { moves } = await promisedGameAnalysis;
+    currentTurnIndex = Math.min(maxTurnIndex, currentTurnIndex + 1);
+    console.log(maxTurnIndex);
 
     transitionBoardState(currentTurnIndex + 1);
     playSound();
   }
 
   function skipToEnd() {
-    currentTurnIndex = 58;
+    currentTurnIndex = maxTurnIndex;
+    transitionBoardState(currentTurnIndex);
   }
 
   // Sound Effects

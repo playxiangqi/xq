@@ -139,7 +139,7 @@ defmodule XQ.Board.State do
     delta =
       case ch do
         :elephant -> 2
-        :horse -> 1
+        :horse -> if next_file - file == 2, do: 1, else: 2
         _ -> 1
       end
 
