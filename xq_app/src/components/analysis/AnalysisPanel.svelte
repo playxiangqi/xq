@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { createBoardState, notationToMove } from 'components/board';
+  import { createBoardState } from 'components/board';
 
   export let boardState: ReturnType<typeof createBoardState>;
 
-  const { store, loadGameAnalysis, slidePiece } = boardState;
+  const { store, loadGameAnalysis, transitionBoardState } = boardState;
 
   let promisedGameAnalysis = loadGameAnalysis();
-  let currentTurnIndex = -1;
+  let currentTurnIndex = 0;
+  $: maxTurnIndex = $store.layouts.length - 1;
 
   function generateMoveNotationClassical(moves: string[]) {
     let turnNum = 0;
@@ -22,24 +23,32 @@
   }
 
   function skipToBeginning() {
-    currentTurnIndex = -1;
+    currentTurnIndex = 0;
+    transitionBoardState(0);
+    // TODO: reset turn to red
   }
 
+  // TODO: in prevMove and nextMove, need to toggle turns as well
+  //       also need to support grab/drop piece actions that generate
+  //       separate moves/board state array that branches off from the
+  //       prepared game analysis board state
   function previousMove() {
-    currentTurnIndex = Math.max(-1, currentTurnIndex - 1);
+    currentTurnIndex = Math.max(0, currentTurnIndex - 1);
+    transitionBoardState(currentTurnIndex);
+    playSound();
   }
 
   async function nextMove() {
-    currentTurnIndex = Math.min(58, currentTurnIndex + 1);
-    const { moves } = await promisedGameAnalysis;
+    currentTurnIndex = Math.min(maxTurnIndex, currentTurnIndex + 1);
+    console.log(currentTurnIndex);
 
-    const move = notationToMove(moves[currentTurnIndex]);
-    slidePiece(move);
+    transitionBoardState(currentTurnIndex);
     playSound();
   }
 
   function skipToEnd() {
-    currentTurnIndex = 58;
+    currentTurnIndex = maxTurnIndex;
+    transitionBoardState(currentTurnIndex);
   }
 
   // Sound Effects
@@ -61,7 +70,7 @@
   {:then game}
     <div class="game-info">
       <div class="players">
-        {game.redPlayer} vs. {game.blackPlayer}
+        {game.redPlayer} vs. {game.blackPlayer} — {game.result}
       </div>
       <div class="venue">
         {game.event}
@@ -75,12 +84,12 @@
       {#each generateMoveNotationClassical(game.moves) as { moveNum, moveRed, moveBlack }, i}
         <div class="panel-block move">
           <span class="move-num">{moveNum}.</span>
-          <span class="move-red" class:current={currentTurnIndex === i * 2}
+          <span class="move-red" class:current={currentTurnIndex - 1 === i * 2}
             >{moveRed}</span
           >
           <span
             class="move-black"
-            class:current={currentTurnIndex === i * 2 + 1}>{moveBlack}</span
+            class:current={currentTurnIndex - 1 === i * 2 + 1}>{moveBlack}</span
           >
         </div>
       {/each}
@@ -97,13 +106,15 @@
       on:click={previousMove}
       disabled={currentTurnIndex < 0}>{'◀️'}</button
     >
-    <button class="button" on:click={nextMove} disabled={currentTurnIndex >= 58}
-      >{'▶️'}</button
+    <button
+      class="button"
+      on:click={nextMove}
+      disabled={currentTurnIndex >= maxTurnIndex}>{'▶️'}</button
     >
     <button
       class="button"
       on:click={skipToEnd}
-      disabled={currentTurnIndex >= 58}>{'⏭️'}</button
+      disabled={currentTurnIndex >= maxTurnIndex}>{'⏭️'}</button
     >
   </div>
 </div>

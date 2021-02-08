@@ -5,10 +5,12 @@ defmodule XQWeb.AnalysisController do
     with {:ok, %{body: content, status: 200}} <-
            Finch.build(:get, archive_service() <> "/game")
            |> Finch.request(XQ.Finch),
-         {:ok, content} <- Jason.decode(content) do
+         {:ok, content} <- Jason.decode(content),
+         game_info <- List.first(content) do
+      # TODO: realistically, this would be GET /analysis/game + specific ID
       json(conn, %{
-        game_info: List.first(content),
-        board_states: [XQ.Board.State.get_starting_state()]
+        game_info: game_info,
+        board_states: XQ.Board.State.generate(Map.get(game_info, "moves"))
       })
     else
       {:error, _} ->

@@ -13,6 +13,7 @@ import {
 
 type Layout = Point[];
 
+// TODO: AnalysisState which contains/extends a BoardState
 export type BoardState = {
   activeLayout: Layout;
   layouts: Layout[];
@@ -20,7 +21,10 @@ export type BoardState = {
   turn: Side;
 };
 
-async function fetchGameAnalysis() {
+async function fetchGameAnalysis(): Promise<{
+  boardStates: Layout[];
+  gameInfo: any;
+}> {
   const { data } = await apiClient.get('/api/analysis/game');
   console.log(data);
   return data;
@@ -31,7 +35,7 @@ export function createBoardState(dimensions: Dimensions) {
 
   const store = writable<BoardState>({
     activeLayout,
-    layouts: [],
+    layouts: [activeLayout],
     moves: [],
     turn: RED,
   });
@@ -46,11 +50,29 @@ export function createBoardState(dimensions: Dimensions) {
     loadGameAnalysis: async () => {
       const { boardStates, gameInfo } = await fetchGameAnalysis();
       update((state) => {
-        state.layouts = boardStates;
+        state.layouts = boardStates.map((layout) =>
+          layout.map(({ ch, side, rank, file }) => {
+            const position = dimensions.pointToCoords(rank, file);
+            return {
+              side,
+              ch,
+              position,
+              rank,
+              file,
+              prevPosition: position,
+              grabbing: false,
+            } as Point;
+          })
+        );
         return state;
       });
       return gameInfo;
     },
+    transitionBoardState: (turnIndex: number) =>
+      update((state) => {
+        state.activeLayout = state.layouts[turnIndex];
+        return state;
+      }),
     dropPiece: (index: number, side: Side): boolean => {
       let movedFromPrev = false;
 
@@ -115,55 +137,6 @@ export function createBoardState(dimensions: Dimensions) {
     movePiece: (index: number, position: [number, number]) => {
       update((state) => {
         state.activeLayout[index].position = position;
-        return state;
-      });
-    },
-    slidePiece: (move: {
-      ch: Character;
-      side: Side;
-      file?: number;
-      newFile: number;
-      diffRank: number;
-      isFront: boolean;
-    }) => {
-      update((state) => {
-        // movePiece/dropPiece combined, but set by specific rank/file
-        // TODO: use flatmap of indices to index front/rear (default 0/front when only a single piece)
-        const pieces = state.activeLayout
-          .filter((v) => v.ch === move.ch && v.side === move.side)
-          .filter((v) => (move.file != null ? v.file === move.file : true))
-          .sort((a, b) =>
-            move.side === RED ? a.rank - b.rank : b.rank - a.rank
-          );
-
-        let piece = move.isFront ? pieces[0] : pieces[1];
-
-        const index = state.activeLayout.indexOf(piece);
-        const computedRank = piece.rank + move.diffRank;
-        const computedFile = move.newFile;
-
-        console.log('computedRank', computedRank);
-        console.log('computedFile', move.newFile);
-
-        const newPoint = [computedRank, computedFile];
-        console.log('newPoint:', newPoint);
-        state.activeLayout[index].rank = newPoint[0];
-        state.activeLayout[index].file = newPoint[1];
-        state.activeLayout[index].prevPosition =
-          state.activeLayout[index].position;
-        const [newY, newX] = dimensions.pointToCoords(newPoint[0], newPoint[1]);
-        console.log('newPosition:', [newY, newX]);
-        state.activeLayout[index].position = [newY, newX];
-
-        // Potential capture
-        state.activeLayout = state.activeLayout.filter(
-          (v) =>
-            !(
-              v.side !== move.side &&
-              v.file === computedFile &&
-              v.rank === computedRank
-            )
-        );
         return state;
       });
     },
