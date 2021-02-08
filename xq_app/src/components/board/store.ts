@@ -142,54 +142,5 @@ export function createBoardState(dimensions: Dimensions) {
         return state;
       });
     },
-    slidePiece: (move: {
-      ch: Character;
-      side: Side;
-      file?: number;
-      newFile: number;
-      diffRank: number;
-      isFront: boolean;
-    }) => {
-      update((state) => {
-        // movePiece/dropPiece combined, but set by specific rank/file
-        // TODO: use flatmap of indices to index front/rear (default 0/front when only a single piece)
-        const pieces = state.activeLayout
-          .filter((v) => v.ch === move.ch && v.side === move.side)
-          .filter((v) => (move.file != null ? v.file === move.file : true))
-          .sort((a, b) =>
-            move.side === RED ? a.rank - b.rank : b.rank - a.rank
-          );
-
-        let piece = move.isFront ? pieces[0] : pieces[1];
-
-        const index = state.activeLayout.indexOf(piece);
-        const computedRank = piece.rank + move.diffRank;
-        const computedFile = move.newFile;
-
-        console.log('computedRank', computedRank);
-        console.log('computedFile', move.newFile);
-
-        const newPoint = [computedRank, computedFile];
-        console.log('newPoint:', newPoint);
-        state.activeLayout[index].rank = newPoint[0];
-        state.activeLayout[index].file = newPoint[1];
-        state.activeLayout[index].prevPosition =
-          state.activeLayout[index].position;
-        const [newY, newX] = dimensions.pointToCoords(newPoint[0], newPoint[1]);
-        console.log('newPosition:', [newY, newX]);
-        state.activeLayout[index].position = [newY, newX];
-
-        // Potential capture
-        state.activeLayout = state.activeLayout.filter(
-          (v) =>
-            !(
-              v.side !== move.side &&
-              v.file === computedFile &&
-              v.rank === computedRank
-            )
-        );
-        return state;
-      });
-    },
   };
 }

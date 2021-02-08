@@ -106,13 +106,15 @@
       on:click={previousMove}
       disabled={currentTurnIndex < 0}>{'◀️'}</button
     >
-    <button class="button" on:click={nextMove} disabled={currentTurnIndex >= 58}
-      >{'▶️'}</button
+    <button
+      class="button"
+      on:click={nextMove}
+      disabled={currentTurnIndex >= maxTurnIndex}>{'▶️'}</button
     >
     <button
       class="button"
       on:click={skipToEnd}
-      disabled={currentTurnIndex >= 58}>{'⏭️'}</button
+      disabled={currentTurnIndex >= maxTurnIndex}>{'⏭️'}</button
     >
   </div>
 </div>

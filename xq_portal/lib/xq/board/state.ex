@@ -70,41 +70,57 @@ defmodule XQ.Board.State do
         nil ->
           nil
 
-        # case Regex.run(front_or_rear_move, next_move) do
-        #   matches when is_list(matches) ->
-        #     piece_mover(matches)
+          case Regex.run(front_or_rear_move, next_move) do
+            matches when is_list(matches) ->
+              piece_mover(matches)
 
-        #   nil ->
-        #     raise RuntimeError, message: "invalid move notation"
-        # end
+            nil ->
+              raise RuntimeError, message: "invalid move notation"
+          end
 
         matches ->
           piece_mover(matches)
       end
 
-    case resolved_point do
-      nil ->
-        prev_board_states
+    next_board_state =
+      prev_board_states
+      |> List.first()
+      |> update_point(resolved_point)
 
-      p ->
-        next_board_state =
-          prev_board_states
-          |> List.first()
-          |> update_point(p)
-
-        [next_board_state | prev_board_states]
-    end
+    [next_board_state | prev_board_states]
   end
 
-  # Pieces that move vertically or horizontally along axes
-  defp piece_mover([_match, abbrev, prev_file, dir, abs_or_delta_file])
+  defp piece_mover([_match, abbrev, prev_file, dir, movement])
        when abbrev in ["P", "p", "C", "c", "R", "r"] do
+    axis_mover(abbrev, prev_file, dir, movement)
+  end
+
+  defp piece_mover([_match, abbrev, prev_file, dir, next_file])
+       when abbrev in ["B", "b", "N", "n", "A", "a", "K", "k"] do
+    fixed_mover(abbrev, prev_file, dir, next_file)
+  end
+
+  # Pieces that lie on the same file
+  defp piece_mover([_match, front_or_rear, abbrev, dir, movement])
+       when front_or_rear in ["+", "-"] and
+              abbrev in ["P", "p", "C", "c", "R", "r"] do
+    axis_mover(abbrev, "-1", dir, movement, front_or_rear == "+")
+  end
+
+  defp piece_mover([_match, front_or_rear, abbrev, dir, next_file])
+       when front_or_rear in ["+", "-"] and
+              abbrev in ["B", "b", "N", "n", "A", "a", "K", "k"] do
+    fixed_mover(abbrev, "-1", dir, next_file, front_or_rear == "+")
+  end
+
+  # Pieces that move vertically or horizontally
+  defp axis_mover(abbrev, prev_file, dir, movement, is_front \\ true) do
     {
       ch,
       side,
       prev_file,
-      abs_or_delta_file
-    } = parse_params(abbrev, prev_file, abs_or_delta_file)
+      abs_file_or_delta_rank
+    } = parse_params(abbrev, prev_file, movement)
 
     file = calc_file(prev_file, side)
     sign = if side == @side_facing, do: -1, else: 1
@@ -113,23 +129,30 @@ defmodule XQ.Board.State do
       case dir do
         # Horizontal movement w/ absolute file
         "=" ->
-          {calc_file(abs_or_delta_file, side), 0}
+          {calc_file(abs_file_or_delta_rank, side), 0}
 
-        # Vertical movement w/ delta file
+        # Vertical movement w/ delta rank
         "-" ->
-          {prev_file, abs_or_delta_file * -1}
+          {file, abs_file_or_delta_rank * -1}
 
         "+" ->
-          {prev_file, abs_or_delta_file}
+          {file, abs_file_or_delta_rank}
       end
 
-    {ch, side, file, next_file, diff_rank * sign, true}
+    {ch, side, file, next_file, diff_rank * sign, is_front}
   end
 
   # Pieces that move both vertically and horizontally
-  defp piece_mover([_match, abbrev, prev_file, dir, next_file])
-       when abbrev in ["B", "b", "N", "n", "A", "a", "K", "k"] do
+  defp fixed_mover(abbrev, prev_file, dir, next_file, is_front \\ true) do
     {ch, side, prev_file, next_file} = parse_params(abbrev, prev_file, next_file)
+
+    cond do
+      prev_file == -1 or prev_file == 11 ->
+        Logger.info("front or rear move")
+
+      true ->
+        nil
+    end
 
     file = calc_file(prev_file, side)
     next_file = calc_file(next_file, side)
@@ -149,7 +172,7 @@ defmodule XQ.Board.State do
         "-" -> -sign
       end
 
-    {ch, side, file, next_file, diff_rank * delta, true}
+    {ch, side, file, next_file, diff_rank * delta, is_front}
   end
 
   defp parse_params(abbrev, prev, next) do
@@ -180,7 +203,7 @@ defmodule XQ.Board.State do
   defp get_matching_points(board_state, ch, side, file) do
     board_state
     |> Enum.filter(fn {p, _} -> p.ch == ch and p.side == side end)
-    |> Enum.filter(fn {p, _} -> p.file == file end)
+    |> Enum.filter(fn {p, _} -> p.file == file or file == -1 or file == 11 end)
   end
 
   defp update_point(board_state, {
@@ -195,22 +218,13 @@ defmodule XQ.Board.State do
       board_state
       |> Enum.with_index()
       |> get_matching_points(ch, side, file)
+      |> Enum.sort(fn {a, _}, {b, _} ->
+        if side == :red,
+          do: a.rank < b.rank,
+          else: a.rank > b.rank
+      end)
 
     Logger.info("points_to_move: #{inspect(points_to_move)}")
-
-    # |> Enum.sort(fn {a, _}, {b, _} ->
-    #   case side do
-    #     :red -> a.rank < b.rank
-    #     _ -> b.rank > a.rank
-    #   end
-    # end)
-
-    # |> Enum.filter(fn {p, _} ->
-    #   case file do
-    #     f -> p[:file] == file
-    #     nil -> true
-    #   end
-    # end)
 
     case points_to_move do
       [] ->
@@ -223,6 +237,7 @@ defmodule XQ.Board.State do
             else: List.last(points)
 
         Logger.info("exact_point: #{inspect(point)}, index: #{index}")
+        Logger.info("new_rank: #{point.rank + diff_rank}, new_file: #{next_file}")
 
         new_point = Map.merge(point, %{rank: point.rank + diff_rank, file: next_file})
 
@@ -233,10 +248,16 @@ defmodule XQ.Board.State do
           |> Enum.with_index()
           |> Enum.filter(fn {_, i} -> i != index end)
           |> Enum.map(fn {p, _} -> p end)
-
-        Logger.info("updated_board_state: #{inspect(updated_board_state)}")
+          |> maybe_capture_piece(new_point)
 
         [new_point | updated_board_state]
     end
+  end
+
+  defp maybe_capture_piece(board_state, point) do
+    Enum.filter(
+      board_state,
+      fn p -> p.file != point.file or p.rank != point.rank end
+    )
   end
 end
