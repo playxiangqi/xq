@@ -13,6 +13,7 @@ import {
 
 type Layout = Point[];
 
+// TODO: AnalysisState which contains/extends a BoardState
 export type BoardState = {
   activeLayout: Layout;
   layouts: Layout[];
@@ -31,7 +32,7 @@ export function createBoardState(dimensions: Dimensions) {
 
   const store = writable<BoardState>({
     activeLayout,
-    layouts: [],
+    layouts: [activeLayout],
     moves: [],
     turn: RED,
   });
@@ -51,6 +52,11 @@ export function createBoardState(dimensions: Dimensions) {
       });
       return gameInfo;
     },
+    transitionBoardState: (turnIndex: number) =>
+      update((state) => {
+        state.activeLayout = state.layouts[turnIndex];
+        return state;
+      }),
     dropPiece: (index: number, side: Side): boolean => {
       let movedFromPrev = false;
 

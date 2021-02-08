@@ -34,7 +34,7 @@
     const { moves } = await promisedGameAnalysis;
 
     const move = notationToMove(moves[currentTurnIndex]);
-    slidePiece(move);
+    // slidePiece(move);
     playSound();
   }
 
