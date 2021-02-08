@@ -72,14 +72,14 @@ defmodule XQ.Board.State do
 
         # case Regex.run(front_or_rear_move, next_move) do
         #   matches when is_list(matches) ->
-        #     default_mover(matches)
+        #     piece_mover(matches)
 
         #   nil ->
         #     raise RuntimeError, message: "invalid move notation"
         # end
 
         matches ->
-          default_mover(matches)
+          piece_mover(matches)
       end
 
     case resolved_point do
@@ -96,23 +96,91 @@ defmodule XQ.Board.State do
     end
   end
 
-  defp default_mover([_match, abbrev, prev_file, direction, next_file]) do
-    {ch, side} = get_ch_and_side(abbrev)
-    {prev_file, _} = Integer.parse(prev_file)
-    {next_file, _} = Integer.parse(next_file)
+  # Pieces that move vertically or horizontally along axes
+  defp piece_mover([_match, abbrev, prev_file, dir, abs_or_delta_file])
+       when abbrev in ["P", "p", "C", "c", "R", "r"] do
+    {
+      ch,
+      side,
+      prev_file,
+      abs_or_delta_file
+    } = parse_params(abbrev, prev_file, abs_or_delta_file)
+
+    file = calc_file(prev_file, side)
+    sign = if side == @side_facing, do: -1, else: 1
+
+    {next_file, diff_rank} =
+      case dir do
+        # Horizontal movement w/ absolute file
+        "=" ->
+          {calc_file(abs_or_delta_file, side), 0}
+
+        # Vertical movement w/ delta file
+        "-" ->
+          {prev_file, abs_or_delta_file * -1}
+
+        "+" ->
+          {prev_file, abs_or_delta_file}
+      end
+
+    {ch, side, file, next_file, diff_rank * sign, true}
+  end
+
+  # Pieces that move both vertically and horizontally
+  defp piece_mover([_match, abbrev, prev_file, dir, next_file])
+       when abbrev in ["B", "b", "N", "n", "A", "a", "K", "k"] do
+    {ch, side, prev_file, next_file} = parse_params(abbrev, prev_file, next_file)
 
     file = calc_file(prev_file, side)
     next_file = calc_file(next_file, side)
 
-    sign =
-      case direction do
-        "+" -> -1
-        _ -> -1
+    sign = if side == @side_facing, do: -1, else: 1
+
+    delta =
+      case ch do
+        :elephant -> 2
+        :horse -> 1
+        _ -> 1
       end
 
-    diff_rank = sign
+    diff_rank =
+      case dir do
+        "+" -> sign
+        "-" -> -sign
+      end
 
-    {ch, side, file, next_file, diff_rank, true}
+    {ch, side, file, next_file, diff_rank * delta, true}
+  end
+
+  defp parse_params(abbrev, prev, next) do
+    {ch, side} = get_ch_and_side(abbrev)
+    {prev, _} = Integer.parse(prev)
+    {next, _} = Integer.parse(next)
+    {ch, side, prev, next}
+  end
+
+  defp get_ch_and_side("A"), do: {:advisor, :red}
+  defp get_ch_and_side("a"), do: {:advisor, :black}
+  defp get_ch_and_side("P"), do: {:soldier, :red}
+  defp get_ch_and_side("p"), do: {:soldier, :black}
+  defp get_ch_and_side("C"), do: {:cannon, :red}
+  defp get_ch_and_side("c"), do: {:cannon, :black}
+  defp get_ch_and_side("N"), do: {:horse, :red}
+  defp get_ch_and_side("n"), do: {:horse, :black}
+  defp get_ch_and_side("R"), do: {:chariot, :red}
+  defp get_ch_and_side("r"), do: {:chariot, :black}
+  defp get_ch_and_side("B"), do: {:elephant, :red}
+  defp get_ch_and_side("b"), do: {:elephant, :black}
+  defp get_ch_and_side("K"), do: {:general, :red}
+  defp get_ch_and_side("k"), do: {:general, :black}
+
+  defp calc_file(prev, side) when side == @side_facing, do: 10 - prev
+  defp calc_file(prev, _side), do: prev
+
+  defp get_matching_points(board_state, ch, side, file) do
+    board_state
+    |> Enum.filter(fn {p, _} -> p.ch == ch and p.side == side end)
+    |> Enum.filter(fn {p, _} -> p.file == file end)
   end
 
   defp update_point(board_state, {
@@ -170,29 +238,5 @@ defmodule XQ.Board.State do
 
         [new_point | updated_board_state]
     end
-  end
-
-  defp get_ch_and_side("A"), do: {:advisor, :red}
-  defp get_ch_and_side("a"), do: {:advisor, :black}
-  defp get_ch_and_side("P"), do: {:soldier, :red}
-  defp get_ch_and_side("p"), do: {:soldier, :black}
-  defp get_ch_and_side("C"), do: {:cannon, :red}
-  defp get_ch_and_side("c"), do: {:cannon, :black}
-  defp get_ch_and_side("N"), do: {:horse, :red}
-  defp get_ch_and_side("n"), do: {:horse, :black}
-  defp get_ch_and_side("R"), do: {:chariot, :red}
-  defp get_ch_and_side("r"), do: {:chariot, :black}
-  defp get_ch_and_side("B"), do: {:elephant, :red}
-  defp get_ch_and_side("b"), do: {:elephant, :black}
-  defp get_ch_and_side("K"), do: {:general, :red}
-  defp get_ch_and_side("k"), do: {:general, :black}
-
-  defp calc_file(prev, side) when side == @side_facing, do: 10 - prev
-  defp calc_file(prev, _side), do: prev
-
-  defp get_matching_points(board_state, ch, side, file) do
-    board_state
-    |> Enum.filter(fn {p, _} -> p.ch == ch and p.side == side end)
-    |> Enum.filter(fn {p, _} -> p.file == file end)
   end
 end
