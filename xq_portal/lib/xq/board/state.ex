@@ -162,7 +162,7 @@ defmodule XQ.Board.State do
     delta =
       case ch do
         :elephant -> 2
-        :horse -> if next_file - file == 2, do: 1, else: 2
+        :horse -> if abs(next_file - file) == 2, do: 1, else: 2
         _ -> 1
       end
 
@@ -224,31 +224,25 @@ defmodule XQ.Board.State do
           else: a.rank > b.rank
       end)
 
-    case points_to_move do
-      [] ->
-        board_state
+    {point, index} =
+      if is_front == true,
+        do: List.first(points_to_move),
+        else: List.last(points_to_move)
 
-      points ->
-        {point, index} =
-          if is_front == true,
-            do: List.first(points),
-            else: List.last(points)
+    new_point =
+      Map.merge(point, %{
+        rank: point.rank + diff_rank,
+        file: next_file
+      })
 
-        new_point =
-          Map.merge(point, %{
-            rank: point.rank + diff_rank,
-            file: next_file
-          })
+    updated_board_state =
+      board_state
+      |> Enum.with_index()
+      |> Enum.filter(fn {_, i} -> i != index end)
+      |> Enum.map(fn {p, _} -> p end)
+      |> maybe_capture_piece(new_point)
 
-        updated_board_state =
-          board_state
-          |> Enum.with_index()
-          |> Enum.filter(fn {_, i} -> i != index end)
-          |> Enum.map(fn {p, _} -> p end)
-          |> maybe_capture_piece(new_point)
-
-        [new_point | updated_board_state]
-    end
+    [new_point | updated_board_state]
   end
 
   defp maybe_capture_piece(board_state, point) do
