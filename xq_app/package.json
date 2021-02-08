@@ -20,6 +20,8 @@
     "@types/axios": "^0.14.0",
     "@types/node": "^14.14.22",
     "@types/phoenix": "^1.5.1",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
     "autoprefixer": "^10.2.4",
     "axios": "^0.21.1",
     "axios-case-converter": "^0.7.0",
