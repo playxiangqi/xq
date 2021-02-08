@@ -5,11 +5,12 @@
 
   const { store, loadGameAnalysis, transitionBoardState } = boardState;
 
-  let promisedGameAnalysis = loadGameAnalysis();
-  let currentTurnIndex = 0;
   $: maxTurnIndex = $store.layouts.length - 1;
 
-  function generateMoveNotationClassical(moves: string[]) {
+  let promisedGameAnalysis = loadGameAnalysis();
+  let currentTurnIndex = 0;
+
+  function prepareMoveNotation(moves: string[]) {
     let turnNum = 0;
     let moveStrs = [];
     for (let i = 0; i < moves.length; i += 2) {
@@ -25,7 +26,8 @@
   function skipToBeginning() {
     currentTurnIndex = 0;
     transitionBoardState(0);
-    // TODO: reset turn to red
+    // TODO: reset turn to red, because grabbing pieces while using the
+    //       move replay puts things out of sync
   }
 
   // TODO: in prevMove and nextMove, need to toggle turns as well
@@ -81,7 +83,7 @@
       <div class="opening-name">{game.openingCode}: {game.openingName}</div>
     </div>
     <div class="moves-container">
-      {#each generateMoveNotationClassical(game.moves) as { moveNum, moveRed, moveBlack }, i}
+      {#each prepareMoveNotation(game.moves) as { moveNum, moveRed, moveBlack }, i}
         <div class="panel-block move">
           <span class="move-num">{moveNum}.</span>
           <span class="move-red" class:current={currentTurnIndex - 1 === i * 2}
@@ -99,12 +101,12 @@
     <button
       class="button"
       on:click={skipToBeginning}
-      disabled={currentTurnIndex < 0}>{'⏮'}</button
+      disabled={currentTurnIndex <= 0}>{'⏮'}</button
     >
     <button
       class="button"
       on:click={previousMove}
-      disabled={currentTurnIndex < 0}>{'◀️'}</button
+      disabled={currentTurnIndex <= 0}>{'◀️'}</button
     >
     <button
       class="button"
@@ -146,6 +148,12 @@
 
       span.current {
         background-color: #ededed;
+      }
+    }
+
+    .move-buttons {
+      .button:disabled {
+        cursor: default;
       }
     }
   }
