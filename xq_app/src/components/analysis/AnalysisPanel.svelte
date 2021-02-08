@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { createBoardState, notationToMove } from 'components/board';
+  import { createBoardState } from 'components/board';
 
   export let boardState: ReturnType<typeof createBoardState>;
 
   const { store, loadGameAnalysis, transitionBoardState } = boardState;
 
   let promisedGameAnalysis = loadGameAnalysis();
-  let currentTurnIndex = -1; // use -1 as a sentinel
+  let currentTurnIndex = 0;
   $: maxTurnIndex = $store.layouts.length - 1;
 
   function generateMoveNotationClassical(moves: string[]) {
@@ -23,7 +23,7 @@
   }
 
   function skipToBeginning() {
-    currentTurnIndex = -1;
+    currentTurnIndex = 0;
     transitionBoardState(0);
     // TODO: reset turn to red
   }
@@ -33,16 +33,16 @@
   //       separate moves/board state array that branches off from the
   //       prepared game analysis board state
   function previousMove() {
-    currentTurnIndex = Math.max(-1, currentTurnIndex - 1);
-    transitionBoardState(currentTurnIndex + 1);
+    currentTurnIndex = Math.max(0, currentTurnIndex - 1);
+    transitionBoardState(currentTurnIndex);
     playSound();
   }
 
   async function nextMove() {
     currentTurnIndex = Math.min(maxTurnIndex, currentTurnIndex + 1);
-    console.log(maxTurnIndex);
+    console.log(currentTurnIndex);
 
-    transitionBoardState(currentTurnIndex + 1);
+    transitionBoardState(currentTurnIndex);
     playSound();
   }
 
@@ -84,12 +84,12 @@
       {#each generateMoveNotationClassical(game.moves) as { moveNum, moveRed, moveBlack }, i}
         <div class="panel-block move">
           <span class="move-num">{moveNum}.</span>
-          <span class="move-red" class:current={currentTurnIndex === i * 2}
+          <span class="move-red" class:current={currentTurnIndex - 1 === i * 2}
             >{moveRed}</span
           >
           <span
             class="move-black"
-            class:current={currentTurnIndex === i * 2 + 1}>{moveBlack}</span
+            class:current={currentTurnIndex - 1 === i * 2 + 1}>{moveBlack}</span
           >
         </div>
       {/each}

@@ -71,8 +71,6 @@ export function createBoardState(dimensions: Dimensions) {
     transitionBoardState: (turnIndex: number) =>
       update((state) => {
         state.activeLayout = state.layouts[turnIndex];
-        console.log('activeLayout:', state.activeLayout);
-        console.log('turnIndex:', turnIndex);
         return state;
       }),
     dropPiece: (index: number, side: Side): boolean => {
