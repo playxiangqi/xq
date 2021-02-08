@@ -224,8 +224,6 @@ defmodule XQ.Board.State do
           else: a.rank > b.rank
       end)
 
-    Logger.info("points_to_move: #{inspect(points_to_move)}")
-
     case points_to_move do
       [] ->
         board_state
@@ -236,12 +234,11 @@ defmodule XQ.Board.State do
             do: List.first(points),
             else: List.last(points)
 
-        Logger.info("exact_point: #{inspect(point)}, index: #{index}")
-        Logger.info("new_rank: #{point.rank + diff_rank}, new_file: #{next_file}")
-
-        new_point = Map.merge(point, %{rank: point.rank + diff_rank, file: next_file})
-
-        Logger.info("new_point: #{inspect(new_point)}")
+        new_point =
+          Map.merge(point, %{
+            rank: point.rank + diff_rank,
+            file: next_file
+          })
 
         updated_board_state =
           board_state
