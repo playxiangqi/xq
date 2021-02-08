@@ -1,15 +1,7 @@
 import { writable } from 'svelte/store';
 import { apiClient } from 'services';
 import { Dimensions } from './dimensions';
-import {
-  createInitialLayout,
-  Move,
-  Point,
-  Side,
-  RED,
-  BLACK,
-  Character,
-} from './pieces';
+import { createInitialLayout, Move, Point, Side, RED, BLACK } from './pieces';
 
 type Layout = Point[];
 

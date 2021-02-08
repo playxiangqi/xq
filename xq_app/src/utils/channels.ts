@@ -1,6 +1,6 @@
 import { Socket } from 'phoenix';
 
-let socket = new Socket('/socket');
+const socket = new Socket('/socket');
 socket.connect();
 
 export type PhoenixEvent = (
@@ -21,7 +21,7 @@ export function createChannel(topic: string, onMessage: PhoenixEvent) {
 
   channel
     .join()
-    .receive('ok', ({ messages }) => {
+    .receive('ok', () => {
       console.log(`successfully joined channel ${topic}`);
     })
     .receive('error', ({ reason }) => {
