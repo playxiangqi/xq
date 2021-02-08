@@ -3,7 +3,7 @@
 
   export let boardState: ReturnType<typeof createBoardState>;
 
-  const { store, loadGameAnalysis, slidePiece } = boardState;
+  const { loadGameAnalysis, transitionBoardState } = boardState;
 
   let promisedGameAnalysis = loadGameAnalysis();
   let currentTurnIndex = -1;
@@ -33,8 +33,7 @@
     currentTurnIndex = Math.min(58, currentTurnIndex + 1);
     const { moves } = await promisedGameAnalysis;
 
-    const move = notationToMove(moves[currentTurnIndex]);
-    // slidePiece(move);
+    transitionBoardState(currentTurnIndex + 1);
     playSound();
   }
 

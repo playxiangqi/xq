@@ -1,37 +1,39 @@
 defmodule XQ.Board.State do
+  require Logger
+
   @starting_state [
-    %{piece: :chariot, side: :black, rank: 1, file: 1},
-    %{piece: :horse, side: :black, rank: 1, file: 2},
-    %{piece: :elephant, side: :black, rank: 1, file: 3},
-    %{piece: :advisor, side: :black, rank: 1, file: 4},
-    %{piece: :general, side: :black, rank: 1, file: 5},
-    %{piece: :advisor, side: :black, rank: 1, file: 6},
-    %{piece: :elephant, side: :black, rank: 1, file: 7},
-    %{piece: :horse, side: :black, rank: 1, file: 8},
-    %{piece: :chariot, side: :black, rank: 1, file: 9},
-    %{piece: :cannon, side: :black, rank: 3, file: 2},
-    %{piece: :cannon, side: :black, rank: 3, file: 8},
-    %{piece: :soldier, side: :black, rank: 4, file: 1},
-    %{piece: :soldier, side: :black, rank: 4, file: 3},
-    %{piece: :soldier, side: :black, rank: 4, file: 5},
-    %{piece: :soldier, side: :black, rank: 4, file: 7},
-    %{piece: :soldier, side: :black, rank: 4, file: 9},
-    %{piece: :soldier, side: :red, rank: 7, file: 1},
-    %{piece: :soldier, side: :red, rank: 7, file: 3},
-    %{piece: :soldier, side: :red, rank: 7, file: 5},
-    %{piece: :soldier, side: :red, rank: 7, file: 7},
-    %{piece: :soldier, side: :red, rank: 7, file: 9},
-    %{piece: :cannon, side: :red, rank: 8, file: 2},
-    %{piece: :cannon, side: :red, rank: 8, file: 8},
-    %{piece: :chariot, side: :red, rank: 10, file: 1},
-    %{piece: :horse, side: :red, rank: 10, file: 2},
-    %{piece: :elephant, side: :red, rank: 10, file: 3},
-    %{piece: :advisor, side: :red, rank: 10, file: 4},
-    %{piece: :general, side: :red, rank: 10, file: 5},
-    %{piece: :advisor, side: :red, rank: 10, file: 6},
-    %{piece: :elephant, side: :red, rank: 10, file: 7},
-    %{piece: :horse, side: :red, rank: 10, file: 8},
-    %{piece: :chariot, side: :red, rank: 10, file: 9}
+    %{ch: :chariot, side: :black, rank: 1, file: 1},
+    %{ch: :horse, side: :black, rank: 1, file: 2},
+    %{ch: :elephant, side: :black, rank: 1, file: 3},
+    %{ch: :advisor, side: :black, rank: 1, file: 4},
+    %{ch: :general, side: :black, rank: 1, file: 5},
+    %{ch: :advisor, side: :black, rank: 1, file: 6},
+    %{ch: :elephant, side: :black, rank: 1, file: 7},
+    %{ch: :horse, side: :black, rank: 1, file: 8},
+    %{ch: :chariot, side: :black, rank: 1, file: 9},
+    %{ch: :cannon, side: :black, rank: 3, file: 2},
+    %{ch: :cannon, side: :black, rank: 3, file: 8},
+    %{ch: :soldier, side: :black, rank: 4, file: 1},
+    %{ch: :soldier, side: :black, rank: 4, file: 3},
+    %{ch: :soldier, side: :black, rank: 4, file: 5},
+    %{ch: :soldier, side: :black, rank: 4, file: 7},
+    %{ch: :soldier, side: :black, rank: 4, file: 9},
+    %{ch: :soldier, side: :red, rank: 7, file: 1},
+    %{ch: :soldier, side: :red, rank: 7, file: 3},
+    %{ch: :soldier, side: :red, rank: 7, file: 5},
+    %{ch: :soldier, side: :red, rank: 7, file: 7},
+    %{ch: :soldier, side: :red, rank: 7, file: 9},
+    %{ch: :cannon, side: :red, rank: 8, file: 2},
+    %{ch: :cannon, side: :red, rank: 8, file: 8},
+    %{ch: :chariot, side: :red, rank: 10, file: 1},
+    %{ch: :horse, side: :red, rank: 10, file: 2},
+    %{ch: :elephant, side: :red, rank: 10, file: 3},
+    %{ch: :advisor, side: :red, rank: 10, file: 4},
+    %{ch: :general, side: :red, rank: 10, file: 5},
+    %{ch: :advisor, side: :red, rank: 10, file: 6},
+    %{ch: :elephant, side: :red, rank: 10, file: 7},
+    %{ch: :horse, side: :red, rank: 10, file: 8},
+    %{ch: :chariot, side: :red, rank: 10, file: 9}
   ]
 
   @side_facing :red
@@ -39,6 +41,7 @@ defmodule XQ.Board.State do
   def generate(moves) do
     moves
     |> Enum.reduce([@starting_state], &generate_board_state/2)
+    |> Enum.reverse()
     |> to_zero_indices()
   end
 
@@ -46,10 +49,10 @@ defmodule XQ.Board.State do
 
   defp to_zero_indices(states) do
     states
-    |> Enum.each(fn s ->
+    |> Enum.map(fn s ->
       Enum.map(s, fn p ->
         %{
-          piece: p.piece,
+          ch: p.ch,
           side: p.side,
           rank: p.rank - 1,
           file: p.file - 1
@@ -64,29 +67,40 @@ defmodule XQ.Board.State do
 
     resolved_point =
       case Regex.run(exact_move, next_move) do
-        matches when is_list(matches) ->
-          default_mover(matches)
-
         nil ->
-          case Regex.run(front_or_rear_move, next_move) do
-            matches when is_list(matches) ->
-              default_mover(matches)
+          nil
 
-            nil ->
-              raise RuntimeError, message: "invalid move notation"
-          end
+        # case Regex.run(front_or_rear_move, next_move) do
+        #   matches when is_list(matches) ->
+        #     default_mover(matches)
+
+        #   nil ->
+        #     raise RuntimeError, message: "invalid move notation"
+        # end
+
+        matches ->
+          default_mover(matches)
       end
 
-    next_board_state =
-      prev_board_states
-      |> List.first()
-      |> update_point(resolved_point)
+    case resolved_point do
+      nil ->
+        prev_board_states
 
-    [next_board_state | prev_board_states]
+      p ->
+        next_board_state =
+          prev_board_states
+          |> List.first()
+          |> update_point(p)
+
+        [next_board_state | prev_board_states]
+    end
   end
 
-  defp default_mover([abbrev, prev_file, next_file, direction]) do
-    {piece, side} = get_piece_and_side(abbrev)
+  defp default_mover([_match, abbrev, prev_file, direction, next_file]) do
+    {ch, side} = get_ch_and_side(abbrev)
+    {prev_file, _} = Integer.parse(prev_file)
+    {next_file, _} = Integer.parse(next_file)
+
     file = calc_file(prev_file, side)
     next_file = calc_file(next_file, side)
 
@@ -98,11 +112,11 @@ defmodule XQ.Board.State do
 
     diff_rank = sign
 
-    {piece, side, file, next_file, diff_rank, true}
+    {ch, side, file, next_file, diff_rank, true}
   end
 
   defp update_point(board_state, {
-         piece,
+         ch,
          side,
          file,
          next_file,
@@ -112,13 +126,16 @@ defmodule XQ.Board.State do
     points_to_move =
       board_state
       |> Enum.with_index()
-      |> Enum.filter(fn {p, _} -> p.piece == piece and p.side == side end)
-      |> Enum.sort_by(fn {{a, _}, {b, _}} ->
-        case side do
-          :red -> a.rank - b.rank
-          _ -> b.rank - a.rank
-        end
-      end)
+      |> get_matching_points(ch, side, file)
+
+    Logger.info("points_to_move: #{inspect(points_to_move)}")
+
+    # |> Enum.sort(fn {a, _}, {b, _} ->
+    #   case side do
+    #     :red -> a.rank < b.rank
+    #     _ -> b.rank > a.rank
+    #   end
+    # end)
 
     # |> Enum.filter(fn {p, _} ->
     #   case file do
@@ -127,36 +144,55 @@ defmodule XQ.Board.State do
     #   end
     # end)
 
-    {point, index} =
-      if is_front == true,
-        do: List.first(points_to_move),
-        else: List.last(points_to_move)
+    case points_to_move do
+      [] ->
+        board_state
 
-    new_point = Map.merge(point, %{rank: point.rank + diff_rank, file: next_file})
+      points ->
+        {point, index} =
+          if is_front == true,
+            do: List.first(points),
+            else: List.last(points)
 
-    updated_board_state =
-      board_state
-      |> Enum.with_index()
-      |> Enum.filter(fn {_, i} -> i != index end)
+        Logger.info("exact_point: #{inspect(point)}, index: #{index}")
 
-    [new_point, updated_board_state]
+        new_point = Map.merge(point, %{rank: point.rank + diff_rank, file: next_file})
+
+        Logger.info("new_point: #{inspect(new_point)}")
+
+        updated_board_state =
+          board_state
+          |> Enum.with_index()
+          |> Enum.filter(fn {_, i} -> i != index end)
+          |> Enum.map(fn {p, _} -> p end)
+
+        Logger.info("updated_board_state: #{inspect(updated_board_state)}")
+
+        [new_point | updated_board_state]
+    end
   end
 
-  defp get_piece_and_side("A"), do: {:advisor, :red}
-  defp get_piece_and_side("a"), do: {:advisor, :black}
-  defp get_piece_and_side("P"), do: {:soldier, :red}
-  defp get_piece_and_side("p"), do: {:soldier, :black}
-  defp get_piece_and_side("C"), do: {:cannon, :red}
-  defp get_piece_and_side("c"), do: {:cannon, :black}
-  defp get_piece_and_side("N"), do: {:horse, :red}
-  defp get_piece_and_side("n"), do: {:horse, :black}
-  defp get_piece_and_side("R"), do: {:chariot, :red}
-  defp get_piece_and_side("r"), do: {:chariot, :black}
-  defp get_piece_and_side("B"), do: {:elephant, :red}
-  defp get_piece_and_side("b"), do: {:elephant, :black}
-  defp get_piece_and_side("K"), do: {:general, :red}
-  defp get_piece_and_side("k"), do: {:general, :black}
+  defp get_ch_and_side("A"), do: {:advisor, :red}
+  defp get_ch_and_side("a"), do: {:advisor, :black}
+  defp get_ch_and_side("P"), do: {:soldier, :red}
+  defp get_ch_and_side("p"), do: {:soldier, :black}
+  defp get_ch_and_side("C"), do: {:cannon, :red}
+  defp get_ch_and_side("c"), do: {:cannon, :black}
+  defp get_ch_and_side("N"), do: {:horse, :red}
+  defp get_ch_and_side("n"), do: {:horse, :black}
+  defp get_ch_and_side("R"), do: {:chariot, :red}
+  defp get_ch_and_side("r"), do: {:chariot, :black}
+  defp get_ch_and_side("B"), do: {:elephant, :red}
+  defp get_ch_and_side("b"), do: {:elephant, :black}
+  defp get_ch_and_side("K"), do: {:general, :red}
+  defp get_ch_and_side("k"), do: {:general, :black}
 
   defp calc_file(prev, side) when side == @side_facing, do: 10 - prev
-  defp calc_file(prev, side), do: prev
+  defp calc_file(prev, _side), do: prev
+
+  defp get_matching_points(board_state, ch, side, file) do
+    board_state
+    |> Enum.filter(fn {p, _} -> p.ch == ch and p.side == side end)
+    |> Enum.filter(fn {p, _} -> p.file == file end)
+  end
 end

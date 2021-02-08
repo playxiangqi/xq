@@ -21,7 +21,10 @@ export type BoardState = {
   turn: Side;
 };
 
-async function fetchGameAnalysis() {
+async function fetchGameAnalysis(): Promise<{
+  boardStates: Layout[];
+  gameInfo: any;
+}> {
   const { data } = await apiClient.get('/api/analysis/game');
   console.log(data);
   return data;
@@ -47,7 +50,20 @@ export function createBoardState(dimensions: Dimensions) {
     loadGameAnalysis: async () => {
       const { boardStates, gameInfo } = await fetchGameAnalysis();
       update((state) => {
-        state.layouts = boardStates;
+        state.layouts = boardStates.map((layout) =>
+          layout.map(({ ch, side, rank, file }) => {
+            const position = dimensions.pointToCoords(rank, file);
+            return {
+              side,
+              ch,
+              position,
+              rank,
+              file,
+              prevPosition: position,
+              grabbing: false,
+            } as Point;
+          })
+        );
         return state;
       });
       return gameInfo;
@@ -55,6 +71,8 @@ export function createBoardState(dimensions: Dimensions) {
     transitionBoardState: (turnIndex: number) =>
       update((state) => {
         state.activeLayout = state.layouts[turnIndex];
+        console.log('activeLayout:', state.activeLayout);
+        console.log('turnIndex:', turnIndex);
         return state;
       }),
     dropPiece: (index: number, side: Side): boolean => {

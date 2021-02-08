@@ -10,7 +10,7 @@ defmodule XQWeb.AnalysisController do
       # TODO: realistically, this would be GET /analysis/game + specific ID
       json(conn, %{
         game_info: game_info,
-        board_states: [XQ.Board.State.generate(Map.get(game_info, "moves"))]
+        board_states: XQ.Board.State.generate(Map.get(game_info, "moves"))
       })
     else
       {:error, _} ->
