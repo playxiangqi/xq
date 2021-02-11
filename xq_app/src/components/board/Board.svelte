@@ -98,6 +98,13 @@
 
 <style lang="scss">
   .board-container {
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding-left: 45px;
+
     * {
       position: absolute;
       color: black;

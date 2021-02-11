@@ -41,10 +41,8 @@
     playSound();
   }
 
-  async function nextMove() {
+  function nextMove() {
     currentTurnIndex = Math.min(maxTurnIndex, currentTurnIndex + 1);
-    console.log(currentTurnIndex);
-
     transitionBoardState(currentTurnIndex);
     playSound();
   }
@@ -67,12 +65,12 @@
 
 <div class="panel analysis-panel">
   <!-- <p>Joined lobby as: {$authStore.username}</p> -->
-  <p class="panel-heading">Database Explorer</p>
+  <p class="panel-heading">Game Analysis</p>
   {#await promisedGameAnalysis}
-    <div class="game-info loading">Loading Game...</div>
+    <div class="p-5 game-info loading">Loading Game...</div>
     <div class="moves-container loading" />
   {:then game}
-    <div class="game-info">
+    <div class="px-4 py-3 game-info">
       <div class="players">
         {game.redPlayer} vs. {game.blackPlayer} — {game.result}
       </div>
@@ -125,13 +123,7 @@
 
 <style lang="scss">
   .analysis-panel {
-    margin-top: 10px;
     margin-right: 50px;
-
-    .game-info {
-      padding: 15px 0px 15px 20px;
-    }
-
     .moves-container {
       min-height: 550px;
       height: 550px;

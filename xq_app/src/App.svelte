@@ -3,6 +3,7 @@
 
   // Components
   import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
+  import SearchPanel from './components/analysis/SearchPanel.svelte';
   import Board from './components/board/Board.svelte';
   import Navbar from './components/nav/Navbar.svelte';
 
@@ -19,7 +20,9 @@
 <div class="app">
   <Navbar />
   <div class="content-container">
-    <div class="col-1" />
+    <div class="col-1">
+      <SearchPanel />
+    </div>
     <div class="col-2">
       <Board {dimensions} {boardState} />
     </div>
