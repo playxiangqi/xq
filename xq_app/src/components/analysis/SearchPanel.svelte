@@ -44,6 +44,12 @@
       </div>
     </div>
     <div class="field">
+      <label for="game-id-input" class="label">Exact Game ID</label>
+      <div class="control game-id-input">
+        <input class="input" type="text" placeholder="" />
+      </div>
+    </div>
+    <div class="field">
       <div class="control">
         <button class="button is-link">Search</button>
       </div>
@@ -58,8 +64,6 @@
     margin-left: 50px;
 
     .search-form-container {
-      /* padding: 15px 20px 15px 20px; */
-
       min-height: 725px;
       height: 725px;
     }
