@@ -3,13 +3,13 @@
 
 <div class="panel search-panel">
   <p class="panel-heading">Database Explorer</p>
-  <div class="search-form-container">
-    <div class="field">
-      <label for="red-player-input" class="label">Player</label>
+  <div class="p-5 search-form-container">
+    <label for="red-player-input" class="label">Player</label>
+    <div class="field is-horizontal">
       <div class="control red-player-input">
         <input class="input" type="text" placeholder="Red Player" />
       </div>
-      vs.
+      <span class="m-2">vs.</span>
       <div class="control black-player-input">
         <input class="input" type="text" placeholder="Black Player" />
       </div>
@@ -58,7 +58,7 @@
     margin-left: 50px;
 
     .search-form-container {
-      padding: 15px 20px 15px 20px;
+      /* padding: 15px 20px 15px 20px; */
 
       min-height: 725px;
       height: 725px;
