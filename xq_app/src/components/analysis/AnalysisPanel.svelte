@@ -41,10 +41,8 @@
     playSound();
   }
 
-  async function nextMove() {
+  function nextMove() {
     currentTurnIndex = Math.min(maxTurnIndex, currentTurnIndex + 1);
-    console.log(currentTurnIndex);
-
     transitionBoardState(currentTurnIndex);
     playSound();
   }
@@ -67,7 +65,7 @@
 
 <div class="panel analysis-panel">
   <!-- <p>Joined lobby as: {$authStore.username}</p> -->
-  <p class="panel-heading">Database Explorer</p>
+  <p class="panel-heading">Game Analysis</p>
   {#await promisedGameAnalysis}
     <div class="game-info loading">Loading Game...</div>
     <div class="moves-container loading" />
@@ -125,7 +123,6 @@
 
 <style lang="scss">
   .analysis-panel {
-    margin-top: 10px;
     margin-right: 50px;
 
     .game-info {
