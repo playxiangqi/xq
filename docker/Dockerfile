@@ -31,7 +31,8 @@ RUN cd xq_portal && mix do deps.get --only ${MIX_ENV}, deps.compile
 
 # Build assets
 COPY xq_app xq_app
-RUN yarn --cwd xq_app install && yarn --cwd xq_app deploy
+RUN yarn --cwd xq_app install
+RUN yarn --cwd xq_app deploy
 RUN cd xq_portal && mix phx.digest
 
 # Compile and build release
