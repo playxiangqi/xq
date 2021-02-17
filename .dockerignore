@@ -1,0 +1,20 @@
+# .dockerignore
+.circleci
+.git
+.vscode
+docker
+
+# Mix artifacts
+xq_portal/_build
+xq_portal/deps
+xq_portal/*.ez
+
+# Generate on crash by the VM
+xq_portal/erl_crash.dump
+
+# Node
+xq_app/node_modules
+
+# Temporary
+cmake
+xq_engine

@@ -25,8 +25,8 @@
 
   function skipToBeginning() {
     currentTurnIndex = 0;
-    transitionBoardState(0);
     playSound();
+    transitionBoardState(0);
     // TODO: reset turn to red, because grabbing pieces while using the
     //       move replay puts things out of sync
   }
@@ -37,20 +37,20 @@
   //       prepared game analysis board state
   function previousMove() {
     currentTurnIndex = Math.max(0, currentTurnIndex - 1);
-    transitionBoardState(currentTurnIndex);
     playSound();
+    transitionBoardState(currentTurnIndex);
   }
 
   function nextMove() {
     currentTurnIndex = Math.min(maxTurnIndex, currentTurnIndex + 1);
-    transitionBoardState(currentTurnIndex);
     playSound();
+    transitionBoardState(currentTurnIndex);
   }
 
   function skipToEnd() {
     currentTurnIndex = maxTurnIndex;
-    transitionBoardState(currentTurnIndex);
     playSound();
+    transitionBoardState(currentTurnIndex);
   }
 
   // Sound Effects
