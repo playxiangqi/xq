@@ -3,6 +3,7 @@ ARG ALPINE_VERSION=3.11
 
 FROM elixir:1.11.2-alpine AS build
 
+ARG BUILD
 ARG MIX_ENV
 ARG SECRET_KEY_BASE
 
@@ -22,6 +23,7 @@ RUN apk update && \
 #   /opt/.asdf/asdf.sh install
 
 # Set build environments
+ENV BUILD=${BUILD}
 ENV MIX_ENV=${MIX_ENV}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
@@ -41,6 +43,7 @@ RUN cd xq_portal && mix do compile, release
 # Prepare release image
 FROM alpine:3.11 AS app
 
+ARG BUILD
 ARG MIX_ENV
 
 RUN apk add --no-cache openssl ncurses-libs
@@ -53,6 +56,8 @@ USER nobody:nogroup
 
 COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/_build/${MIX_ENV}/rel/xq ./
 COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/start.sh ./
+
+RUN echo "export BUILD=${BUILD} >> .env"
 
 ENV HOME=/opt/app
 
