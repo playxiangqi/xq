@@ -1,12 +1,19 @@
 # .dockerignore
 .git
 .vscode
-Dockerfile
+docker
 
 # Mix artifacts
-_build
-deps
-*.ez
+xq_portal/_build
+xq_portal/deps
+**/*.ez
 
 # Generate on crash by the VM
 erl_crash.dump
+
+# Node
+xq_app/node_modules
+
+# Temporary
+cmake
+xq_engine

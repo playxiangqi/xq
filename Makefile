@@ -6,6 +6,10 @@ CXX=g++-8
 #------------------------------------------------------------------------------
 SOURCE_ENV=PROJECT_DIR=${PWD} CC=${CC} CXX=${CXX}
 
+APP_NAME ?= `grep 'app:' xq_portal/mix.exs | sed -e 's/\[//g' -e 's/ //g' -e 's/app://' -e 's/[:,]//g'`
+APP_VSN ?= `grep 'version:' xq_portal/mix.exs | cut -d '"' -f2`
+BUILD ?= `git rev-parse --short HEAD`
+
 #------------------------------------------------------------------------------
 # Targets
 #------------------------------------------------------------------------------
@@ -16,10 +20,6 @@ start:
 .PHONY: setup
 setup:
 	@./scripts/setup.bash
-
-.PHONY: docker-composer
-docker-compose:
-	@./scripts/docker-compose.bash
 
 .PHONY: conan
 conan:
@@ -33,3 +33,17 @@ gen:
 build:
 	@cd xq_app && yarn
 	@${SOURCE_ENV} ./scripts/cmake.bash -b
+
+.PHONY: docker-compose
+docker-compose:
+	@./scripts/docker-compose.bash
+
+.PHONY: docker-dev-local
+docker-dev-local:
+	docker build --build-arg MIX_ENV=dev -f docker/Dockerfile \
+		-t $(APP_NAME):$(APP_VSN) .
+
+.PHONY: docker-dev
+docker-dev:
+	docker build --build-arg APP_VSN=$(APP_VSN) --build-arg MIX_ENV=prod \
+		-f docker/Dockerfile -t ${AWS_ECR_URL}:latest .

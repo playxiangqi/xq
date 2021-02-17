@@ -12,14 +12,15 @@ WORKDIR /opt/app
 # Install dependencies and build tools
 RUN apk update && \
   apk upgrade --no-cache && \
-  apk add --no-cache git build-base yarn && \
+  apk add --no-cache git yarn && \
+  # apk add --no-cache git build-base yarn && \
   mix local.rebar --force && \
   mix local.hex --force
 
-RUN git clone https://github.com/asdf-vm/asdf.git /opt/.asdf --branch v0.8.0 && \
-  chmod +x /opt/.asdf/asdf.sh && \
-  /opt/.asdf/asdf.sh plugin add nodejs cmake && \
-  /opt/.asdf/asdf.sh install
+# RUN git clone https://github.com/asdf-vm/asdf.git /opt/.asdf --branch v0.8.0 && \
+#   chmod +x /opt/.asdf/asdf.sh && \
+#   /opt/.asdf/asdf.sh plugin add nodejs cmake && \
+#   /opt/.asdf/asdf.sh install
 
 # Set build environments
 ENV MIX_ENV=${MIX_ENV}
@@ -27,23 +28,17 @@ ENV DATABASE_URL=${DATABASE_URL}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
 # Install mix dependencies
-COPY mix.exs mix.lock ./
-COPY config config
-
-RUN mix do deps.get --only ${MIX_ENV}, deps.compile
+COPY xq_portal xq_portal
+RUN cd xq_portal && mix do deps.get --only ${MIX_ENV}, deps.compile
 
 # Build assets
-COPY priv priv
-COPY assets assets
-RUN yarn --cwd assets deploy
-
-RUN mix phx.digest
+COPY xq_app xq_app
+RUN yarn --cwd xq_app install && yarn --cwd xq_app deploy
+RUN cd xq_portal && mix phx.digest
 
 # Compile and build release
-COPY lib lib
-COPY scripts/start.sh ./
-
-RUN mix do compile, release
+COPY scripts/start.sh ./xq_portal/
+RUN cd xq_portal && mix do compile, release
 
 # Prepare release image
 FROM alpine:3.11 AS app
@@ -58,8 +53,8 @@ RUN chown nobody:nogroup /opt/app
 
 USER nobody:nogroup
 
-COPY --from=build --chown=nobody:nogroup /opt/app/_build/${MIX_ENV}/rel/xq ./
-COPY --from=build --chown=nobody:nogroup /opt/app/start.sh ./
+COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/_build/${MIX_ENV}/rel/xq ./
+COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/start.sh ./
 
 ENV HOME=/opt/app
 
