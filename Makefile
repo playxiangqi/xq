@@ -47,3 +47,7 @@ docker-dev-local:
 docker-dev:
 	docker build --build-arg APP_VSN=$(APP_VSN) --build-arg MIX_ENV=prod \
 		-f docker/Dockerfile -t ${AWS_ECR_URL}:latest .
+
+.PHONY: push-dev
+push-dev:
+	docker push ${AWS_ECR_URL}:latest

@@ -4,7 +4,6 @@ ARG ALPINE_VERSION=3.11
 FROM elixir:1.11.2-alpine AS build
 
 ARG MIX_ENV
-ARG DATABASE_URL
 ARG SECRET_KEY_BASE
 
 WORKDIR /opt/app
@@ -24,7 +23,6 @@ RUN apk update && \
 
 # Set build environments
 ENV MIX_ENV=${MIX_ENV}
-ENV DATABASE_URL=${DATABASE_URL}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
 # Install mix dependencies
