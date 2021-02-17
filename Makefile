@@ -17,8 +17,8 @@ start:
 setup:
 	@./scripts/setup.bash
 
-.PHONY: docker
-docker:
+.PHONY: docker-composer
+docker-compose:
 	@./scripts/docker-compose.bash
 
 .PHONY: conan
