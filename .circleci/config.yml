@@ -55,8 +55,8 @@ workflows:
           name: dev-deploy-ecs-update
           context: AWS
           deploy-env: dev
-          requires:
-            - dev-deploy-docker-ecr
+          # requires:
+          #   - dev-deploy-docker-ecr
           # filters:
           #   branches:
           #     only: master
