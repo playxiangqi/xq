@@ -1,4 +1,5 @@
 # .dockerignore
+.circleci
 .git
 .vscode
 docker
@@ -6,10 +7,10 @@ docker
 # Mix artifacts
 xq_portal/_build
 xq_portal/deps
-**/*.ez
+xq_portal/*.ez
 
 # Generate on crash by the VM
-erl_crash.dump
+xq_portal/erl_crash.dump
 
 # Node
 xq_app/node_modules
