@@ -40,12 +40,13 @@ docker-compose:
 
 .PHONY: docker-dev-local
 docker-dev-local:
-	docker build --build-arg MIX_ENV=dev -f docker/Dockerfile \
-		-t $(APP_NAME):$(APP_VSN) .
+	docker build --build-arg MIX_ENV=dev --build-arg BUILD=$(BUILD) \
+		-f docker/Dockerfile -t $(APP_NAME):$(APP_VSN) .
 
 .PHONY: docker-dev
 docker-dev:
 	docker build --build-arg APP_VSN=$(APP_VSN) --build-arg MIX_ENV=prod \
+		--build-arg BUILD=$(BUILD) \
 		-f docker/Dockerfile -t ${AWS_ECR_URL}:latest .
 
 .PHONY: push-dev

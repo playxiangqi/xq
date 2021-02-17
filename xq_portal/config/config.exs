@@ -9,7 +9,8 @@ use Mix.Config
 
 config :xq,
   namespace: XQ,
-  ecto_repos: [XQ.Repo]
+  ecto_repos: [XQ.Repo],
+  build: System.get_env("BUILD")
 
 # Configures the endpoint
 config :xq, XQWeb.Endpoint,
