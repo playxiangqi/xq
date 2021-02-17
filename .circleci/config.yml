@@ -16,7 +16,8 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 19.03.13
       - aws-ecr/ecr-login
       - run:
           name: Build Docker Image
