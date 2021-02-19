@@ -38,6 +38,8 @@ defmodule XQ.Board.State do
 
   @side_facing :red
 
+  def generate(nil), do: [@starting_state] |> to_zero_indices()
+
   def generate(moves) do
     moves
     |> Enum.reduce([@starting_state], &generate_board_state/2)
@@ -45,20 +47,12 @@ defmodule XQ.Board.State do
     |> to_zero_indices()
   end
 
-  def generate(nil), do: [@starting_state] |> to_zero_indices()
-
   defp to_zero_indices(states) do
-    states
-    |> Enum.map(fn s ->
-      Enum.map(s, fn p ->
-        %{
-          ch: p.ch,
-          side: p.side,
-          rank: p.rank - 1,
-          file: p.file - 1
-        }
-      end)
-    end)
+    Enum.map(states, fn s -> Enum.map(s, &to_zero_index/1) end)
+  end
+
+  defp to_zero_index(piece) do
+    piece |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
   end
 
   defp generate_board_state(next_move, prev_board_states) do
