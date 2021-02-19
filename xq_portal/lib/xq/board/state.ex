@@ -38,6 +38,9 @@ defmodule XQ.Board.State do
 
   @side_facing :red
 
+  # TODO: Rename module to Core and this file to Generator
+  # Can have XQ.Core.Generator, XQ.Core.Board, and XQ.Core.Point
+
   def generate(nil), do: [@starting_state] |> to_zero_indices()
 
   def generate(moves) do
@@ -51,8 +54,8 @@ defmodule XQ.Board.State do
     Enum.map(states, fn s -> Enum.map(s, &to_zero_index/1) end)
   end
 
-  defp to_zero_index(piece) do
-    piece |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
+  defp to_zero_index(point) do
+    point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
   end
 
   defp generate_board_state(next_move, prev_board_states) do
@@ -220,10 +223,10 @@ defmodule XQ.Board.State do
         else: List.last(points_to_move)
 
     new_point =
-      Map.merge(point, %{
-        rank: point.rank + diff_rank,
-        file: next_file
-      })
+      point
+      |> Map.update!(:rank, &(&1 + diff_rank))
+      # next_file of -1 indicates front/rear move where there is no file change
+      |> Map.update!(:file, &if(next_file != -1, do: next_file, else: &1))
 
     updated_board_state =
       board_state
