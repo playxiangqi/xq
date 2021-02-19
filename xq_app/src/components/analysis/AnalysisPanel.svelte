@@ -23,6 +23,15 @@
     return moveStrs;
   }
 
+  function formatResult(result: string) {
+    const format: { [result: string]: string } = {
+      ['Red WIN']: 'Red Victory',
+      ['Red DRAW']: 'Draw',
+      ['Red LOSS']: 'Black Victory',
+    };
+    return format[result] || result;
+  }
+
   function skipToBeginning() {
     currentTurnIndex = 0;
     playSound();
@@ -72,7 +81,7 @@
   {:then game}
     <div class="px-4 py-3 game-info">
       <div class="players">
-        {game.redPlayer} vs. {game.blackPlayer} — {game.result}
+        {game.redPlayer} vs. {game.blackPlayer} — {formatResult(game.result)}
       </div>
       <div class="venue">
         {game.event}
