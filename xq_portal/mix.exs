@@ -51,8 +51,7 @@ defmodule XQ.MixProject do
       {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
 
-      # Data & Metrics
-      {:jason, "~> 1.0"},
+      # Instrumentation
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
 
@@ -60,6 +59,7 @@ defmodule XQ.MixProject do
       {:credo, "~> 1.5.4", only: [:dev, :test], runtime: false},
 
       # Misc
+      {:jason, "~> 1.0"},
       {:gettext, "~> 0.11"}
     ]
   end

@@ -34,9 +34,9 @@ build:
 	@cd xq_app && yarn
 	@${SOURCE_ENV} ./scripts/cmake.bash -b
 
-.PHONY: docker-compose
-docker-compose:
-	@./scripts/docker-compose.bash
+.PHONY: docker-compose-dev
+docker-compose-dev:
+	docker-compose --file ./docker/docker-compose.dev.yml --project-name xq up --detach
 
 .PHONY: docker-dev-local
 docker-dev-local:
