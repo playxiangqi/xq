@@ -15,7 +15,7 @@ BUILD ?= `git rev-parse --short HEAD`
 #------------------------------------------------------------------------------
 .PHONY: start
 start:
-	@cd xq_portal && mix phx.server
+	@cd xq_portal && mix compile --force && mix phx.server
 
 .PHONY: setup
 setup:
