@@ -108,7 +108,7 @@
         {resp.data.game.info.event}
       </div>
       <div class="date">
-        {new Date(resp.data.game.date).toDateString()}
+        {new Date(resp.data.game.info.date).toDateString()}
       </div>
       <div class="opening-name">
         {resp.data.game.info.openingCode}: {resp.data.game.info.openingName}
