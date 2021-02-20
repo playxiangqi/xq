@@ -41,7 +41,7 @@
           <div class="select is-small">
             <select>
               {#each resp.data?.openings || [] as o}
-                <option>{o.name}</option>
+                <option>{o.id} - {o.name}</option>
               {/each}
             </select>
           </div>

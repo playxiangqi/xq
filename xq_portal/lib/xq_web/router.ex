@@ -28,12 +28,12 @@ defmodule XQWeb.Router do
 
   scope "/graphql" do
     forward "/ui", Absinthe.Plug.GraphiQL,
-      schema: XQWeb.GraphQL.Schemas.Opening,
+      schema: XQWeb.Schema,
       default_url: "http://localhost:4000/graphql",
       interface: :playground
 
     forward "/", Absinthe.Plug,
-      schema: XQWeb.GraphQL.Schemas.Opening,
+      schema: XQWeb.Schema,
       adapter: Absinthe.Adapter.StrictLanguageConventions
   end
 

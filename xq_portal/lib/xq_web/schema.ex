@@ -1,4 +1,4 @@
-defmodule XQWeb.GraphQL.Schemas.Opening do
+defmodule XQWeb.Schema do
   use Absinthe.Schema
   import_types XQWeb.GraphQL.ContentTypes
 

@@ -3,9 +3,7 @@
 
   // GraphQL Client
   import { initClient } from '@urql/svelte';
-  initClient({
-    url: '/graphql',
-  });
+  initClient({ url: '/graphql' });
 
   // Components
   import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
