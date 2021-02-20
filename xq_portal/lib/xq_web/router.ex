@@ -22,8 +22,6 @@ defmodule XQWeb.Router do
 
   scope "/api", XQWeb do
     pipe_through :api
-
-    get "/analysis/game", AnalysisController, :analyze_game
   end
 
   scope "/graphql" do
