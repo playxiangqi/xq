@@ -10,6 +10,7 @@ import nodePollyfills from 'rollup-plugin-polyfill-node';
 import svelteSVG from 'rollup-plugin-svelte-svg';
 import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser';
+import replace from '@rollup/plugin-replace';
 
 const production = process.env.MIX_ENV === 'prod';
 const STATIC_ASSET_DIR = '../xq_portal/priv/static';
@@ -79,5 +80,10 @@ export default {
 
     // Minify production builds
     production && terser(),
+
+    // NODE_ENV replacement for bundling urql
+    production
+      ? replace({ 'process.env.NODE_ENV': JSON.stringify('production') })
+      : replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
   ],
 };

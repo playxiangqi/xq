@@ -26,6 +26,17 @@ defmodule XQWeb.Router do
     get "/analysis/game", AnalysisController, :analyze_game
   end
 
+  scope "/graphql" do
+    forward "/ui", Absinthe.Plug.GraphiQL,
+      schema: XQWeb.Schema,
+      default_url: "http://localhost:4000/graphql",
+      interface: :playground
+
+    forward "/", Absinthe.Plug,
+      schema: XQWeb.Schema,
+      adapter: Absinthe.Adapter.StrictLanguageConventions
+  end
+
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put
