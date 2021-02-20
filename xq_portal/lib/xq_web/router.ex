@@ -32,7 +32,9 @@ defmodule XQWeb.Router do
       default_url: "http://localhost:4000/graphql",
       interface: :playground
 
-    forward "/", Absinthe.Plug, schema: XQWeb.GraphQL.Schemas.Opening
+    forward "/", Absinthe.Plug,
+      schema: XQWeb.GraphQL.Schemas.Opening,
+      adapter: Absinthe.Adapter.StrictLanguageConventions
   end
 
   # Enables LiveDashboard only for development

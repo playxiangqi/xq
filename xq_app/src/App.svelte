@@ -1,6 +1,12 @@
 <script lang="ts">
   import 'bulma/bulma.sass';
 
+  // GraphQL Client
+  import { initClient } from '@urql/svelte';
+  initClient({
+    url: '/graphql',
+  });
+
   // Components
   import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
   import SearchPanel from './components/analysis/SearchPanel.svelte';

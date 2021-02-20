@@ -1,4 +1,20 @@
 <script lang="ts">
+  import { operationStore, query } from '@urql/svelte';
+
+  type Opening = {
+    id: string;
+    name: string;
+  };
+
+  const opStore = operationStore<{ openings: ArrayLike<Opening> }>(`
+    query {
+      openings {
+        id
+        name
+      }
+    }
+  `);
+  const resp = query(opStore);
 </script>
 
 <div class="panel search-panel">
@@ -15,14 +31,26 @@
       </div>
     </div>
     <div class="field">
-      <label for="opening-input" class="label">Opening</label>
-      <div class="control opening-input">
-        <input class="input" type="text" placeholder="Elephant Opening" />
+      <label for="opening-dropdown" class="label">Opening</label>
+      <div class="control opening-dropdown">
+        {#if $resp.fetching}
+          <div class="select is-loading">
+            <select />
+          </div>
+        {:else}
+          <div class="select is-small">
+            <select>
+              {#each resp.data?.openings || [] as o}
+                <option>{o.name}</option>
+              {/each}
+            </select>
+          </div>
+        {/if}
       </div>
     </div>
     <div class="field">
       <label for="source-dropdown" class="label">Source</label>
-      <div class="control">
+      <div class="control source-dropdown">
         <div class="select">
           <select>
             <option>Play XiangQi</option>
