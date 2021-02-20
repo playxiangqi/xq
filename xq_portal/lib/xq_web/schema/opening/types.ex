@@ -1,4 +1,4 @@
-defmodule XQWeb.GraphQL.ContentTypes do
+defmodule XQWeb.Schema.Opening.Types do
   use Absinthe.Schema.Notation
 
   object :opening do

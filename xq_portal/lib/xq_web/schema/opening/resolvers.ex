@@ -1,4 +1,4 @@
-defmodule XQWeb.GraphQL.Resolvers.Content do
+defmodule XQWeb.Schema.Opening.Resolvers do
   require Logger
 
   def list_openings(_root, _args, _info) do

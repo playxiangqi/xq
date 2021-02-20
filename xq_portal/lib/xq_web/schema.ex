@@ -1,13 +1,9 @@
 defmodule XQWeb.Schema do
   use Absinthe.Schema
-  import_types XQWeb.GraphQL.ContentTypes
 
-  alias XQWeb.GraphQL.Resolvers
+  import_types __MODULE__.Opening.{Queries, Types}
 
   query do
-    @desc "Get all openings"
-    field :openings, list_of(:opening) do
-      resolve &Resolvers.Content.list_openings/3
-    end
+    import_fields :opening_queries
   end
 end
