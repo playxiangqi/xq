@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-import { apiClient } from 'services';
 import { Dimensions } from './dimensions';
 import { createInitialLayout, Move, Point, Side, RED, BLACK } from './pieces';
 
@@ -12,15 +11,6 @@ export type BoardState = {
   moves: Move[];
   turn: Side;
 };
-
-async function fetchGameAnalysis(): Promise<{
-  boardStates: Layout[];
-  gameInfo: any;
-}> {
-  const { data } = await apiClient.get('/api/analysis/game');
-  console.log(data);
-  return data;
-}
 
 export function createBoardState(dimensions: Dimensions) {
   const activeLayout = createInitialLayout(dimensions);
@@ -39,8 +29,7 @@ export function createBoardState(dimensions: Dimensions) {
 
   return {
     store,
-    loadGameAnalysis: async () => {
-      const { boardStates, gameInfo } = await fetchGameAnalysis();
+    updateBoardState: (boardStates: Layout[]) =>
       update((state) => {
         state.layouts = boardStates.map((layout) =>
           layout.map(({ ch, side, rank, file }) => {
@@ -54,12 +43,10 @@ export function createBoardState(dimensions: Dimensions) {
               prevPosition: position,
               grabbing: false,
             } as Point;
-          })
+          }),
         );
         return state;
-      });
-      return gameInfo;
-    },
+      }),
     transitionBoardState: (turnIndex: number) =>
       update((state) => {
         state.activeLayout = state.layouts[turnIndex];
@@ -92,7 +79,7 @@ export function createBoardState(dimensions: Dimensions) {
           ];
           const [rank, file] = dimensions.coordsToPoint(
             position[0],
-            position[1]
+            position[1],
           );
           state.moves = [
             ...state.moves,

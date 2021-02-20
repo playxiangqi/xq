@@ -1,13 +1,42 @@
 <script lang="ts">
+  import { operationStore, query } from '@urql/svelte';
   import { createBoardState } from 'components/board';
 
   export let boardState: ReturnType<typeof createBoardState>;
 
-  const { store, loadGameAnalysis, transitionBoardState } = boardState;
+  const { store, updateBoardState, transitionBoardState } = boardState;
+
+  const opStore = operationStore(`
+    query {
+      game(id:"0") {
+        info {
+          redPlayer
+          blackPlayer
+          result
+          event
+          date
+          openingCode
+          openingName
+          moves
+        }
+        boardStates {
+          ch
+          side
+          rank
+          file
+        }
+      }
+    }
+  `);
+  const resp = query(opStore);
+  opStore.subscribe((store) => {
+    if (!store.fetching && !store.stale) {
+      updateBoardState(store.data?.game?.boardStates);
+    }
+  });
 
   $: maxTurnIndex = $store.layouts.length - 1;
 
-  let promisedGameAnalysis = loadGameAnalysis();
   let currentTurnIndex = 0;
 
   function prepareMoveNotation(moves: string[]) {
@@ -66,24 +95,27 @@
 <div class="panel analysis-panel">
   <!-- <p>Joined lobby as: {$authStore.username}</p> -->
   <p class="panel-heading">Game Analysis</p>
-  {#await promisedGameAnalysis}
+  {#if $resp.fetching}
     <div class="p-5 game-info loading">Loading Game...</div>
     <div class="moves-container loading" />
-  {:then game}
+  {:else}
     <div class="px-4 py-3 game-info">
       <div class="players">
-        {game.redPlayer} vs. {game.blackPlayer} — {game.result}
+        {resp.data.game.info.redPlayer} vs. {resp.data.game.info.blackPlayer} — {resp
+          .data.game.info.result}
       </div>
       <div class="venue">
-        {game.event}
+        {resp.data.game.info.event}
       </div>
       <div class="date">
-        {new Date(game.date).toDateString()}
+        {new Date(resp.data.game.date).toDateString()}
       </div>
-      <div class="opening-name">{game.openingCode}: {game.openingName}</div>
+      <div class="opening-name">
+        {resp.data.game.info.openingCode}: {resp.data.game.info.openingName}
+      </div>
     </div>
     <div class="moves-container">
-      {#each prepareMoveNotation(game.moves) as { moveNum, moveRed, moveBlack }, i}
+      {#each prepareMoveNotation(resp.data.game.info.moves) as { moveNum, moveRed, moveBlack }, i}
         <div class="panel-block move">
           <span class="move-num">{moveNum}.</span>
           <span class="move-red" class:current={currentTurnIndex - 1 === i * 2}
@@ -96,7 +128,7 @@
         </div>
       {/each}
     </div>
-  {/await}
+  {/if}
   <div class="panel-block move-buttons">
     <button
       class="button"
