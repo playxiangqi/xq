@@ -1,17 +1,15 @@
 defmodule XQWeb.Schema.Game.Resolvers do
-  def get_game(_root, _args, _info) do
+  def get_game(_root, %{id: id}, _info) do
     with {:ok, %{body: content, status: 200}} <-
-           Finch.build(:get, XQWeb.Service.archive() <> "/game")
+           Finch.build(:get, XQWeb.Service.archive() <> "/game/#{id}")
            |> Finch.request(XQ.Finch),
-         {:ok, content} <- Jason.decode(content, keys: :atoms),
-         game_info <- List.first(content) do
-      # TODO: realistically, this would be GET /analysis/game + specific ID
+         {:ok, content} <- Jason.decode(content, keys: :atoms) do
       {:ok,
        %{
-         board_states: XQ.Board.State.generate(Map.get(game_info, :moves)),
+         board_states: XQ.Board.State.generate(Map.get(content, :moves)),
          # TODO: Should be handled during parsing stage, since we cache raw data
          info:
-           Map.update!(game_info, :result, fn
+           Map.update!(content, :result, fn
              "Red WIN" -> "Red Victory"
              "Red DRAW" -> "Draw"
              "Red LOSS" -> "Black Victory"
