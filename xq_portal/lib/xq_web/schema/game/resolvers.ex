@@ -6,19 +6,11 @@ defmodule XQWeb.Schema.Game.Resolvers do
          {:ok, content} <- Jason.decode(content, keys: :atoms) do
       {:ok,
        %{
+         # TODO: Consider moving board state generation as part of ETL pipeline
+         #       Entire asynchronous processing, simply serve client-side pristine
+         #       output immediately that is DB cached.
          board_states: XQ.Board.State.generate(Map.get(content, :moves)),
-         # TODO: Should be handled during parsing stage, since we cache raw data
-         info:
-           Map.update!(content, :result, fn
-             "Red WIN" -> "Red Victory"
-             "Red DRAW" -> "Draw"
-             "Red LOSS" -> "Black Victory"
-             result -> result
-           end)
-         # TODO: consider moving this to xq-archive /api/ingest
-         #       as the last stage of ETL, so all board_states
-         #       are pre-computed asynchronously and save in table as the pristine output
-         #       no need for runtime processing on client request
+         info: content
        }}
     else
       {:error, _} ->
