@@ -8,7 +8,7 @@
 
   const opStore = operationStore(`
     query {
-      game(id:"random") {
+      game(id: "random") {
         info {
           redPlayer
           blackPlayer
