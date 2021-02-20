@@ -3,7 +3,7 @@ defmodule XQWeb.AnalysisController do
 
   def analyze_game(conn, _params) do
     with {:ok, %{body: content, status: 200}} <-
-           Finch.build(:get, archive_service() <> "/game")
+           Finch.build(:get, XQWeb.Service.archive() <> "/game")
            |> Finch.request(XQ.Finch),
          {:ok, content} <- Jason.decode(content),
          game_info <- List.first(content) do
@@ -27,6 +27,4 @@ defmodule XQWeb.AnalysisController do
         conn |> put_status(:not_found) |> render(:"404")
     end
   end
-
-  defp archive_service, do: Application.get_env(:xq, :archive_service)
 end

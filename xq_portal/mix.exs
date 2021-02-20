@@ -5,7 +5,7 @@ defmodule XQ.MixProject do
     [
       app: :xq,
       version: "0.1.0",
-      elixir: "~> 1.7",
+      elixir: "~> 1.11.2",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
@@ -44,6 +44,8 @@ defmodule XQ.MixProject do
       {:phoenix_live_dashboard, "~> 0.2"},
 
       # Web
+      {:absinthe, "~> 1.6"},
+      {:absinthe_plug, "~> 1.5"},
       {:finch, "~> 0.6.0"},
       {:plug_cowboy, "~> 2.0"},
 
