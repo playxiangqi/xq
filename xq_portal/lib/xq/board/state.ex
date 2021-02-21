@@ -65,8 +65,6 @@ defmodule XQ.Board.State do
     resolved_point =
       case Regex.run(exact_move, next_move) do
         nil ->
-          nil
-
           case Regex.run(front_or_rear_move, next_move) do
             matches when is_list(matches) ->
               piece_mover(matches)
@@ -88,12 +86,12 @@ defmodule XQ.Board.State do
   end
 
   defp piece_mover([_match, abbrev, prev_file, dir, movement])
-       when abbrev in ["P", "p", "C", "c", "R", "r"] do
+       when abbrev in ["P", "p", "C", "c", "R", "r", "K", "k"] do
     axis_mover(abbrev, prev_file, dir, movement)
   end
 
   defp piece_mover([_match, abbrev, prev_file, dir, next_file])
-       when abbrev in ["B", "b", "N", "n", "A", "a", "K", "k"] do
+       when abbrev in ["B", "b", "N", "n", "A", "a"] do
     fixed_mover(abbrev, prev_file, dir, next_file)
   end
 
@@ -106,7 +104,7 @@ defmodule XQ.Board.State do
 
   defp piece_mover([_match, front_or_rear, abbrev, dir, next_file])
        when front_or_rear in ["+", "-"] and
-              abbrev in ["B", "b", "N", "n", "A", "a", "K", "k"] do
+              abbrev in ["B", "b", "N", "n", "A", "a"] do
     fixed_mover(abbrev, "-1", dir, next_file, front_or_rear == "+")
   end
 
