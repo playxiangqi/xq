@@ -5,7 +5,7 @@ defmodule XQ.Core.Board do
     board
     |> Enum.with_index()
     |> remove_piece_at(old_index)
-    |> Enum.map(&Enum.at(&1, 0))
+    |> Enum.map(&elem(&1, 0))
     |> maybe_capture_piece(new_point)
   end
 
