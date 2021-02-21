@@ -1,6 +1,8 @@
 defmodule XQ.Core.Generator do
   require Logger
 
+  alias XQ.Core.{Point}
+
   @starting_state [
     %{ch: :chariot, side: :black, rank: 1, file: 1},
     %{ch: :horse, side: :black, rank: 1, file: 2},
@@ -35,8 +37,6 @@ defmodule XQ.Core.Generator do
     %{ch: :horse, side: :red, rank: 10, file: 8},
     %{ch: :chariot, side: :red, rank: 10, file: 9}
   ]
-
-  @side_facing :red
 
   # TODO: Rename module to Core and this file to Generator
   # Can have XQ.Core.Generator, XQ.Core.Board, and XQ.Core.Point
@@ -111,14 +111,14 @@ defmodule XQ.Core.Generator do
       abs_file_or_delta_rank
     } = parse_params(abbrev, prev_file, movement)
 
-    file = calc_file(prev_file, side)
-    sign = if side == @side_facing, do: -1, else: 1
+    file = Point.norm_file(prev_file, side)
+    sign = Point.sign(side)
 
     {next_file, diff_rank} =
       case dir do
         # Horizontal movement w/ absolute file
         "=" ->
-          {calc_file(abs_file_or_delta_rank, side), 0}
+          {Point.norm_file(abs_file_or_delta_rank, side), 0}
 
         # Vertical movement w/ delta rank
         "-" ->
@@ -143,10 +143,10 @@ defmodule XQ.Core.Generator do
         nil
     end
 
-    file = calc_file(prev_file, side)
-    next_file = calc_file(next_file, side)
+    file = Point.norm_file(prev_file, side)
+    next_file = Point.norm_file(next_file, side)
 
-    sign = if side == @side_facing, do: -1, else: 1
+    sign = Point.sign(side)
 
     delta =
       case ch do
@@ -165,29 +165,11 @@ defmodule XQ.Core.Generator do
   end
 
   defp parse_params(abbrev, prev, next) do
-    {ch, side} = get_ch_and_side(abbrev)
+    {ch, side} = Point.piece(abbrev)
     {prev, _} = Integer.parse(prev)
     {next, _} = Integer.parse(next)
     {ch, side, prev, next}
   end
-
-  defp get_ch_and_side("A"), do: {:advisor, :red}
-  defp get_ch_and_side("a"), do: {:advisor, :black}
-  defp get_ch_and_side("P"), do: {:soldier, :red}
-  defp get_ch_and_side("p"), do: {:soldier, :black}
-  defp get_ch_and_side("C"), do: {:cannon, :red}
-  defp get_ch_and_side("c"), do: {:cannon, :black}
-  defp get_ch_and_side("N"), do: {:horse, :red}
-  defp get_ch_and_side("n"), do: {:horse, :black}
-  defp get_ch_and_side("R"), do: {:chariot, :red}
-  defp get_ch_and_side("r"), do: {:chariot, :black}
-  defp get_ch_and_side("B"), do: {:elephant, :red}
-  defp get_ch_and_side("b"), do: {:elephant, :black}
-  defp get_ch_and_side("K"), do: {:general, :red}
-  defp get_ch_and_side("k"), do: {:general, :black}
-
-  defp calc_file(prev, side) when side == @side_facing, do: 10 - prev
-  defp calc_file(prev, _side), do: prev
 
   defp get_matching_points(board_state, ch, side, file) do
     board_state
@@ -243,9 +225,6 @@ defmodule XQ.Core.Generator do
   end
 
   defp maybe_capture_piece(board_state, point) do
-    Enum.filter(
-      board_state,
-      fn p -> p.file != point.file or p.rank != point.rank end
-    )
+    Enum.reject(board_state, &Point.can_capture(&1, point))
   end
 end
