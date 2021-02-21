@@ -3,14 +3,15 @@ defmodule XQ.Core.Board do
 
   def update(board, old_index, new_point) do
     board
-    |> Enum.with_index()
     |> remove_piece_at(old_index)
-    |> Enum.map(&elem(&1, 0))
     |> maybe_capture_piece(new_point)
   end
 
   defp remove_piece_at(board, index) do
-    Enum.filter(board, fn {_, i} -> i != index end)
+    board
+    |> Enum.with_index()
+    |> Enum.filter(fn {_, i} -> i != index end)
+    |> Enum.map(&elem(&1, 0))
   end
 
   defp maybe_capture_piece(board_state, point) do
