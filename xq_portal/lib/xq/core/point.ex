@@ -33,4 +33,8 @@ defmodule XQ.Core.Point do
     do:
       point.side != other.side and
         point.file == other.file and point.rank == other.rank
+
+  def to_zero_index(point) do
+    point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
+  end
 end

@@ -1,13 +1,22 @@
 defmodule XQ.Core.Move do
-  defstruct ~w(kind letter direction delta prev_file next_file is_front)a
+  alias XQ.Core.Point
 
-  @type t :: %__MODULE__{
-          kind: :axis | :fixed,
-          letter: String.t(),
+  defstruct ~w(ch side prev_file next_file diff_rank is_front)a
+
+  @type parsed :: %{
           direction: String.t(),
           delta: integer() | nil,
           prev_file: integer() | nil,
           next_file: integer() | nil,
+          is_front: boolean() | nil
+        }
+
+  @type t :: %__MODULE__{
+          ch: atom(),
+          side: :red | :black,
+          prev_file: integer() | nil,
+          next_file: integer() | nil,
+          diff_rank: integer() | nil,
           is_front: boolean() | nil
         }
 
@@ -24,65 +33,88 @@ defmodule XQ.Core.Move do
         Regex.run(front_or_rear_move, notation) ||
         raise RuntimeError, message: "invalid move notation"
 
-    to_move(matches)
+    piece_mover(matches)
   end
 
-  def move(%__MODULE__{kind: :axis} = move) do
-  end
-
-  def move(%__MODULE__{kind: :fixed} = move) do
-  end
-
-  # TODO: Can be further coalesced into fewer loc
-  defp to_move([_match, position, letter, direction, delta])
-       when is_positional(position) or is_axis_piece(letter) do
-    %__MODULE__{
-      kind: :axis,
-      letter: letter,
-      direction: direction,
-      delta: delta,
-      prev_file: nil,
-      next_file: nil,
-      is_front: position == "+"
-    }
-  end
-
-  defp to_move([_match, letter, prev_file, direction, delta])
+  defp piece_mover([_, letter, prev_file, dir, movement])
        when is_axis_piece(letter) do
-    %__MODULE__{
-      kind: :axis,
-      letter: letter,
-      direction: direction,
-      delta: delta,
-      prev_file: prev_file,
-      next_file: nil,
-      is_front: nil
-    }
+    axis_mover(letter, prev_file, dir, movement)
   end
 
-  defp to_move([_match, position, letter, direction, next_file])
-       when is_positional(position) or is_fixed_piece(letter) do
-    %__MODULE__{
-      kind: :fixed,
-      letter: letter,
-      direction: direction,
-      delta: nil,
-      prev_file: nil,
-      next_file: next_file,
-      is_front: position == "+"
-    }
-  end
-
-  defp to_move([_match, letter, prev_file, direction, next_file])
+  defp piece_mover([_, letter, prev_file, dir, next_file])
        when is_fixed_piece(letter) do
-    %__MODULE__{
-      kind: :fixed,
-      letter: letter,
-      direction: direction,
-      delta: nil,
-      prev_file: prev_file,
-      next_file: next_file,
-      is_front: nil
-    }
+    fixed_mover(letter, prev_file, dir, next_file)
+  end
+
+  # Pieces that lie on the same file
+  defp piece_mover([_, front_or_rear, letter, dir, movement])
+       when is_positional(front_or_rear) and is_axis_piece(letter) do
+    axis_mover(letter, "-1", dir, movement, front_or_rear == "+")
+  end
+
+  defp piece_mover([_, front_or_rear, letter, dir, next_file])
+       when is_positional(front_or_rear) and is_fixed_piece(letter) do
+    fixed_mover(letter, "-1", dir, next_file, front_or_rear == "+")
+  end
+
+  # Pieces that move vertically or horizontally
+  defp axis_mover(letter, prev_file, dir, movement, is_front \\ true) do
+    {
+      ch,
+      side,
+      prev_file,
+      abs_file_or_delta_rank
+    } = parse_params(letter, prev_file, movement)
+
+    file = Point.norm_file(prev_file, side)
+    sign = Point.sign(side)
+
+    {next_file, diff_rank} =
+      case dir do
+        # Horizontal movement w/ absolute file
+        "=" ->
+          {Point.norm_file(abs_file_or_delta_rank, side), 0}
+
+        # Vertical movement w/ delta rank
+        "-" ->
+          {file, abs_file_or_delta_rank * -1}
+
+        "+" ->
+          {file, abs_file_or_delta_rank}
+      end
+
+    {ch, side, file, next_file, diff_rank * sign, is_front}
+  end
+
+  # Pieces that move both vertically and horizontally
+  defp fixed_mover(letter, prev_file, dir, next_file, is_front \\ true) do
+    {ch, side, prev_file, next_file} = parse_params(letter, prev_file, next_file)
+
+    file = Point.norm_file(prev_file, side)
+    next_file = Point.norm_file(next_file, side)
+
+    sign = Point.sign(side)
+
+    delta =
+      case ch do
+        :elephant -> 2
+        :horse -> if abs(next_file - file) == 2, do: 1, else: 2
+        _ -> 1
+      end
+
+    diff_rank =
+      case dir do
+        "+" -> sign
+        "-" -> -sign
+      end
+
+    {ch, side, file, next_file, diff_rank * delta, is_front}
+  end
+
+  defp parse_params(abbrev, prev, next) do
+    {ch, side} = Point.piece(abbrev)
+    {prev, _} = Integer.parse(prev)
+    {next, _} = Integer.parse(next)
+    {ch, side, prev, next}
   end
 end

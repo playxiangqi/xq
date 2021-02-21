@@ -1,7 +1,7 @@
 defmodule XQ.Core.Generator do
   require Logger
 
-  alias XQ.Core.{Point}
+  alias XQ.Core.{Move, Point}
 
   @starting_state [
     %{ch: :chariot, side: :black, rank: 1, file: 1},
@@ -51,124 +51,16 @@ defmodule XQ.Core.Generator do
   end
 
   defp to_zero_indices(states) do
-    Enum.map(states, fn s -> Enum.map(s, &to_zero_index/1) end)
-  end
-
-  defp to_zero_index(point) do
-    point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
+    Enum.map(states, fn s -> Enum.map(s, &Point.to_zero_index/1) end)
   end
 
   defp generate_board_state(next_move, prev_board_states) do
     next_board_state =
       prev_board_states
       |> List.first()
-      |> update_point(resolve_point(next_move))
+      |> update_point(Move.resolve(next_move))
 
     [next_board_state | prev_board_states]
-  end
-
-  defp resolve_point(next_move) do
-    exact_move = ~r/([a-z])([0-9])([+=-])([0-9])/i
-    front_or_rear_move = ~r/([+-])([a-z])([+=-])([0-9])/i
-
-    matches =
-      Regex.run(exact_move, next_move) ||
-        Regex.run(front_or_rear_move, next_move) ||
-        raise RuntimeError, message: "invalid move notation"
-
-    piece_mover(matches)
-  end
-
-  defp piece_mover([_match, abbrev, prev_file, dir, movement])
-       when abbrev in ["P", "p", "C", "c", "R", "r", "K", "k"] do
-    axis_mover(abbrev, prev_file, dir, movement)
-  end
-
-  defp piece_mover([_match, abbrev, prev_file, dir, next_file])
-       when abbrev in ["B", "b", "N", "n", "A", "a"] do
-    fixed_mover(abbrev, prev_file, dir, next_file)
-  end
-
-  # Pieces that lie on the same file
-  defp piece_mover([_match, front_or_rear, abbrev, dir, movement])
-       when front_or_rear in ["+", "-"] and
-              abbrev in ["P", "p", "C", "c", "R", "r"] do
-    axis_mover(abbrev, "-1", dir, movement, front_or_rear == "+")
-  end
-
-  defp piece_mover([_match, front_or_rear, abbrev, dir, next_file])
-       when front_or_rear in ["+", "-"] and
-              abbrev in ["B", "b", "N", "n", "A", "a"] do
-    fixed_mover(abbrev, "-1", dir, next_file, front_or_rear == "+")
-  end
-
-  # Pieces that move vertically or horizontally
-  defp axis_mover(abbrev, prev_file, dir, movement, is_front \\ true) do
-    {
-      ch,
-      side,
-      prev_file,
-      abs_file_or_delta_rank
-    } = parse_params(abbrev, prev_file, movement)
-
-    file = Point.norm_file(prev_file, side)
-    sign = Point.sign(side)
-
-    {next_file, diff_rank} =
-      case dir do
-        # Horizontal movement w/ absolute file
-        "=" ->
-          {Point.norm_file(abs_file_or_delta_rank, side), 0}
-
-        # Vertical movement w/ delta rank
-        "-" ->
-          {file, abs_file_or_delta_rank * -1}
-
-        "+" ->
-          {file, abs_file_or_delta_rank}
-      end
-
-    {ch, side, file, next_file, diff_rank * sign, is_front}
-  end
-
-  # Pieces that move both vertically and horizontally
-  defp fixed_mover(abbrev, prev_file, dir, next_file, is_front \\ true) do
-    {ch, side, prev_file, next_file} = parse_params(abbrev, prev_file, next_file)
-
-    cond do
-      prev_file == -1 or prev_file == 11 ->
-        Logger.info("front or rear move")
-
-      true ->
-        nil
-    end
-
-    file = Point.norm_file(prev_file, side)
-    next_file = Point.norm_file(next_file, side)
-
-    sign = Point.sign(side)
-
-    delta =
-      case ch do
-        :elephant -> 2
-        :horse -> if abs(next_file - file) == 2, do: 1, else: 2
-        _ -> 1
-      end
-
-    diff_rank =
-      case dir do
-        "+" -> sign
-        "-" -> -sign
-      end
-
-    {ch, side, file, next_file, diff_rank * delta, is_front}
-  end
-
-  defp parse_params(abbrev, prev, next) do
-    {ch, side} = Point.piece(abbrev)
-    {prev, _} = Integer.parse(prev)
-    {next, _} = Integer.parse(next)
-    {ch, side, prev, next}
   end
 
   defp get_matching_points(board_state, ch, side, file) do
@@ -192,7 +84,7 @@ defmodule XQ.Core.Generator do
       |> sort_front_rear_rank(side)
 
     {point, index} =
-      if is_front == true,
+      if is_front,
         do: List.first(points_to_move),
         else: List.last(points_to_move)
 
