@@ -1,4 +1,4 @@
-defmodule XQ.Board.State do
+defmodule XQ.Core.Generator do
   require Logger
 
   @starting_state [
@@ -59,30 +59,24 @@ defmodule XQ.Board.State do
   end
 
   defp generate_board_state(next_move, prev_board_states) do
-    exact_move = ~r/([a-z])([0-9])([+=-])([0-9])/i
-    front_or_rear_move = ~r/([+-])([a-z])([+=-])([0-9])/i
-
-    resolved_point =
-      case Regex.run(exact_move, next_move) do
-        nil ->
-          case Regex.run(front_or_rear_move, next_move) do
-            matches when is_list(matches) ->
-              piece_mover(matches)
-
-            nil ->
-              raise RuntimeError, message: "invalid move notation"
-          end
-
-        matches ->
-          piece_mover(matches)
-      end
-
     next_board_state =
       prev_board_states
       |> List.first()
-      |> update_point(resolved_point)
+      |> update_point(resolve_point(next_move))
 
     [next_board_state | prev_board_states]
+  end
+
+  defp resolve_point(next_move) do
+    exact_move = ~r/([a-z])([0-9])([+=-])([0-9])/i
+    front_or_rear_move = ~r/([+-])([a-z])([+=-])([0-9])/i
+
+    matches =
+      Regex.run(exact_move, next_move) ||
+        Regex.run(front_or_rear_move, next_move) ||
+        raise RuntimeError, message: "invalid move notation"
+
+    piece_mover(matches)
   end
 
   defp piece_mover([_match, abbrev, prev_file, dir, movement])

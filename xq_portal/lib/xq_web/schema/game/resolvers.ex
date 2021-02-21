@@ -6,10 +6,15 @@ defmodule XQWeb.Schema.Game.Resolvers do
          {:ok, content} <- Jason.decode(content, keys: :atoms) do
       {:ok,
        %{
-         # TODO: Consider moving board state generation as part of ETL pipeline
-         #       Entire asynchronous processing, simply serve client-side pristine
-         #       output immediately that is DB cached.
-         board_states: XQ.Board.State.generate(Map.get(content, :moves)),
+         # TODO:
+         #  Consider moving board state generation as part of ETL pipeline
+         #  Entire asynchronous processing, simply serve client-side pristine
+         #  output immediately that is DB cached.
+         #
+         # However:
+         #  Run-time processing gives the most flexibility, since
+         #  there is minimal support and an assumption of only one move notation.
+         board_states: XQ.Core.Generator.generate(Map.get(content, :moves)),
          info: content
        }}
     else
