@@ -37,4 +37,17 @@ defmodule XQ.Core.Point do
   def to_zero_index(point) do
     point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
   end
+
+  def by_rank(side, a, b) do
+    if side == :red,
+      do: a.rank < b.rank,
+      else: a.rank > b.rank
+  end
+
+  def update(point, next_file, diff_rank) do
+    point
+    |> Map.update!(:rank, &(&1 + diff_rank))
+    # next_file of -1 indicates front/rear move where there is no file change
+    |> Map.update!(:file, &if(next_file != -1, do: next_file, else: &1))
+  end
 end

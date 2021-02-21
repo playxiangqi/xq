@@ -1,7 +1,7 @@
 defmodule XQ.Core.Generator do
   require Logger
 
-  alias XQ.Core.{Move, Point}
+  alias XQ.Core.{Board, Move, Point}
 
   @starting_state [
     %{ch: :chariot, side: :black, rank: 1, file: 1},
@@ -55,21 +55,17 @@ defmodule XQ.Core.Generator do
   end
 
   defp generate_board_state(next_move, prev_board_states) do
+    move = Move.resolve(next_move)
+
     next_board_state =
       prev_board_states
       |> List.first()
-      |> update_point(Move.resolve(next_move))
+      |> update_board_state(move)
 
     [next_board_state | prev_board_states]
   end
 
-  defp get_matching_points(board_state, ch, side, file) do
-    board_state
-    |> Enum.filter(fn {p, _} -> p.ch == ch and p.side == side end)
-    |> Enum.filter(fn {p, _} -> p.file == file or file == -1 or file == 11 end)
-  end
-
-  defp update_point(board_state, {
+  defp update_board_state(board_state, {
          ch,
          side,
          file,
@@ -88,35 +84,21 @@ defmodule XQ.Core.Generator do
         do: List.first(points_to_move),
         else: List.last(points_to_move)
 
-    new_point =
-      point
-      |> Map.update!(:rank, &(&1 + diff_rank))
-      # next_file of -1 indicates front/rear move where there is no file change
-      |> Map.update!(:file, &if(next_file != -1, do: next_file, else: &1))
-
-    updated_board_state =
-      board_state
-      |> Enum.with_index()
-      |> remove_original_piece(index)
-      |> Enum.map(fn {p, _} -> p end)
-      |> maybe_capture_piece(new_point)
+    new_point = Point.update(point, next_file, diff_rank)
+    updated_board_state = Board.update(board_state, index, new_point)
 
     [new_point | updated_board_state]
   end
 
+  defp get_matching_points(board_state, ch, side, file) do
+    board_state
+    |> Enum.filter(fn {p, _} -> p.ch == ch and p.side == side end)
+    |> Enum.filter(fn {p, _} -> p.file == file or file == -1 or file == 11 end)
+  end
+
   defp sort_front_rear_rank(board_state, side) do
     Enum.sort(board_state, fn {a, _}, {b, _} ->
-      if side == :red,
-        do: a.rank < b.rank,
-        else: a.rank > b.rank
+      Point.by_rank(side, a, b)
     end)
-  end
-
-  defp remove_original_piece(board_state, orig_index) do
-    Enum.filter(board_state, fn {_, i} -> i != orig_index end)
-  end
-
-  defp maybe_capture_piece(board_state, point) do
-    Enum.reject(board_state, &Point.can_capture(&1, point))
   end
 end
