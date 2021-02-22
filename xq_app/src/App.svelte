@@ -6,14 +6,14 @@
   initClient({ url: '/graphql' });
 
   // Components
-  import SearchPanel from './components/analysis/SearchPanel.svelte';
+  import DatabaseExplorer from './views/analysis/DatabaseExplorer.svelte';
   import Demo from './views/Demo.svelte';
 
   // Routes
   import Router, { link } from 'svelte-spa-router';
   const routes = {
     '/': Demo,
-    '/analysis/database-explorer': SearchPanel,
+    '/analysis/database-explorer': DatabaseExplorer,
   };
 
   // Modules
@@ -36,9 +36,14 @@
     <div class="navbar-menu">
       <div class="navbar-start">
         <a class="navbar-item" href="/" use:link>Demo</a>
-        <a class="navbar-item" href="/analysis/database-explorer" use:link>
-          Analysis
-        </a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <div class="navbar-link">Analysis</div>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="/analysis/database-explorer" use:link>
+              Database Explorer
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
