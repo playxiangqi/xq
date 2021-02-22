@@ -1,4 +1,4 @@
-defmodule XQ.Core.Generator do
+defmodule XQ.Generator do
   require Logger
 
   alias XQ.Core.{Board, Move, Point}
@@ -40,7 +40,8 @@ defmodule XQ.Core.Generator do
 
   # TODO: Can turn this to match :moves vs. :board, e.g. move notation vs FEN/PGN
 
-  def generate(%{moves: moves}) do
+  def generate(%{id: id, moves: moves}) do
+    Logger.info("id: #{id}")
     Logger.info("moves: #{inspect(moves, limit: :infinity)}")
 
     moves
