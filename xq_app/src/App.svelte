@@ -6,10 +6,15 @@
   initClient({ url: '/graphql' });
 
   // Components
-  import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
   import SearchPanel from './components/analysis/SearchPanel.svelte';
-  import Board from './components/board/Board.svelte';
-  import Navbar from './components/nav/Navbar.svelte';
+  import Demo from './views/Demo.svelte';
+
+  // Routes
+  import Router, { link } from 'svelte-spa-router';
+  const routes = {
+    '/': Demo,
+    '/analysis/database-explorer': SearchPanel,
+  };
 
   // Modules
   // TODO: Move dimensions to utilities
@@ -22,17 +27,12 @@
 </script>
 
 <div class="app">
-  <Navbar />
-  <div class="content-container">
-    <div class="col-1">
-      <SearchPanel />
-    </div>
-    <div class="col-2">
-      <Board {dimensions} {boardState} />
-    </div>
-    <div class="col-3">
-      <AnalysisPanel {boardState} />
-    </div>
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <a href="/" use:link>Demo</a>
+    <a href="/analysis/database-explorer" use:link>Analysis</a>
+  </nav>
+  <div class="view-container">
+    <Router {routes} />
   </div>
 </div>
 
@@ -59,9 +59,11 @@
   .app {
     height: 100%;
     width: 100%;
-    .content-container {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr 1fr;
+
+    .navbar {
+    }
+
+    .view-container {
     }
   }
 </style>
