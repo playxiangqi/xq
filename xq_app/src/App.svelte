@@ -28,8 +28,19 @@
 
 <div class="app">
   <nav class="navbar" role="navigation" aria-label="main navigation">
-    <a href="/" use:link>Demo</a>
-    <a href="/analysis/database-explorer" use:link>Analysis</a>
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://github.com/playxiangqi">
+        Play XiangQi
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/" use:link>Demo</a>
+        <a class="navbar-item" href="/analysis/database-explorer" use:link>
+          Analysis
+        </a>
+      </div>
+    </div>
   </nav>
   <div class="view-container">
     <Router {routes} />
