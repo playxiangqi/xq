@@ -3,6 +3,7 @@ defmodule XQ.Core.Move do
 
   defstruct ~w(ch side prev_file next_file diff_rank is_front)a
 
+  # TODO: Move this to a parser module that provides inputs to this mover module
   @type parsed :: %{
           direction: String.t(),
           delta: integer() | nil,

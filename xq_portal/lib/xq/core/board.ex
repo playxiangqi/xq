@@ -7,15 +7,20 @@ defmodule XQ.Core.Board do
     |> maybe_capture_piece(new_point)
   end
 
-  def point_to_moves(board, ch, side, file) do
-    board
-    |> Enum.with_index()
-    |> Enum.filter(fn {p, _} ->
-      Point.is_matching(p, %{ch: ch, side: side, file: file})
-    end)
-    |> Enum.sort(fn {a, _}, {b, _} ->
-      Point.by_rank(side, a, b)
-    end)
+  def find_point(board, ch, side, file, is_front) do
+    potential_points =
+      board
+      |> Enum.with_index()
+      |> Enum.filter(fn {p, _} ->
+        Point.is_matching(p, %{ch: ch, side: side, file: file})
+      end)
+      |> Enum.sort(fn {a, _}, {b, _} ->
+        Point.by_rank(side, a, b)
+      end)
+
+    if is_front,
+      do: List.first(potential_points),
+      else: List.last(potential_points)
   end
 
   defp remove_piece_at(board, index) do

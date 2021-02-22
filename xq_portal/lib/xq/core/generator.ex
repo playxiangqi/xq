@@ -40,14 +40,16 @@ defmodule XQ.Core.Generator do
 
   # TODO: Can turn this to match :moves vs. :board, e.g. move notation vs FEN/PGN
 
-  def generate(nil), do: [@starting_state] |> to_zero_indices()
-
   def generate(%{moves: moves}) do
+    Logger.info("moves: #{inspect(moves, limit: :infinity)}")
+
     moves
     |> Enum.reduce([@starting_state], &generate_board_state/2)
     |> Enum.reverse()
     |> to_zero_indices()
   end
+
+  def generate(_), do: [@starting_state] |> to_zero_indices()
 
   defp to_zero_indices(states) do
     Enum.map(states, fn s -> Enum.map(s, &Point.to_zero_index/1) end)
@@ -72,14 +74,8 @@ defmodule XQ.Core.Generator do
          diff_rank,
          is_front
        }) do
-    points_to_move = Board.point_to_moves(prev_state, ch, side, file)
-
-    {point_to_move, index} =
-      if is_front,
-        do: List.first(points_to_move),
-        else: List.last(points_to_move)
-
-    new_point = Point.update(point_to_move, next_file, diff_rank)
+    {old_point, index} = Board.find_point(prev_state, ch, side, file, is_front)
+    new_point = Point.update(old_point, next_file, diff_rank)
     updated_state = Board.update(prev_state, index, new_point)
 
     [new_point | updated_state]
