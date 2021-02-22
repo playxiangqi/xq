@@ -1,5 +1,6 @@
 defmodule XQ.Core.Point do
   @type t :: %{
+          ch: atom(),
           side: :red | :black,
           rank: integer(),
           file: integer()
@@ -42,6 +43,17 @@ defmodule XQ.Core.Point do
     if side == :red,
       do: a.rank < b.rank,
       else: a.rank > b.rank
+  end
+
+  def is_matching(point, other) do
+    point.ch == other.ch and point.side == other.side and
+      (point.file == other.file or is_front_or_rear(other))
+  end
+
+  # -1 for previous_file is a standin for front/rear move
+  # In which case the resolved file will be -1 or 11 (depending on the side)
+  defp is_front_or_rear(point) do
+    point.file == -1 or point.file == 11
   end
 
   def update(point, next_file, diff_rank) do

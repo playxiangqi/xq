@@ -24,6 +24,8 @@ defmodule XQ.Core.Move do
   defguardp is_fixed_piece(letter) when letter in ~w(B b N n A a)
   defguardp is_positional(c) when c in ~w(+ -)
 
+  # TODO: Eventually abstract to a number of different notation parsers
+  #       that generate a uniform move struct w/ as much point info as possible
   def resolve(notation) do
     exact_move = ~r/([a-z])([0-9])([+=-])([0-9])/i
     front_or_rear_move = ~r/([+-])([a-z])([+=-])([0-9])/i
