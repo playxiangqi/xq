@@ -7,7 +7,7 @@
   const { store, updateBoardState, transitionBoardState } = boardState;
 
   const opStore = operationStore(`
-    query {
+    query getGameBoardStates {
       game(id: "random") {
         info {
           redPlayer

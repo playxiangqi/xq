@@ -1,7 +1,6 @@
 <script lang="ts">
   // Components
   import AnalysisPanel from '../components/analysis/AnalysisPanel.svelte';
-  import SearchPanel from '../components/analysis/SearchPanel.svelte';
   import Board from '../components/board/Board.svelte';
 
   // Modules
@@ -15,9 +14,7 @@
 </script>
 
 <div class="demo">
-  <div class="col-1">
-    <SearchPanel />
-  </div>
+  <div class="col-1" />
   <div class="col-2">
     <Board {dimensions} {boardState} />
   </div>
@@ -32,6 +29,6 @@
     width: 100%;
 
     display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr;
+    grid-template-columns: 1fr 2fr 2fr;
   }
 </style>

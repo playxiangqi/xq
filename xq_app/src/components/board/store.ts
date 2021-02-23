@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import { Dimensions } from './dimensions';
 import { createInitialLayout, Move, Point, Side, RED, BLACK } from './pieces';
 
-type Layout = Point[];
+export type Layout = Point[];
 
 // TODO: AnalysisState which contains/extends a BoardState
 export type BoardState = {

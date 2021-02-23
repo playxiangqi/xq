@@ -1,10 +1,45 @@
 <script lang="ts">
-  import SearchPanel from '../../components/analysis/SearchPanel.svelte';
-  // import { createBoardState } from 'components/board';
-
-  // export let boardState: ReturnType<typeof createBoardState>;
+  import { gql, operationStore, query } from '@urql/svelte';
+  import SearchForm from './SearchForm.svelte';
 </script>
 
 <div class="database-explorer">
-  <SearchPanel />
+  <div class="col-1" />
+  <div class="main-panel panel">
+    <p class="panel-heading">Database Explorer</p>
+    <div class="panel-block">
+      <SearchForm />
+    </div>
+    <div class="panel-block">
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Red Player</th>
+              <th>Black Player</th>
+              <th>Opening</th>
+              <th>Result</th>
+              <th>Event</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td />
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-3" />
 </div>
+
+<style lang="scss">
+  .database-explorer {
+    margin-top: 15px;
+
+    display: grid;
+    grid-template-columns: 1fr 6.5fr 1fr;
+  }
+</style>

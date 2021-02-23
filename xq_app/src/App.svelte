@@ -15,15 +15,6 @@
     '/': Demo,
     '/analysis/database-explorer': DatabaseExplorer,
   };
-
-  // Modules
-  // TODO: Move dimensions to utilities
-  // TODO: Turn boardState into matchState
-  import { createBoardState, Dimensions } from 'components/board';
-
-  const DEFAULT_SCALE = 1.0;
-  const dimensions = new Dimensions(DEFAULT_SCALE);
-  const boardState = createBoardState(dimensions);
 </script>
 
 <div class="app">
