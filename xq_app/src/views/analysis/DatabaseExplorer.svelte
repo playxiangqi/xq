@@ -10,25 +10,23 @@
       <SearchForm />
     </div>
     <div class="panel-block">
-      <div class="table-container">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Red Player</th>
-              <th>Black Player</th>
-              <th>Opening</th>
-              <th>Result</th>
-              <th>Event</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td />
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="table is-fullwidth is-striped is-hoverable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Red Player</th>
+            <th>Black Player</th>
+            <th>Opening</th>
+            <th>Result</th>
+            <th>Event</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td />
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <div class="col-3" />

@@ -3,10 +3,16 @@ defmodule XQWeb.Schema.Game.Queries do
 
   alias XQWeb.Schema.Game.Resolvers
 
+  input_object :search_filters do
+    field :red_player, :string
+    field :limit, :integer
+  end
+
   object :game_queries do
-    @desc "Get full board representation/metadata for a specific game"
+    @desc "Get game info and board representation"
     field :game, :game do
       arg :id, non_null(:id)
+      arg :search_filters, :search_filters
       resolve &Resolvers.get_game/3
     end
   end

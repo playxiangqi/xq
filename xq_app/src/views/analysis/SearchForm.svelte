@@ -52,7 +52,7 @@
   const gameInfoStore = operationStore(
     searchQuery,
     { redPlayer, limit },
-    { pause: true },
+    { requestPolicy: 'cache-first', pause: true },
   );
   query(gameInfoStore);
 
@@ -65,6 +65,7 @@
 
     $gameInfoStore.context = {
       ...gameInfoStore.context,
+      requestPolicy: 'network-only',
       pause: false,
     };
   }

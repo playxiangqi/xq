@@ -1,4 +1,6 @@
 defmodule XQWeb.Schema.Game.Resolvers do
+  require Logger
+
   def get_game(_root, %{id: id}, _info) do
     with {:ok, %{body: content, status: 200}} <-
            Finch.build(:get, XQWeb.Service.archive() <> "/game/#{id}")
@@ -21,5 +23,9 @@ defmodule XQWeb.Schema.Game.Resolvers do
       {:error, _} ->
         {:error, %{message: "Not found"}}
     end
+  end
+
+  def get_game(_root, %{limit: _} = args, _info) do
+    Logger.info("args: #{inspect(args)}")
   end
 end
