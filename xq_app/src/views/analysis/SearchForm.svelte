@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gql, operationStore, query } from '@urql/svelte';
+  import { operationStore, query } from '@urql/svelte';
 
   type Opening = {
     id: string;
@@ -16,30 +16,45 @@
   `);
   const resp = query(openingStore);
 
-  let redPlayer: string;
-  let blackPlayer: string;
-  let opening: string;
-  let result: string;
+  let redPlayer: string | undefined;
+  let blackPlayer: string | undefined;
+  let opening: string | undefined;
+  let result: string | undefined;
   let limit = 10;
 
-  const gameInfoStore = operationStore(
-    gql`
-      query searchGames($limit: Int) {
-        game(limit: $limit) {
-          info {
-            redPlayer
-            blackPlayer
-            result
-            event
-            date
-            openingCode
-            openingName
-          }
+  const searchQuery = `
+    query searchGames(
+      $redPlayer: String
+      $blackPlayer: String
+      $opening: String
+      $result: String
+      $limit: Int
+    ) {
+      game(
+        redPlayer: $redPlayer
+        blackPlayer: $blackPlayer
+        opening: $opening
+        result: $result
+        limit: $limit
+      ) {
+        info {
+          redPlayer
+          blackPlayer
+          result
+          event
+          date
+          openingCode
+          openingName
         }
       }
-    `,
-    { limit },
+    }
+  `;
+  const gameInfoStore = operationStore(
+    searchQuery,
+    { redPlayer, limit },
+    { pause: true },
   );
+  query(gameInfoStore);
 
   function searchGames() {
     console.log(`redPlayer: ${redPlayer}`);
@@ -48,7 +63,10 @@
     console.log(`result: ${result}`);
     console.log(`limit: ${limit}`);
 
-    // query(gameInfoStore);
+    $gameInfoStore.context = {
+      ...gameInfoStore.context,
+      pause: false,
+    };
   }
 </script>
 
