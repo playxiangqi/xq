@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { gql, operationStore, query } from '@urql/svelte';
   import SearchForm from './SearchForm.svelte';
 </script>
 
@@ -40,6 +39,6 @@
     margin-top: 15px;
 
     display: grid;
-    grid-template-columns: 1fr 6.5fr 1fr;
+    grid-template-columns: 1fr 6.75fr 1fr;
   }
 </style>

@@ -1,5 +1,3 @@
-import { Point } from 'components/board';
-
 export type GameResult = 'Red Victory' | 'Draw' | 'Black Victory';
 
 export type GameInfo = {
