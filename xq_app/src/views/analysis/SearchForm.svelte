@@ -30,29 +30,27 @@
       $result: String
       $limit: Int
     ) {
-      game(
+      games(
         redPlayer: $redPlayer
         blackPlayer: $blackPlayer
         opening: $opening
         result: $result
         limit: $limit
       ) {
-        info {
-          redPlayer
-          blackPlayer
-          result
-          event
-          date
-          openingCode
-          openingName
-        }
+        redPlayer
+        blackPlayer
+        result
+        event
+        date
+        openingCode
+        openingName
       }
     }
   `;
   const gameInfoStore = operationStore(
     searchQuery,
     { redPlayer, limit },
-    { requestPolicy: 'cache-first', pause: true },
+    { requestPolicy: 'network-only', pause: true },
   );
   query(gameInfoStore);
 
@@ -65,7 +63,6 @@
 
     $gameInfoStore.context = {
       ...gameInfoStore.context,
-      requestPolicy: 'network-only',
       pause: false,
     };
   }
