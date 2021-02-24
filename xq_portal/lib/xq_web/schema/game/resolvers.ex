@@ -24,7 +24,12 @@ defmodule XQWeb.Schema.Game.Resolvers do
   end
 
   def get_game_info(_root, %{} = args, _info) do
-    fetch_games("?#{URI.encode_query(args)}")
+    query_string =
+      args
+      |> URI.encode_query()
+      |> String.replace("opening_code", "opening_id")
+
+    fetch_games("?#{query_string}")
   end
 
   defp fetch_games(query_string) do

@@ -1,5 +1,9 @@
 <script lang="ts">
+  import GameInfoTable from './GameInfoTable.svelte';
   import SearchForm from './SearchForm.svelte';
+  import type { GameInfo } from 'utils/game';
+
+  let gameInfos: GameInfo[] = [];
 </script>
 
 <div class="database-explorer">
@@ -10,20 +14,7 @@
       <SearchForm />
     </div>
     <div class="search-results-container panel-block">
-      <table class="table is-fullwidth is-striped is-hoverable">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Red Player</th>
-            <th>Black Player</th>
-            <th>Opening</th>
-            <th>Result</th>
-            <th>Event</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody />
-      </table>
+      <GameInfoTable {gameInfos} />
     </div>
   </div>
   <div class="col-3" />

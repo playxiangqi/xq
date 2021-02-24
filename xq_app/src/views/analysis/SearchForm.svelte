@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { operationStore, query } from '@urql/svelte';
+  import { operationStore, query, getClient } from '@urql/svelte';
 
   type Opening = {
     id: string;
@@ -16,24 +16,27 @@
   `);
   const resp = query(openingStore);
 
+  const client = getClient();
+
   let redPlayer: string | undefined;
   let blackPlayer: string | undefined;
   let opening: string | undefined;
   let result: string | undefined;
   let limit = 10;
 
+  // TODO: opening -> openingID
   const searchQuery = `
     query searchGames(
       $redPlayer: String
       $blackPlayer: String
-      $opening: String
+      $openingCode: String
       $result: String
       $limit: Int
     ) {
       games(
         redPlayer: $redPlayer
         blackPlayer: $blackPlayer
-        opening: $opening
+        openingCode: $openingCode
         result: $result
         limit: $limit
       ) {
@@ -47,24 +50,25 @@
       }
     }
   `;
-  const gameInfoStore = operationStore(
-    searchQuery,
-    { redPlayer, limit },
-    { requestPolicy: 'network-only', pause: true },
-  );
-  query(gameInfoStore);
 
-  function searchGames() {
-    console.log(`redPlayer: ${redPlayer}`);
-    console.log(`blackPlayer: ${blackPlayer}`);
-    console.log(`opening: ${opening}`);
-    console.log(`result: ${result}`);
-    console.log(`limit: ${limit}`);
+  async function searchGames() {
+    const resp = await client
+      .query(
+        searchQuery,
+        {
+          redPlayer,
+          blackPlayer,
+          openingCode: opening?.split('-')?.[0].trim(),
+          result,
+          limit,
+        },
+        {
+          requestPolicy: 'network-only', // Always resend search (for now)
+        },
+      )
+      .toPromise();
 
-    $gameInfoStore.context = {
-      ...gameInfoStore.context,
-      pause: false,
-    };
+    console.log(resp.data);
   }
 </script>
 

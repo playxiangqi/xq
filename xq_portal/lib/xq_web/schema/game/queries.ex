@@ -8,7 +8,7 @@ defmodule XQWeb.Schema.Game.Queries do
     field :games, list_of(:game_info) do
       arg :red_player, :string
       arg :black_player, :string
-      arg :opening, :string
+      arg :opening_code, :string
       arg :result, :string
       arg :limit, :integer
       resolve &Resolvers.get_game_info/3
