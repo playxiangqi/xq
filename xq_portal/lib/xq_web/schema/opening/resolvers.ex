@@ -3,8 +3,10 @@ defmodule XQWeb.Schema.Opening.Resolvers do
 
   def list_openings(_root, _args, _info) do
     {:ok, %{body: content, status: 200}} =
-      Finch.build(:get, XQWeb.Service.archive() <> "/openings")
-      |> Finch.request(XQ.Finch)
+      Finch.request(
+        Finch.build(:get, "#{XQWeb.Service.archive()}/openings"),
+        XQ.Finch
+      )
 
     Jason.decode(content, keys: :atoms!)
   end

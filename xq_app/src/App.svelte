@@ -6,33 +6,40 @@
   initClient({ url: '/graphql' });
 
   // Components
-  import AnalysisPanel from './components/analysis/AnalysisPanel.svelte';
-  import SearchPanel from './components/analysis/SearchPanel.svelte';
-  import Board from './components/board/Board.svelte';
-  import Navbar from './components/nav/Navbar.svelte';
+  import DatabaseExplorer from './views/analysis/DatabaseExplorer.svelte';
+  import Demo from './views/Demo.svelte';
 
-  // Modules
-  // TODO: Move dimensions to utilities
-  // TODO: Turn boardState into matchState
-  import { createBoardState, Dimensions } from 'components/board';
-
-  const DEFAULT_SCALE = 1.0;
-  const dimensions = new Dimensions(DEFAULT_SCALE);
-  const boardState = createBoardState(dimensions);
+  // Routes
+  import Router, { link } from 'svelte-spa-router';
+  const routes = {
+    '/': Demo,
+    '/analysis/database-explorer': DatabaseExplorer,
+  };
 </script>
 
 <div class="app">
-  <Navbar />
-  <div class="content-container">
-    <div class="col-1">
-      <SearchPanel />
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://github.com/playxiangqi">
+        Play XiangQi
+      </a>
     </div>
-    <div class="col-2">
-      <Board {dimensions} {boardState} />
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/" use:link>Demo</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <div class="navbar-link">Analysis</div>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="/analysis/database-explorer" use:link>
+              Database Explorer
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="col-3">
-      <AnalysisPanel {boardState} />
-    </div>
+  </nav>
+  <div class="view-container">
+    <Router {routes} />
   </div>
 </div>
 
@@ -59,9 +66,11 @@
   .app {
     height: 100%;
     width: 100%;
-    .content-container {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr 1fr;
+
+    .navbar {
+    }
+
+    .view-container {
     }
   }
 </style>
