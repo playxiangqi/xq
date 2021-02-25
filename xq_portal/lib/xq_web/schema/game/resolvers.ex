@@ -33,11 +33,13 @@ defmodule XQWeb.Schema.Game.Resolvers do
   end
 
   defp fetch_games(query_string) do
-    with {:ok, %{body: content, status: 200}} <-
-           Finch.build(:get, XQWeb.Service.archive() <> "/game#{query_string}")
-           |> Finch.request(XQ.Finch) do
-      Jason.decode(content, keys: :atoms)
-    else
+    case Finch.request(
+           Finch.build(:get, "#{XQWeb.Service.archive()}/game#{query_string}"),
+           XQ.Finch
+         ) do
+      {:ok, %{body: content, status: 200}} ->
+        Jason.decode(content, keys: :atoms)
+
       {:error, _} ->
         {:error, %{message: "Not found"}}
     end
