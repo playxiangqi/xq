@@ -1,24 +1,15 @@
 <script lang="ts">
   import { operationStore, query, getClient } from '@urql/svelte';
-  import type { GameInfo } from 'utils/game';
+  import type { GameInfo, Opening } from 'utils/game';
+  import { GET_OPENINGS_QUERY, SEARCH_GAMES_QUERY } from './queries';
 
   export let gameInfos: GameInfo[];
 
   const client = getClient();
 
-  type Opening = {
-    id: string;
-    name: string;
-  };
-
-  const openingStore = operationStore<{ openings: ArrayLike<Opening> }>(`
-    query getOpenings {
-      openings {
-        id
-        name
-      }
-    }
-  `);
+  const openingStore = operationStore<{ openings: ArrayLike<Opening> }>(
+    GET_OPENINGS_QUERY,
+  );
   const resp = query(openingStore);
 
   let redPlayer: string | undefined;
@@ -27,36 +18,10 @@
   let result: string | undefined;
   let limit = 10;
 
-  const searchQuery = `
-    query searchGames(
-      $redPlayer: String
-      $blackPlayer: String
-      $openingCode: String
-      $result: String
-      $limit: Int
-    ) {
-      games(
-        redPlayer: $redPlayer
-        blackPlayer: $blackPlayer
-        openingCode: $openingCode
-        result: $result
-        limit: $limit
-      ) {
-        redPlayer
-        blackPlayer
-        result
-        event
-        date
-        openingCode
-        openingName
-      }
-    }
-  `;
-
   async function searchGames() {
     const resp = await client
       .query(
-        searchQuery,
+        SEARCH_GAMES_QUERY,
         {
           redPlayer,
           blackPlayer,

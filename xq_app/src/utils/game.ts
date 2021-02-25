@@ -10,3 +10,8 @@ export type GameInfo = {
   openingName: string;
   moves: string[];
 };
+
+export type Opening = {
+  id: string;
+  name: string;
+};
