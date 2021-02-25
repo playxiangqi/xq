@@ -2,12 +2,11 @@
   import type { GameInfo } from 'utils/game';
 
   export let gameInfos: GameInfo[];
-  export let pageSize = 20;
+  export let pageSize = 14;
 
   let currentPage = 0;
-  let numPages = 0;
-  console.log(gameInfos);
-  let viewableResults = gameInfos.slice(
+  let numPages = gameInfos.length / pageSize;
+  $: viewableResults = gameInfos.slice(
     currentPage * pageSize,
     (currentPage + 1) * pageSize,
   );
@@ -18,7 +17,7 @@
   }
 
   function nextPage() {
-    currentPage = Math.min(numPages - 1, currentPage + 1);
+    currentPage = Math.min(gameInfos.length - 1, currentPage + 1);
   }
 </script>
 
@@ -54,7 +53,11 @@
   aria-label="pagination"
 >
   <ul class="pagination-list" />
-  <button class="pagination-previous" on:click={previousPage}>Previous</button>
+  <button
+    class="pagination-previous"
+    on:click={previousPage}
+    disabled={currentPage <= 0}>Previous</button
+  >
   <button class="pagination-next" on:click={nextPage}>Next</button>
 </nav>
 

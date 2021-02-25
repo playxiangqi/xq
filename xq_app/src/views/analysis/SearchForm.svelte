@@ -39,7 +39,7 @@
   }
 </script>
 
-<div class="search-form p-5">
+<div class="search-form p-4">
   <div class="field is-grouped">
     <div class="control red-player-input">
       <label for="red-player-input" class="label">Player</label>
@@ -97,9 +97,8 @@
         </select>
       </div>
     </div>
-  </div>
-  <div class="field">
     <div class="control">
+      <label for="search-button" class="label is-invisible">Search</label>
       <button class="button is-link" on:click={searchGames}>Search</button>
     </div>
   </div>
