@@ -2,9 +2,27 @@
   import type { GameInfo } from 'utils/game';
 
   export let gameInfos: GameInfo[];
+  export let pageSize = 20;
+
+  let currentPage = 0;
+  let numPages = 0;
+  console.log(gameInfos);
+  let viewableResults = gameInfos.slice(
+    currentPage * pageSize,
+    (currentPage + 1) * pageSize,
+  );
+  console.log(viewableResults);
+
+  function previousPage() {
+    currentPage = Math.max(0, currentPage - 1);
+  }
+
+  function nextPage() {
+    currentPage = Math.min(numPages - 1, currentPage + 1);
+  }
 </script>
 
-<table class="table is-fullwidth is-striped is-hoverable">
+<table class="game-info-table table is-fullwidth is-striped is-hoverable">
   <thead>
     <tr>
       <th>Date</th>
@@ -17,7 +35,7 @@
     </tr>
   </thead>
   <tbody>
-    {#each gameInfos as game}
+    {#each viewableResults as game}
       <tr>
         <td>{new Date(game.date).toDateString()}</td>
         <td>{game.redPlayer}</td>
@@ -30,3 +48,22 @@
     {/each}
   </tbody>
 </table>
+<nav
+  class="table-pagination pagination"
+  role="navigation"
+  aria-label="pagination"
+>
+  <ul class="pagination-list" />
+  <button class="pagination-previous" on:click={previousPage}>Previous</button>
+  <button class="pagination-next" on:click={nextPage}>Next</button>
+</nav>
+
+<style lang="scss">
+  .game-info-table {
+    width: 100%;
+  }
+
+  .table-pagination {
+    margin-top: auto;
+  }
+</style>

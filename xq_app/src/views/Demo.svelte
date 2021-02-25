@@ -30,5 +30,10 @@
 
     display: grid;
     grid-template-columns: 1fr 2fr 2fr;
+
+    .col-2 {
+      display: flex;
+      align-items: center;
+    }
   }
 </style>

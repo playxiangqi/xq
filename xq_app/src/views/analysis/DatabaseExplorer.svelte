@@ -28,8 +28,11 @@
     grid-template-columns: 1fr 6.75fr 1fr;
 
     .search-results-container {
-      align-items: flex-start;
       min-height: 600px;
+
+      align-items: flex-start;
+      flex-direction: row;
+      flex-wrap: wrap;
     }
   }
 </style>
