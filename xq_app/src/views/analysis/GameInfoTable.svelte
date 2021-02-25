@@ -19,13 +19,13 @@
   <tbody>
     {#each gameInfos as game}
       <tr>
-        <th>{game.date}</th>
-        <th>{game.redPlayer}</th>
-        <th>{game.blackPlayer}</th>
-        <th>{game.openingCode} - {game.openingName}</th>
-        <th>{game.result}</th>
-        <th>{game.event}</th>
-        <th />
+        <td>{new Date(game.date).toDateString()}</td>
+        <td>{game.redPlayer}</td>
+        <td>{game.blackPlayer}</td>
+        <td>{game.openingCode} - {game.openingName}</td>
+        <td>{game.result}</td>
+        <td>{game.event}</td>
+        <td />
       </tr>
     {/each}
   </tbody>

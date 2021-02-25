@@ -11,7 +11,7 @@
   <div class="main-panel panel">
     <p class="panel-heading">Database Explorer</p>
     <div class="search-form-container panel-block">
-      <SearchForm />
+      <SearchForm bind:gameInfos />
     </div>
     <div class="search-results-container panel-block">
       <GameInfoTable {gameInfos} />

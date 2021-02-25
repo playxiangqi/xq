@@ -1,5 +1,6 @@
 <script lang="ts">
   import { operationStore, query, getClient } from '@urql/svelte';
+  import type { GameInfo } from 'utils/game';
 
   type Opening = {
     id: string;
@@ -17,6 +18,8 @@
   const resp = query(openingStore);
 
   const client = getClient();
+
+  export let gameInfos: GameInfo[];
 
   let redPlayer: string | undefined;
   let blackPlayer: string | undefined;
@@ -69,6 +72,8 @@
       .toPromise();
 
     console.log(resp.data);
+
+    gameInfos = resp.data.games;
   }
 </script>
 
