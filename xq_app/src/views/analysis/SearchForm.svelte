@@ -2,6 +2,10 @@
   import { operationStore, query, getClient } from '@urql/svelte';
   import type { GameInfo } from 'utils/game';
 
+  export let gameInfos: GameInfo[];
+
+  const client = getClient();
+
   type Opening = {
     id: string;
     name: string;
@@ -17,17 +21,12 @@
   `);
   const resp = query(openingStore);
 
-  const client = getClient();
-
-  export let gameInfos: GameInfo[];
-
   let redPlayer: string | undefined;
   let blackPlayer: string | undefined;
   let opening: string | undefined;
   let result: string | undefined;
   let limit = 10;
 
-  // TODO: opening -> openingID
   const searchQuery = `
     query searchGames(
       $redPlayer: String
@@ -70,8 +69,6 @@
         },
       )
       .toPromise();
-
-    console.log(resp.data);
 
     gameInfos = resp.data.games;
   }
