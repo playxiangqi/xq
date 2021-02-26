@@ -1,30 +1,23 @@
-export default function (c: number, m: number) {
-  let current = c,
-    last = m,
-    delta = 2,
-    left = current - delta,
-    right = current + delta + 1,
-    range = [],
-    rangeWithDots = [],
-    l;
+import { range } from './enum';
 
-  for (let i = 1; i <= last; i++) {
-    if (i == 1 || i == last || (i >= left && i < right)) {
-      range.push(i);
-    }
-  }
+export default function (current: number, last: number) {
+  const delta = 2;
+  const [left, right] = [current - delta, current + delta + 1];
 
-  for (let i of range) {
-    if (l) {
+  const numbered = range(1, last).filter(
+    (i) => i === 1 || i === last || (i >= left && i < right),
+  );
+
+  let l = 1;
+  return numbered.reduce<(string | number)[]>((acc, i) => {
+    if (i !== 1) {
       if (i - l === 2) {
-        rangeWithDots.push(l + 1);
+        acc = [...acc, l + 1];
       } else if (i - l !== 1) {
-        rangeWithDots.push('...');
+        acc = [...acc, '...'];
       }
     }
-    rangeWithDots.push(i);
     l = i;
-  }
-
-  return rangeWithDots;
+    return [...acc, i];
+  }, []);
 }
