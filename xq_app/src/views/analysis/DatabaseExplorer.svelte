@@ -22,14 +22,14 @@
 
 <style lang="scss">
   .database-explorer {
-    margin-top: 15px;
-
-    display: grid;
-    grid-template-columns: 1fr 6.75fr 1fr;
+    margin: 10px 50px 0px 50px;
 
     .search-results-container {
+      min-height: 700px;
+
       align-items: flex-start;
-      min-height: 600px;
+      flex-direction: row;
+      flex-wrap: wrap;
     }
   }
 </style>

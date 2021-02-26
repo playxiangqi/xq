@@ -2,9 +2,26 @@
   import type { GameInfo } from 'utils/game';
 
   export let gameInfos: GameInfo[];
+  export let pageSize = 14;
+
+  let currentPage = 0;
+
+  $: numPages = Math.floor(gameInfos.length / pageSize);
+  $: viewableResults = gameInfos.slice(
+    currentPage * pageSize,
+    (currentPage + 1) * pageSize,
+  );
+
+  function previousPage() {
+    currentPage = Math.max(0, currentPage - 1);
+  }
+
+  function nextPage() {
+    currentPage = Math.min(gameInfos.length - 1, currentPage + 1);
+  }
 </script>
 
-<table class="table is-fullwidth is-striped is-hoverable">
+<table class="game-info-table table is-fullwidth is-striped is-hoverable">
   <thead>
     <tr>
       <th>Date</th>
@@ -13,11 +30,11 @@
       <th>Opening</th>
       <th>Result</th>
       <th>Event</th>
-      <th>Actions</th>
+      <th>Analysis</th>
     </tr>
   </thead>
   <tbody>
-    {#each gameInfos as game}
+    {#each viewableResults as game}
       <tr>
         <td>{new Date(game.date).toDateString()}</td>
         <td>{game.redPlayer}</td>
@@ -30,3 +47,30 @@
     {/each}
   </tbody>
 </table>
+<nav
+  class="table-pagination pagination"
+  role="navigation"
+  aria-label="pagination"
+>
+  <ul class="pagination-list" />
+  <button
+    class="pagination-previous"
+    on:click={previousPage}
+    disabled={currentPage <= 0}>Previous</button
+  >
+  <button
+    class="pagination-next"
+    on:click={nextPage}
+    disabled={currentPage >= numPages}>Next</button
+  >
+</nav>
+
+<style lang="scss">
+  .game-info-table {
+    width: 100%;
+  }
+
+  .table-pagination {
+    margin-top: auto;
+  }
+</style>

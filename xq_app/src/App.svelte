@@ -71,6 +71,7 @@
     }
 
     .view-container {
+      height: 80%;
     }
   }
 </style>
