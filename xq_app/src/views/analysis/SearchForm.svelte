@@ -97,7 +97,7 @@
         </select>
       </div>
     </div>
-    <div class="control">
+    <div class="control ml-3">
       <label for="search-button" class="label is-invisible">Search</label>
       <button class="button is-link" on:click={searchGames}>Search</button>
     </div>

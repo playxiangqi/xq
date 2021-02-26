@@ -5,12 +5,12 @@
   export let pageSize = 14;
 
   let currentPage = 0;
-  let numPages = gameInfos.length / pageSize;
+
+  $: numPages = Math.floor(gameInfos.length / pageSize);
   $: viewableResults = gameInfos.slice(
     currentPage * pageSize,
     (currentPage + 1) * pageSize,
   );
-  console.log(viewableResults);
 
   function previousPage() {
     currentPage = Math.max(0, currentPage - 1);
@@ -30,7 +30,7 @@
       <th>Opening</th>
       <th>Result</th>
       <th>Event</th>
-      <th>Actions</th>
+      <th>Analysis</th>
     </tr>
   </thead>
   <tbody>
@@ -58,7 +58,11 @@
     on:click={previousPage}
     disabled={currentPage <= 0}>Previous</button
   >
-  <button class="pagination-next" on:click={nextPage}>Next</button>
+  <button
+    class="pagination-next"
+    on:click={nextPage}
+    disabled={currentPage >= numPages}>Next</button
+  >
 </nav>
 
 <style lang="scss">
