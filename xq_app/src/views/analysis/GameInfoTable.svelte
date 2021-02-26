@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { push } from 'svelte-spa-router';
+  import { link } from 'svelte-spa-router';
   import type { GameInfo } from 'utils/game';
   import pagination from 'utils/pagination';
 
@@ -20,10 +20,6 @@
 
   function nextPage() {
     currentPage = Math.min(gameInfos.length - 1, currentPage + 1);
-  }
-
-  function gotoGameAnalysis(id: number) {
-    return () => push(`/analysis/game/${id}`);
   }
 </script>
 
@@ -53,14 +49,15 @@
         <td>
           <div class="field has-addons">
             <p class="control">
-              <button
+              <a
                 class="button is-small"
-                on:click={gotoGameAnalysis(game.id)}
+                href={`"/analysis/game/${game.id}"`}
+                use:link
               >
                 <span class="icon">
                   <i class="fas fa-game-board" />
                 </span>
-              </button>
+              </a>
             </p>
           </div>
         </td>
