@@ -9,7 +9,7 @@ export default function (current: number, last: number) {
   );
 
   let l = 1;
-  return numbered.reduce<(string | number)[]>(
+  return numbered.reduce<('...' | number)[]>(
     (acc, i) => {
       if (i - l === 2) {
         acc = [...acc, l + 1];

@@ -72,8 +72,8 @@
           <button
             class="pagination-link"
             aria-label={`Goto page ${pageNum}`}
-            on:click={() => (currentPage = Number(pageNum) - 1)}
-            disabled={currentPage === Number(pageNum) - 1}>{pageNum}</button
+            on:click={() => (currentPage = pageNum - 1)}
+            disabled={currentPage === pageNum - 1}>{pageNum}</button
           >
         {/if}
       </li>
