@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { GameInfo } from 'utils/game';
+  import pagination from 'utils/pagination';
 
   export let gameInfos: GameInfo[];
   export let pageSize = 14;
@@ -48,11 +49,10 @@
   </tbody>
 </table>
 <nav
-  class="table-pagination pagination"
+  class="table-pagination pagination is-centered"
   role="navigation"
   aria-label="pagination"
 >
-  <ul class="pagination-list" />
   <button
     class="pagination-previous"
     on:click={previousPage}
@@ -63,6 +63,22 @@
     on:click={nextPage}
     disabled={currentPage >= numPages}>Next</button
   >
+  <ul class="pagination-list">
+    {#each pagination(currentPage + 1, numPages + 1) as pageNum}
+      <li>
+        {#if pageNum === '...'}
+          <span class="pagination-ellipsis">&hellip;</span>
+        {:else}
+          <button
+            class="pagination-link"
+            aria-label={`Goto page ${pageNum}`}
+            on:click={() => (currentPage = Number(pageNum) - 1)}
+            disabled={currentPage === Number(pageNum) - 1}>{pageNum}</button
+          >
+        {/if}
+      </li>
+    {/each}
+  </ul>
 </nav>
 
 <style lang="scss">
@@ -71,6 +87,8 @@
   }
 
   .table-pagination {
+    width: 100%;
+
     margin-top: auto;
   }
 </style>
