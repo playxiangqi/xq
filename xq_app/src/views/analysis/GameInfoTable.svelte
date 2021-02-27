@@ -66,7 +66,7 @@
   </tbody>
 </table>
 <nav
-  class="table-pagination pagination is-centered"
+  class="table-pagination pagination is-left"
   role="navigation"
   aria-label="pagination"
 >

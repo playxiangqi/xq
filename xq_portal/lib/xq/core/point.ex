@@ -9,7 +9,9 @@ defmodule XQ.Core.Point do
   @max_file 10
   @side_facing :red
 
-  def norm_file(prev, side) when side == @side_facing, do: @max_file - prev
+  def norm_file(prev, side) when side == @side_facing and not is_nil(prev),
+    do: @max_file - prev
+
   def norm_file(prev, _side), do: prev
 
   def sign(@side_facing), do: -1

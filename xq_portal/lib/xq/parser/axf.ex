@@ -1,25 +1,42 @@
 defmodule XQ.Parser.AXF do
   alias XQ.Parser.Notation
 
-  defguardp is_axis_piece(letter) when letter in ~w(P p C c R r K k)
-  defguardp is_fixed_piece(letter) when letter in ~w(B b N n A a)
-  defguardp is_positional(c) when c in ~w(+ -)
+  defguardp is_axis(p) when p in ~w(P p C c R r K k)
+  defguardp is_constrained(p) when p in ~w(B b N n A a)
+  defguardp is_positional(d) when d in ~w(+ -)
 
-  def parse(move) do
-    exact_notation = ~r/([a-z])([0-9])([+=-])([0-9])/i
-    positional_notation = ~r/([+-])([a-z])([+=-])([0-9])/i
+  def parse(notation) do
+    exact = ~r/([a-z])([0-9])([+=-])([0-9])/i
+    positional = ~r/([+-])([a-z])([+=-])([0-9])/i
 
     matches =
-      Regex.run(exact_notation, move) ||
-        Regex.run(positional_notation, move) ||
+      Regex.run(exact, notation) || Regex.run(positional, notation) ||
         raise RuntimeError, message: "invalid move notation"
+
+    normalize(matches)
   end
 
-  defp from_matches([_, letter, prev_file, direction, movement])
-       when is_axis_piece(letter) do
-    Map.merge(Notation.default(), %{
+  @doc """
+
+  ## Parameters
+
+
+  """
+  def normalize([_, abbrev, prev_file, direction, movement])
+      when is_axis(abbrev) do
+    %Notation{
       direction: direction,
       prev_file: prev_file
-    })
+    }
   end
+
+  def normalize([_, position, abbrev, direction, movement])
+      when is_axis(abbrev) and is_positional(position) do
+    %Notation{
+      direction: direction,
+      prev_file: nil
+    }
+  end
+
+  def normalize(_), do: raise(RuntimeError, message: "invalid AXF notation")
 end
