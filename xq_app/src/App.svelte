@@ -16,10 +16,9 @@
     '/analysis/explorer': wrap({
       asyncComponent: () => import('./views/analysis/DatabaseExplorer.svelte'),
     }),
-    // '/analysis/game/:id': wrap({
-    //   asyncComponent: () =>
-    //     import('./components/analysis/AnalysisPanel.svelte'),
-    // }),
+    '/analysis/game/:id': wrap({
+      asyncComponent: () => import('./views/analysis/GameAnalysis.svelte'),
+    }),
   };
 </script>
 
