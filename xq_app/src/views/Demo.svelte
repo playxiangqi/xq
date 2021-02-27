@@ -19,7 +19,7 @@
     <Board {dimensions} {boardState} />
   </div>
   <div class="col-3">
-    <AnalysisPanel {boardState} />
+    <AnalysisPanel params={{ id: 'random' }} {boardState} />
   </div>
 </div>
 

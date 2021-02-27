@@ -51,7 +51,7 @@
             <p class="control">
               <a
                 class="button is-small"
-                href={`"/analysis/game/${game.id}"`}
+                href={`/analysis/game/${game.id}`}
                 use:link
               >
                 <span class="icon">

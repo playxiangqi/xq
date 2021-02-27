@@ -2,13 +2,14 @@
   import { operationStore, query } from '@urql/svelte';
   import { createBoardState } from 'components/board';
 
+  export let params: { id: number | string };
   export let boardState: ReturnType<typeof createBoardState>;
 
   const { store, updateBoardState, transitionBoardState } = boardState;
 
   const opStore = operationStore(`
     query getGameBoardStates {
-      game(id: "random") {
+      game(id: "${params.id}") {
         info {
           redPlayer
           blackPlayer
