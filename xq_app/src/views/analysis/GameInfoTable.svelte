@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { link } from 'svelte-spa-router';
   import type { GameInfo } from 'utils/game';
   import pagination from 'utils/pagination';
 
   export let gameInfos: GameInfo[];
-  export let pageSize = 14;
+  export let pageSize = 15;
 
   let currentPage = 0;
 
@@ -22,7 +23,9 @@
   }
 </script>
 
-<table class="game-info-table table is-fullwidth is-striped is-hoverable">
+<table
+  class="game-info-table table is-fullwidth is-striped is-hoverable is-narrow"
+>
   <thead>
     <tr>
       <th>Date</th>
@@ -31,7 +34,7 @@
       <th>Opening</th>
       <th>Result</th>
       <th>Event</th>
-      <th>Analysis</th>
+      <th />
     </tr>
   </thead>
   <tbody>
@@ -43,7 +46,21 @@
         <td>{game.openingCode} - {game.openingName}</td>
         <td>{game.result}</td>
         <td>{game.event}</td>
-        <td />
+        <td>
+          <div class="field has-addons">
+            <p class="control">
+              <a
+                class="button is-small"
+                href={`/analysis/game/${game.id}`}
+                use:link
+              >
+                <span class="icon">
+                  <i class="fas fa-game-board" />
+                </span>
+              </a>
+            </p>
+          </div>
+        </td>
       </tr>
     {/each}
   </tbody>

@@ -6,14 +6,19 @@
   initClient({ url: '/graphql' });
 
   // Components
-  import DatabaseExplorer from './views/analysis/DatabaseExplorer.svelte';
   import Demo from './views/Demo.svelte';
 
   // Routes
   import Router, { link } from 'svelte-spa-router';
+  import { wrap } from 'svelte-spa-router/wrap';
   const routes = {
     '/': Demo,
-    '/analysis/database-explorer': DatabaseExplorer,
+    '/analysis/explorer': wrap({
+      asyncComponent: () => import('./views/analysis/DatabaseExplorer.svelte'),
+    }),
+    '/analysis/game/:id': wrap({
+      asyncComponent: () => import('./views/analysis/GameAnalysis.svelte'),
+    }),
   };
 </script>
 
@@ -30,7 +35,7 @@
         <div class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">Analysis</div>
           <div class="navbar-dropdown">
-            <a class="navbar-item" href="/analysis/database-explorer" use:link>
+            <a class="navbar-item" href="/analysis/explorer" use:link>
               Database Explorer
             </a>
           </div>

@@ -21,8 +21,8 @@ export default {
 
   // Output path/format and request sourcemaps
   output: {
-    file: `${STATIC_ASSET_DIR}/js/app.js`,
-    format: 'iife',
+    dir: `${STATIC_ASSET_DIR}/js`,
+    format: 'es',
     name: 'app',
     sourcemap: true,
   },

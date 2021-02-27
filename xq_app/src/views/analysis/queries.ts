@@ -22,6 +22,7 @@ export const SEARCH_GAMES_QUERY = `
       result: $result
       limit: $limit
     ) {
+      id
       redPlayer
       blackPlayer
       result
