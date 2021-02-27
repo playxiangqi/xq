@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="Xiangqi, online chinese chess" />
     <title>Play XiangQi · 象棋</title>
-    <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.13.0/css/all.css">
+    <script defer type="module" src="<%= Routes.static_path(@conn, "/js/main.js") %>"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

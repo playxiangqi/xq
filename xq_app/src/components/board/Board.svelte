@@ -27,7 +27,7 @@
   // Utils
   function generateLinePath(
     [fromRank, fromFile]: [number, number],
-    [toRank, toFile]: [number, number]
+    [toRank, toFile]: [number, number],
   ): string {
     const [startY, startX] = [
       innerFrameOffsetY + rankSpacing * fromRank,
@@ -102,8 +102,6 @@
 
     display: flex;
     align-items: center;
-
-    padding-left: 45px;
 
     * {
       position: absolute;
