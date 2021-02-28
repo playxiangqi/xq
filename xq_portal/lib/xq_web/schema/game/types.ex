@@ -17,6 +17,7 @@ defmodule XQWeb.Schema.Game.Types do
     field :black_club, :string
     field :black_rating, :integer
     field :moves, non_null(list_of(:string))
+    field :turn_count, non_null(:integer)
   end
 
   object :point do

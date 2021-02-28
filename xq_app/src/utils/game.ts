@@ -10,6 +10,7 @@ export type GameInfo = {
   openingCode: string;
   openingName: string;
   moves: string[];
+  turnCount: number;
 };
 
 export type Opening = {
