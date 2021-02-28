@@ -139,12 +139,14 @@
     height: 100%;
 
     .search-form-field {
+      // Negative spacing neutralized by child margins
       margin-top: -15px;
 
       flex-direction: row;
       flex-wrap: wrap;
 
       & > * {
+        // Margin effectively applied when child items of flex container wrap
         margin-top: 15px;
       }
     }
