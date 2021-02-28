@@ -24,6 +24,7 @@ defmodule XQ.Parser.AXF do
     |> derive_sign(params)
     |> derive_position(params)
     |> derive_file(params)
+    |> derive_rank(params)
   end
 
   def derive_piece(%MoveDetails{} = details, [pos, abbrev, _, _])
@@ -56,16 +57,16 @@ defmodule XQ.Parser.AXF do
     %{details | next_file: maybe_horizontal(dir, mvmt, side)}
   end
 
-  def derive_file(%MoveDetails{side: side} = details, [pos, abbrev, _, next])
-      when is_positional(pos) and is_fixed(abbrev) do
-    %{details | next_file: Point.norm_file(next, side)}
-  end
-
   def derive_file(%MoveDetails{side: side} = details, [abbrev, prev, dir, mvmt])
       when is_axis(abbrev) do
     prev = Point.norm_file(prev, side)
     next = maybe_horizontal(dir, mvmt, side, prev)
     %{details | prev_file: prev, next_file: next, delta_file: next - prev}
+  end
+
+  def derive_file(%MoveDetails{side: side} = details, [pos, abbrev, _, next])
+      when is_positional(pos) and is_fixed(abbrev) do
+    %{details | next_file: Point.norm_file(next, side)}
   end
 
   def derive_file(%MoveDetails{side: side} = details, [abbrev, prev, _, next])
@@ -74,8 +75,38 @@ defmodule XQ.Parser.AXF do
     %{details | prev_file: prev, next_file: next, delta_file: next - prev}
   end
 
-  defp maybe_horizontal(dir, value, side, default \\ nil) do
-    if dir == "=", do: Point.norm_file(value, side), else: default
+  def derive_rank(%MoveDetails{sign: sign} = details, [pos, abbrev, _, mvmt])
+      when is_positional(pos) and is_axis(abbrev) do
+    %{details | delta_rank: mvmt * sign}
+  end
+
+  def derive_rank(%MoveDetails{sign: sign} = details, [abbrev, _, _, mvmt])
+      when is_axis(abbrev) do
+    %{details | delta_rank: mvmt * sign}
+  end
+
+  def derive_rank(
+        %MoveDetails{
+          ch: ch,
+          sign: sign,
+          delta_file: d
+        } = details,
+        [pos, abbrev, _, _]
+      )
+      when is_positional(pos) and is_fixed(abbrev) do
+    %{details | delta_rank: fixed_delta(ch, d) * sign}
+  end
+
+  def derive_rank(
+        %MoveDetails{
+          ch: ch,
+          sign: sign,
+          delta_file: d
+        } = details,
+        [abbrev, _, _, _]
+      )
+      when is_fixed(abbrev) do
+    %{details | delta_rank: fixed_delta(ch, d) * sign}
   end
 
   defp safe_parse(match) do
@@ -87,4 +118,12 @@ defmodule XQ.Parser.AXF do
         match
     end
   end
+
+  defp maybe_horizontal(dir, value, side, default \\ nil) do
+    if dir == "=", do: Point.norm_file(value, side), else: default
+  end
+
+  defp fixed_delta(:elephant, _), do: 2
+  defp fixed_delta(:horse, delta_file), do: if(abs(delta_file) == 2, do: 1, else: 2)
+  defp fixed_delta(_, _), do: 1
 end
