@@ -23,6 +23,7 @@ defmodule XQ.Parser.AXF do
     |> derive_piece(params)
     |> derive_sign(params)
     |> derive_position(params)
+    |> derive_file(params)
   end
 
   def derive_piece(%MoveDetails{} = details, [pos, abbrev, _, _])
@@ -39,8 +40,8 @@ defmodule XQ.Parser.AXF do
     %{details | ch: ch, side: side}
   end
 
-  def derive_sign(%MoveDetails{side: side} = details, [_, _, direction, _]) do
-    %{details | sign: Point.sign(side, direction)}
+  def derive_sign(%MoveDetails{side: side} = details, [_, _, dir, _]) do
+    %{details | sign: Point.sign(side, dir)}
   end
 
   def derive_position(%MoveDetails{} = details, [pos, _, _, _])
@@ -49,6 +50,33 @@ defmodule XQ.Parser.AXF do
   end
 
   def derive_position(details, _params), do: details
+
+  def derive_file(%MoveDetails{side: side} = details, [pos, abbrev, dir, mvmt])
+      when is_positional(pos) and is_axis(abbrev) do
+    %{details | next_file: maybe_horizontal(dir, mvmt, side)}
+  end
+
+  def derive_file(%MoveDetails{side: side} = details, [pos, abbrev, _, next])
+      when is_positional(pos) and is_fixed(abbrev) do
+    %{details | next_file: Point.norm_file(next, side)}
+  end
+
+  def derive_file(%MoveDetails{side: side} = details, [abbrev, prev, dir, mvmt])
+      when is_axis(abbrev) do
+    prev = Point.norm_file(prev, side)
+    next = maybe_horizontal(dir, mvmt, side, prev)
+    %{details | prev_file: prev, next_file: next, delta_file: next - prev}
+  end
+
+  def derive_file(%MoveDetails{side: side} = details, [abbrev, prev, _, next])
+      when is_fixed(abbrev) do
+    {prev, next} = {Point.norm_file(prev, side), Point.norm_file(next, side)}
+    %{details | prev_file: prev, next_file: next, delta_file: next - prev}
+  end
+
+  defp maybe_horizontal(dir, value, side, default \\ nil) do
+    if dir == "=", do: Point.norm_file(value, side), else: default
+  end
 
   defp safe_parse(match) do
     case Integer.parse(match) do
