@@ -6,6 +6,44 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.0.0
 
 jobs:
+  portal:
+    docker:
+      - image: circleci/elixir:1.11.2
+      - image: circleci/postgres:12-alpine-ram
+    environment:
+      MIX_ENV: test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xq_dev
+    working_directory: ~/xq/xq_portal
+    steps:
+      - checkout:
+          path: ~/xq
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+      - restore_cache:
+          keys:
+            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - v1-mix-cache-{{ .Branch }}
+            - v1-mix-cache
+      - restore_cache:
+          keys:
+            - v1-build-cache-{{ .Branch }}
+            - v1-build-cache
+      - run: mix do deps.get, compile
+      - save_cache:
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths: "deps"
+      - save_cache:
+          key: v1-build-cache-{{ .Branch }}
+          paths: "_build"
+      - run:
+          name: Wait for Postgres
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run: mix test
+      - store_test_results:
+          path: _build/test/xq
+
   deploy-docker-ecr:
     parameters:
       deploy-env:
@@ -27,6 +65,7 @@ jobs:
       - run:
           name: Deploy Docker Image
           command: make push-<< parameters.deploy-env >>
+
   deploy-ecs-update:
     parameters:
       deploy-env:
@@ -42,15 +81,23 @@ jobs:
           force-new-deployment: true
 
 workflows:
-  deploy-dev:
+  dev-build-and-deploy:
     jobs:
+      - portal:
+          filters:
+            tags:
+              only: /.*/
+
       - deploy-docker-ecr:
           name: dev-deploy-docker-ecr
           context: AWS
           deploy-env: dev
+          requires:
+            - portal
           filters:
             branches:
               only: master
+
       - deploy-ecs-update:
           name: dev-deploy-ecs-update
           context: AWS

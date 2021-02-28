@@ -34,6 +34,7 @@
       <th>Opening</th>
       <th>Result</th>
       <th>Event</th>
+      <th>Moves</th>
       <th />
     </tr>
   </thead>
@@ -46,8 +47,9 @@
         <td>{game.openingCode} - {game.openingName}</td>
         <td>{game.result}</td>
         <td>{game.event}</td>
+        <td>{Math.floor(game.turnCount / 2)}</td>
         <td>
-          <div class="field has-addons">
+          <div class="action-buttons field has-addons">
             <p class="control">
               <a
                 class="button is-small"
@@ -101,6 +103,18 @@
 <style lang="scss">
   .game-info-table {
     width: 100%;
+
+    .action-buttons {
+      visibility: hidden;
+    }
+
+    tr:hover td > .action-buttons {
+      visibility: visible;
+    }
+
+    td {
+      vertical-align: middle;
+    }
   }
 
   .table-pagination {
