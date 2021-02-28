@@ -13,6 +13,9 @@ defmodule XQ.Core.Point do
     do: @max_file - prev
 
   def norm_file(prev, _side), do: prev
+  def sign(side, "+"), do: sign(side)
+  def sign(side, "-"), do: -1 * sign(side)
+  def sign(_side, "="), do: 0
 
   def sign(@side_facing), do: -1
   def sign(_side), do: 1
