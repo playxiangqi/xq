@@ -21,9 +21,9 @@ defmodule XQ.Parser.AXF do
       |> parametrize()
 
     %MoveDetails{}
+    |> derive_position(params)
     |> derive_piece(params)
     |> derive_sign(params)
-    |> derive_position(params)
     |> derive_file(params)
     |> derive_rank()
   end
@@ -44,6 +44,11 @@ defmodule XQ.Parser.AXF do
       when is_fixed(abbrev),
       do: %{abbrev: abbrev, prev_file: prev_file, dir: dir, next_file: next_file}
 
+  def derive_position(%MoveDetails{} = details, %{pos: pos}),
+    do: %{details | is_front: pos == "+"}
+
+  def derive_position(details, _params), do: details
+
   def derive_piece(%MoveDetails{} = details, %{abbrev: abbrev}) do
     {ch, side} = Point.piece(abbrev)
     %{details | ch: ch, side: side}
@@ -51,11 +56,6 @@ defmodule XQ.Parser.AXF do
 
   def derive_sign(%MoveDetails{side: side} = details, %{dir: dir}),
     do: %{details | sign: Point.sign(side, dir)}
-
-  def derive_position(%MoveDetails{} = details, %{pos: pos}),
-    do: %{details | is_front: pos == "+"}
-
-  def derive_position(details, _params), do: details
 
   def derive_file(
         %MoveDetails{side: side} = details,
