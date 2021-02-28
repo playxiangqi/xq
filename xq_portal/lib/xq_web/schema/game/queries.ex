@@ -11,6 +11,8 @@ defmodule XQWeb.Schema.Game.Queries do
       arg :opening_code, :string
       arg :result, :string
       arg :limit, :integer
+      arg :min_moves, :integer
+      arg :max_moves, :integer
       resolve &Resolvers.get_game_info/3
     end
 

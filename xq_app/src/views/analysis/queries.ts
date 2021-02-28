@@ -14,6 +14,8 @@ export const SEARCH_GAMES_QUERY = `
     $openingCode: String
     $result: String
     $limit: Int
+    $minMoves: Int
+    $maxMoves: Int
   ) {
     games(
       redPlayer: $redPlayer
@@ -21,6 +23,8 @@ export const SEARCH_GAMES_QUERY = `
       openingCode: $openingCode
       result: $result
       limit: $limit
+      minMoves: $minMoves
+      maxMoves: $maxMoves
     ) {
       id
       redPlayer
@@ -30,6 +34,7 @@ export const SEARCH_GAMES_QUERY = `
       date
       openingCode
       openingName
+      turnCount
     }
   }
 `;
