@@ -18,7 +18,7 @@ defmodule XQ.Parser.AXF do
       matches
       |> Enum.slice(1..-1)
       |> Enum.map(&safe_parse/1)
-      |> normalize_matches()
+      |> parametrize()
 
     %MoveDetails{}
     |> derive_piece(params)
@@ -28,19 +28,19 @@ defmodule XQ.Parser.AXF do
     |> derive_rank()
   end
 
-  def normalize_matches([pos, abbrev, dir, mvmt])
+  def parametrize([pos, abbrev, dir, mvmt])
       when is_positional(pos) and is_axis(abbrev),
       do: %{pos: pos, abbrev: abbrev, prev_file: nil, dir: dir, mvmt: mvmt}
 
-  def normalize_matches([abbrev, prev_file, dir, mvmt])
+  def parametrize([abbrev, prev_file, dir, mvmt])
       when is_axis(abbrev),
       do: %{abbrev: abbrev, prev_file: prev_file, dir: dir, mvmt: mvmt}
 
-  def normalize_matches([pos, abbrev, dir, next_file])
+  def parametrize([pos, abbrev, dir, next_file])
       when is_positional(pos) and is_fixed(abbrev),
       do: %{pos: pos, abbrev: abbrev, prev_file: nil, dir: dir, next_file: next_file}
 
-  def normalize_matches([abbrev, prev_file, dir, next_file])
+  def parametrize([abbrev, prev_file, dir, next_file])
       when is_fixed(abbrev),
       do: %{abbrev: abbrev, prev_file: prev_file, dir: dir, next_file: next_file}
 
@@ -88,6 +88,13 @@ defmodule XQ.Parser.AXF do
 
   def derive_rank(details), do: details
 
+  defp maybe_horizontal(dir, value, side, default),
+    do: if(dir == "=", do: Point.norm_file(value, side), else: default)
+
+  defp fixed_delta(:elephant, _), do: 2
+  defp fixed_delta(:horse, delta_file), do: if(abs(delta_file) == 2, do: 1, else: 2)
+  defp fixed_delta(_, _), do: 1
+
   defp safe_parse(match) do
     case Integer.parse(match) do
       {v, _} ->
@@ -97,11 +104,4 @@ defmodule XQ.Parser.AXF do
         match
     end
   end
-
-  defp maybe_horizontal(dir, value, side, default),
-    do: if(dir == "=", do: Point.norm_file(value, side), else: default)
-
-  defp fixed_delta(:elephant, _), do: 2
-  defp fixed_delta(:horse, delta_file), do: if(abs(delta_file) == 2, do: 1, else: 2)
-  defp fixed_delta(_, _), do: 1
 end

@@ -23,7 +23,7 @@ setup:
 
 .PHONY: test
 test:
-	@cd xq_portal && mix test
+	@cd xq_portal && MIX_ENV=test mix test --trace
 
 .PHONY: conan
 conan:
