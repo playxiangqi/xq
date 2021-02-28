@@ -34,6 +34,7 @@
       <th>Opening</th>
       <th>Result</th>
       <th>Event</th>
+      <th>Moves</th>
       <th />
     </tr>
   </thead>
@@ -46,6 +47,7 @@
         <td>{game.openingCode} - {game.openingName}</td>
         <td>{game.result}</td>
         <td>{game.event}</td>
+        <td>{Math.floor(game.turnCount / 2)}</td>
         <td>
           <div class="field has-addons">
             <p class="control">
@@ -66,7 +68,7 @@
   </tbody>
 </table>
 <nav
-  class="table-pagination pagination is-centered"
+  class="table-pagination pagination is-left"
   role="navigation"
   aria-label="pagination"
 >

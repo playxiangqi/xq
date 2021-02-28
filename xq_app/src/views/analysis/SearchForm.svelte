@@ -17,6 +17,8 @@
   let opening: string | undefined;
   let result: string | undefined;
   let limit = 10;
+  let minMoves: number | undefined;
+  let maxMoves: number | undefined;
 
   async function searchGames() {
     const resp = await client
@@ -28,6 +30,8 @@
           openingCode: opening?.split('-')?.[0].trim(),
           result,
           limit,
+          minMoves,
+          maxMoves,
         },
         {
           requestPolicy: 'network-only', // Always resend search (for now)
@@ -39,7 +43,7 @@
   }
 </script>
 
-<div class="search-form p-4">
+<div class="search-form p-3">
   <div class="field is-grouped">
     <div class="control red-player-input">
       <label for="red-player-input" class="label">Player</label>
@@ -87,6 +91,30 @@
         </select>
       </div>
     </div>
+    <div class="control move-count-min-input">
+      <label for="move-count-min-input" class="label">Moves</label>
+      <input
+        class="input numeric-input"
+        type="number"
+        placeholder="Min"
+        min="0"
+        max="500"
+        bind:value={minMoves}
+      />
+    </div>
+    <div class="control move-count-max-input">
+      <label for="move-count-max-input" class="label is-invisible">
+        Max Moves
+      </label>
+      <input
+        class="input numeric-input"
+        type="number"
+        placeholder="Max"
+        min="0"
+        max="500"
+        bind:value={maxMoves}
+      />
+    </div>
     <div class="control limit-dropdown">
       <label for="limit-input" class="label">Limit</label>
       <div class="select">
@@ -107,5 +135,9 @@
 <style lang="scss">
   .search-form {
     height: 100%;
+
+    .numeric-input {
+      width: 100px;
+    }
   }
 </style>
