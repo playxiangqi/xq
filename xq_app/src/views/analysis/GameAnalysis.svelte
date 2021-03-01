@@ -13,6 +13,7 @@
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
+  //  TODO: Rename to GameReview
 </script>
 
 <div class="game-analysis">

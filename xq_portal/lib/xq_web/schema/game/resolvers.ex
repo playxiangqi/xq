@@ -14,7 +14,7 @@ defmodule XQWeb.Schema.Game.Resolvers do
            # However:
            #  Run-time processing gives the most flexibility, since
            #  there is minimal support and an assumption of only one move notation.
-           board_states: XQ.Core.Generator.generate(content),
+           board_states: XQ.Generator.generate(content),
            info: content
          }}
 

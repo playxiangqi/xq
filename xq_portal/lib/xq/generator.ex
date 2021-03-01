@@ -1,4 +1,4 @@
-defmodule XQ.Core.Generator do
+defmodule XQ.Generator do
   require Logger
 
   alias XQ.Core.{Board, Move, Point}
@@ -40,7 +40,8 @@ defmodule XQ.Core.Generator do
 
   # TODO: Can turn this to match :moves vs. :board, e.g. move notation vs FEN/PGN
 
-  def generate(%{moves: moves}) do
+  def generate(%{id: id, moves: moves}) do
+    Logger.info("id: #{id}")
     Logger.info("moves: #{inspect(moves, limit: :infinity)}")
 
     moves
@@ -56,7 +57,9 @@ defmodule XQ.Core.Generator do
   end
 
   defp generate_board_state(next_move, prev_board_states) do
-    move = Move.resolve(next_move)
+    # TODO: Currently hard-coded but should be passed along with the map
+    #       to XQ.Generator.generate/1
+    move = XQ.Parser.parse(:axf, next_move)
 
     next_board_state =
       prev_board_states
@@ -66,16 +69,10 @@ defmodule XQ.Core.Generator do
     [next_board_state | prev_board_states]
   end
 
-  defp compute_next_state(prev_state, {
-         ch,
-         side,
-         file,
-         next_file,
-         diff_rank,
-         is_front
-       }) do
-    {old_point, index} = Board.find_point(prev_state, ch, side, file, is_front)
-    new_point = Point.update(old_point, next_file, diff_rank)
+  defp compute_next_state(prev_state, %Move{} = m) do
+    {old_point, index} = Board.find_point(prev_state, m.ch, m.side, m.prev_file, m.is_front)
+
+    new_point = Point.update(old_point, m.next_file, m.delta_rank)
     updated_state = Board.update(prev_state, index, new_point)
 
     [new_point | updated_state]

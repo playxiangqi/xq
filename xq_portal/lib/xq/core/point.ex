@@ -9,8 +9,13 @@ defmodule XQ.Core.Point do
   @max_file 10
   @side_facing :red
 
-  def norm_file(prev, side) when side == @side_facing, do: @max_file - prev
+  def norm_file(prev, side) when side == @side_facing and not is_nil(prev),
+    do: @max_file - prev
+
   def norm_file(prev, _side), do: prev
+  def sign(side, "+"), do: sign(side)
+  def sign(side, "-"), do: -1 * sign(side)
+  def sign(_side, "="), do: 0
 
   def sign(@side_facing), do: -1
   def sign(_side), do: 1
@@ -50,11 +55,10 @@ defmodule XQ.Core.Point do
       (point.file == other.file or is_front_or_rear(other))
   end
 
-  # -1 for previous_file is a standin for front/rear move
-  # In which case the resolved file will be -1 or 11 (depending on the side)
-  defp is_front_or_rear(point) do
-    point.file == -1 or point.file == 11
-  end
+  # When the exact file is unspecified, the piece is referred to positionally
+  # by front or rear (has an identical piece on the same side lying on the same file)
+  defp is_front_or_rear(%{file: nil}), do: true
+  defp is_front_or_rear(%{file: _}), do: false
 
   def update(point, next_file, diff_rank) do
     point

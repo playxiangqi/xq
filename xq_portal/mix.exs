@@ -13,7 +13,12 @@ defmodule XQ.MixProject do
       deps: deps(),
       lockfile: Path.expand("mix.lock", __DIR__),
       deps_path: Path.expand("deps", __DIR__),
-      build_path: Path.expand("_build", __DIR__)
+      build_path: Path.expand("_build", __DIR__),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.json": :test
+      ]
     ]
   end
 
@@ -40,8 +45,8 @@ defmodule XQ.MixProject do
       {:phoenix, "~> 1.5.5"},
       {:phoenix_ecto, "~> 4.1"},
       {:phoenix_html, "~> 2.11"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_dashboard, "~> 0.2"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
 
       # Web
       {:absinthe, "~> 1.6"},
@@ -59,10 +64,11 @@ defmodule XQ.MixProject do
 
       # Docs, Testing, and Code Quality
       {:credo, "~> 1.5.4", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.13.4", only: :test},
 
       # Misc
-      {:jason, "~> 1.0"},
-      {:gettext, "~> 0.11"}
+      {:gettext, "~> 0.11"},
+      {:jason, "~> 1.0"}
     ]
   end
 

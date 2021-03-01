@@ -21,6 +21,10 @@ start:
 setup:
 	@./scripts/setup.bash
 
+.PHONY: test
+test:
+	@cd xq_portal && MIX_ENV=test mix coveralls.json --trace
+
 .PHONY: conan
 conan:
 	@${SOURCE_ENV} ./scripts/conan.bash -b
