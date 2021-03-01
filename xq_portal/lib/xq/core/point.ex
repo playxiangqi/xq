@@ -1,4 +1,6 @@
 defmodule XQ.Core.Point do
+  require Logger
+
   @type t :: %{
           ch: atom(),
           side: :red | :black,
@@ -36,12 +38,18 @@ defmodule XQ.Core.Point do
   def piece("K"), do: {:general, :red}
   def piece("k"), do: {:general, :black}
 
+  def fixed_delta_rank(:elephant, _), do: 2
+  def fixed_delta_rank(:horse, df), do: if(abs(df) == 2, do: 1, else: 2)
+  def fixed_delta_rank(_, _), do: 1
+
   def can_capture(point, other),
     do:
       point.side != other.side and
         point.file == other.file and point.rank == other.rank
 
   def to_zero_index(point) do
+    # Logger.info("#{inspect(point)}")
+
     point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
   end
 
@@ -62,7 +70,7 @@ defmodule XQ.Core.Point do
   def update(point, next_file, diff_rank) do
     point
     |> Map.update!(:rank, &(&1 + diff_rank))
-    # next_file of -1 indicates front/rear move where there is no file change
-    |> Map.update!(:file, &if(next_file != -1, do: next_file, else: &1))
+    # next_file of nil indicates front/rear move where there is no file change
+    |> Map.update!(:file, &if(not is_nil(next_file), do: next_file, else: &1))
   end
 end

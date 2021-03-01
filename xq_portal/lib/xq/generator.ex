@@ -72,7 +72,19 @@ defmodule XQ.Generator do
   defp compute_next_state(prev_state, %Move{} = m) do
     case Board.find_point(prev_state, m.ch, m.side, m.prev_file, m.is_front) do
       {old_point, index} ->
-        new_point = Point.update(old_point, m.next_file, m.delta_rank)
+        # TODO: If delta_rank is nil, need to derive it based on the available
+        #       move information
+        delta_rank =
+          case m.delta_rank do
+            nil ->
+              m.sign * Point.fixed_delta_rank(m.ch, m.next_file - old_point.file)
+
+            v ->
+              v
+          end
+
+        # Be consistent and use delta /or next for both rank and file
+        new_point = Point.update(old_point, m.next_file, delta_rank)
         updated_state = Board.update(prev_state, index, new_point)
 
         [new_point | updated_state]
