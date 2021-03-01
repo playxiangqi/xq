@@ -69,12 +69,17 @@ defmodule XQ.Generator do
     [next_board_state | prev_board_states]
   end
 
-  defp compute_next_state(prev_state, %Move{} = m) do
-    {old_point, index} = Board.find_point(prev_state, m.ch, m.side, m.prev_file, m.is_front)
+  defp compute_next_state(prev_state, %Move{} = move) do
+    case Board.find_point(prev_state, move) do
+      {old_point, index} ->
+        new_point = Move.to_new_point(move, old_point)
+        updated_state = Board.update(prev_state, index, new_point)
 
-    new_point = Point.update(old_point, m.next_file, m.delta_rank)
-    updated_state = Board.update(prev_state, index, new_point)
+        [new_point | updated_state]
 
-    [new_point | updated_state]
+      nil ->
+        raise RuntimeError,
+          message: "attempted to move a non-existent piece: #{inspect(move)}"
+    end
   end
 end

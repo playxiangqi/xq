@@ -24,7 +24,7 @@ defmodule XQ.Parser.AXF do
     |> derive_piece(params)
     |> derive_sign(params)
     |> derive_file(params)
-    |> derive_rank()
+    |> derive_rank(params)
   end
 
   def parametrize([pos, abbrev, dir, mvmt])
@@ -61,6 +61,14 @@ defmodule XQ.Parser.AXF do
 
   def derive_file(
         %Move{side: side} = move,
+        %{prev_file: prev, next_file: next}
+      ) do
+    {prev, next} = {Point.norm_file(prev, side), Point.norm_file(next, side)}
+    %{move | prev_file: prev, next_file: next, delta_file: next - prev}
+  end
+
+  def derive_file(
+        %Move{side: side} = move,
         %{prev_file: prev, dir: dir, mvmt: mvmt}
       ) do
     prev = Point.norm_file(prev, side)
@@ -69,28 +77,18 @@ defmodule XQ.Parser.AXF do
     %{move | prev_file: prev, next_file: next}
   end
 
-  def derive_file(
-        %Move{side: side} = move,
-        %{prev_file: prev, next_file: next}
-      ) do
-    {prev, next} = {Point.norm_file(prev, side), Point.norm_file(next, side)}
-    %{move | prev_file: prev, next_file: next, delta_file: next - prev}
-  end
-
   def derive_rank(%Move{sign: sign} = move, %{mvmt: mvmt}),
     do: %{move | delta_rank: mvmt * sign}
 
-  def derive_rank(%Move{ch: ch, sign: sign, delta_file: df} = move),
-    do: %{move | delta_rank: fixed_delta(ch, df) * sign}
+  def derive_rank(%Move{delta_file: nil} = move, _params), do: move
 
-  def derive_rank(move), do: move
+  def derive_rank(%Move{ch: ch, sign: sign, delta_file: df} = move, _params),
+    do: %{move | delta_rank: Point.fixed_delta_rank(ch, df, sign)}
+
+  def derive_rank(move, _params), do: move
 
   defp maybe_horizontal(dir, value, side, default),
     do: if(dir == "=", do: Point.norm_file(value, side), else: default)
-
-  defp fixed_delta(:elephant, _), do: 2
-  defp fixed_delta(:horse, df), do: if(abs(df) == 2, do: 1, else: 2)
-  defp fixed_delta(_, _), do: 1
 
   defp safe_parse(match) do
     case Integer.parse(match) do
