@@ -57,6 +57,8 @@ defmodule XQ.Generator do
   end
 
   defp generate_board_state(next_move, prev_board_states) do
+    # TODO: Currently hard-coded but should be passed along with the map
+    #       to XQ.Generator.generate/1
     move = XQ.Parser.parse(:axf, next_move)
 
     next_board_state =
@@ -67,11 +69,10 @@ defmodule XQ.Generator do
     [next_board_state | prev_board_states]
   end
 
-  defp compute_next_state(prev_state, %Move{} = move) do
-    {old_point, index} =
-      Board.find_point(prev_state, move.ch, move.side, move.prev_file, move.is_front)
+  defp compute_next_state(prev_state, %Move{} = m) do
+    {old_point, index} = Board.find_point(prev_state, m.ch, m.side, m.prev_file, m.is_front)
 
-    new_point = Point.update(old_point, move.next_file, move.delta_rank)
+    new_point = Point.update(old_point, m.next_file, m.delta_rank)
     updated_state = Board.update(prev_state, index, new_point)
 
     [new_point | updated_state]
