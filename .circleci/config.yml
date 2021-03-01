@@ -43,7 +43,7 @@ jobs:
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run: mix coveralls.json --trace
       - store_test_results:
-          path: _build/test/xq
+          path: _build/test/lib/xq
       - run: cp ~/xq/codecov.yml .
       - codecov/upload:
           file: cover/excoveralls.json
