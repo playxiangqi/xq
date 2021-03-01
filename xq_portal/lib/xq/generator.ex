@@ -69,28 +69,28 @@ defmodule XQ.Generator do
     [next_board_state | prev_board_states]
   end
 
-  defp compute_next_state(prev_state, %Move{} = m) do
-    case Board.find_point(prev_state, m.ch, m.side, m.prev_file, m.is_front) do
+  defp compute_next_state(prev_state, %Move{delta_rank: dr, next_file: nf} = move) do
+    case Board.find_point(prev_state, move) do
       {old_point, index} ->
         # TODO: If delta_rank is nil, need to derive it based on the available
         #       move information
         delta_rank =
-          case m.delta_rank do
+          case dr do
             nil ->
-              m.sign * Point.fixed_delta_rank(m.ch, m.next_file - old_point.file)
+              move.sign * Point.fixed_delta_rank(move.ch, nf - old_point.file)
 
             v ->
               v
           end
 
         # Be consistent and use delta /or next for both rank and file
-        new_point = Point.update(old_point, m.next_file, delta_rank)
+        new_point = Point.update(old_point, nf, delta_rank)
         updated_state = Board.update(prev_state, index, new_point)
 
         [new_point | updated_state]
 
       nil ->
-        Logger.error("attempted to move a non-existent piece: #{inspect(m)}")
+        Logger.error("attempted to move a non-existent piece: #{inspect(move)}")
         prev_state
     end
   end
