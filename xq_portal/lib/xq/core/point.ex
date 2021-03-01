@@ -13,6 +13,7 @@ defmodule XQ.Core.Point do
     do: @max_file - prev
 
   def norm_file(prev, _side), do: prev
+
   def sign(side, "+"), do: sign(side)
   def sign(side, "-"), do: -1 * sign(side)
   def sign(_side, "="), do: 0
@@ -52,13 +53,11 @@ defmodule XQ.Core.Point do
 
   def is_matching(point, other) do
     point.ch == other.ch and point.side == other.side and
-      (point.file == other.file or is_front_or_rear(other))
+      (point.file == other.file or multiple_on_same_file(other))
   end
 
-  # When the exact file is unspecified, the piece is referred to positionally
-  # by front or rear (has an identical piece on the same side lying on the same file)
-  defp is_front_or_rear(%{file: nil}), do: true
-  defp is_front_or_rear(%{file: _}), do: false
+  defp multiple_on_same_file(%{file: nil}), do: true
+  defp multiple_on_same_file(%{file: _}), do: false
 
   def update(point, next_file, diff_rank) do
     point
