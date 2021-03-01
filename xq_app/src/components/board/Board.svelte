@@ -3,6 +3,7 @@
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { createBoardState } from './store';
   import { RED } from './pieces';
+  import type { Point } from './pieces';
 
   export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
@@ -25,9 +26,22 @@
 
   const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
   $: finalLayout =
-    $store.facing === RED ? $store.activeLayout : $store.activeLayout;
+    $store.facing === RED
+      ? $store.activeLayout
+      : $store.activeLayout.map(invertPoint);
 
   // Utils
+  function invertPoint({ rank, file, position, ...point }: Point) {
+    rank = RANK_MAX - rank;
+    file = FILE_MAX - file;
+    return {
+      ...point,
+      rank,
+      file,
+      position: dimensions.pointToCoords(rank, file) as [number, number],
+    };
+  }
+
   function generateLinePath(
     [fromRank, fromFile]: [number, number],
     [toRank, toFile]: [number, number],
