@@ -94,7 +94,7 @@
 </script>
 
 <div class="panel game-info-panel">
-  <p class="panel-heading">Game Details</p>
+  <p class="panel-heading">Details</p>
   {#if $resp.fetching}
     <div class="game-info-section loading p-5">Loading Game...</div>
     <div class="moves-container loading" />
@@ -162,8 +162,8 @@
     }
 
     .moves-container {
-      min-height: 550px;
-      height: 550px;
+      min-height: 560px;
+      height: 560px;
       overflow-y: scroll;
 
       span.move-num {

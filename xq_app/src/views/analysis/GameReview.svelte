@@ -41,7 +41,7 @@
     .col-2 {
       display: flex;
 
-      padding-left: 4%;
+      padding-left: 3.75%;
     }
   }
 </style>
