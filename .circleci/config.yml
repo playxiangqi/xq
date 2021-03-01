@@ -44,7 +44,7 @@ jobs:
       - run: mix coveralls.json --trace
       - store_test_results:
           path: _build/test/xq
-      - run: cp ~/codecov.yml .
+      - run: cp ~/xq/codecov.yml .
       - codecov/upload:
           file: cover/excoveralls.json
           flags: portal
