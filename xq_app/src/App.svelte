@@ -17,7 +17,7 @@
       asyncComponent: () => import('./views/analysis/DatabaseExplorer.svelte'),
     }),
     '/analysis/game/:id': wrap({
-      asyncComponent: () => import('./views/analysis/GameAnalysis.svelte'),
+      asyncComponent: () => import('./views/analysis/GameReview.svelte'),
     }),
   };
 </script>

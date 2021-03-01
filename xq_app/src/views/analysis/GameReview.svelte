@@ -1,42 +1,47 @@
 <script lang="ts">
   // Components
-  import AnalysisPanel from '../../components/analysis/AnalysisPanel.svelte';
   import Board from '../../components/board/Board.svelte';
+  import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
+  import GameInfoPanel from './GameInfoPanel.svelte';
 
   // Modules
-  // TODO: Move dimensions to utilities
-  // TODO: Turn boardState into matchState
+  // TODO: Move dimensions to utilities and rebrand boardState into matchState
   import { createBoardState, Dimensions } from 'components/board';
 
   export let params: { id: number | string };
 
+  // TODO: Derive dimensions and scale from viewport and set globally
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
-  //  TODO: Rename to GameReview
 </script>
 
-<div class="game-analysis">
-  <div class="col-1" />
+<div class="game-review">
+  <div class="col-1">
+    <EngineAnalysisPanel />
+  </div>
   <div class="col-2">
     <Board {dimensions} {boardState} />
   </div>
   <div class="col-3">
-    <AnalysisPanel gameID={params.id} {boardState} />
+    <GameInfoPanel gameID={params.id} {boardState} />
   </div>
 </div>
 
 <style lang="scss">
-  .game-analysis {
+  .game-review {
     height: 100%;
     width: 100%;
 
+    margin-top: 10px;
+
     display: grid;
-    grid-template-columns: 1fr 2fr 2fr;
+    grid-template-columns: 1fr 1.4fr 1fr;
 
     .col-2 {
       display: flex;
-      align-items: center;
+
+      padding-left: 4%;
     }
   }
 </style>

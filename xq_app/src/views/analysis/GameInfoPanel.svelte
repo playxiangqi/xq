@@ -93,14 +93,13 @@
   }
 </script>
 
-<div class="panel analysis-panel">
-  <!-- <p>Joined lobby as: {$authStore.username}</p> -->
-  <p class="panel-heading">Game Analysis</p>
+<div class="panel game-info-panel">
+  <p class="panel-heading">Game Details</p>
   {#if $resp.fetching}
-    <div class="p-5 game-info loading">Loading Game...</div>
+    <div class="game-info-section loading p-5">Loading Game...</div>
     <div class="moves-container loading" />
   {:else}
-    <div class="px-4 py-3 game-info">
+    <div class="game-info-section px-4 py-3">
       <div class="players">
         {resp.data.game.info.redPlayer} vs. {resp.data.game.info.blackPlayer} — {resp
           .data.game.info.result}
@@ -155,8 +154,13 @@
 </div>
 
 <style lang="scss">
-  .analysis-panel {
+  .game-info-panel {
     margin-right: 50px;
+
+    .game-info-section {
+      min-height: 120px;
+    }
+
     .moves-container {
       min-height: 550px;
       height: 550px;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GameAnalysis from './analysis/GameAnalysis.svelte';
+  import GameReview from './analysis/GameReview.svelte';
 </script>
 
-<GameAnalysis params={{ id: 'random' }} />
+<GameReview params={{ id: 'random' }} />
