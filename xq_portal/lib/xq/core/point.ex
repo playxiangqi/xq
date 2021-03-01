@@ -38,9 +38,10 @@ defmodule XQ.Core.Point do
   def piece("K"), do: {:general, :red}
   def piece("k"), do: {:general, :black}
 
-  def fixed_delta_rank(:elephant, _), do: 2
-  def fixed_delta_rank(:horse, df), do: if(abs(df) == 2, do: 1, else: 2)
-  def fixed_delta_rank(_, _), do: 1
+  def fixed_delta_rank(ch, df, sign), do: sign * do_fixed_delta_rank(ch, df)
+  defp do_fixed_delta_rank(:elephant, _), do: 2
+  defp do_fixed_delta_rank(:horse, df), do: if(abs(df) == 2, do: 1, else: 2)
+  defp do_fixed_delta_rank(_, _), do: 1
 
   def can_capture(point, other),
     do:

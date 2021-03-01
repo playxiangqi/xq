@@ -83,7 +83,7 @@ defmodule XQ.Parser.AXF do
   def derive_rank(%Move{delta_file: nil} = move, _params), do: move
 
   def derive_rank(%Move{ch: ch, sign: sign, delta_file: df} = move, _params),
-    do: %{move | delta_rank: Point.fixed_delta_rank(ch, df) * sign}
+    do: %{move | delta_rank: Point.fixed_delta_rank(ch, df, sign)}
 
   def derive_rank(move, _params), do: move
 
