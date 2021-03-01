@@ -1,6 +1,5 @@
 defmodule XQ.Parser.AXF do
-  alias XQ.Core.{Point}
-  alias XQ.Parser.MoveDetails
+  alias XQ.Core.{Point, Move}
 
   defguardp is_axis(p) when p in ~w(P p C c R r K k)
   defguardp is_fixed(p) when p in ~w(B b N n A a)
@@ -20,7 +19,7 @@ defmodule XQ.Parser.AXF do
       |> Enum.map(&safe_parse/1)
       |> parametrize()
 
-    %MoveDetails{}
+    %Move{}
     |> derive_position(params)
     |> derive_piece(params)
     |> derive_sign(params)
@@ -44,55 +43,53 @@ defmodule XQ.Parser.AXF do
       when is_fixed(abbrev),
       do: %{abbrev: abbrev, prev_file: prev_file, dir: dir, next_file: next_file}
 
-  def derive_position(%MoveDetails{} = details, %{pos: pos}),
-    do: %{details | is_front: pos == "+"}
+  def derive_position(%Move{} = move, %{pos: pos}),
+    do: %{move | is_front: pos == "+"}
 
-  def derive_position(details, _params), do: details
+  def derive_position(move, _params), do: move
 
-  def derive_piece(%MoveDetails{} = details, %{abbrev: abbrev}) do
+  def derive_piece(%Move{} = move, %{abbrev: abbrev}) do
     {ch, side} = Point.piece(abbrev)
-    %{details | ch: ch, side: side}
+    %{move | ch: ch, side: side}
   end
 
-  def derive_sign(%MoveDetails{side: side} = details, %{dir: dir}),
-    do: %{details | sign: Point.sign(side, dir)}
+  def derive_sign(%Move{side: side} = move, %{dir: dir}),
+    do: %{move | sign: Point.sign(side, dir)}
+
+  def derive_file(%Move{side: side} = move, %{prev_file: nil, next_file: next}),
+    do: %{move | next_file: Point.norm_file(next, side)}
 
   def derive_file(
-        %MoveDetails{side: side} = details,
+        %Move{side: side} = move,
         %{prev_file: prev, dir: dir, mvmt: mvmt}
       ) do
     prev = Point.norm_file(prev, side)
     next = maybe_horizontal(dir, mvmt, side, prev)
-    %{details | prev_file: prev, next_file: next, delta_file: next - prev}
+    # Axis piece notation carries direction / movement, no need for delta_file
+    %{move | prev_file: prev, next_file: next}
   end
 
   def derive_file(
-        %MoveDetails{side: side} = details,
-        %{prev_file: nil, next_file: next}
-      ),
-      do: %{details | next_file: Point.norm_file(next, side)}
-
-  def derive_file(
-        %MoveDetails{side: side} = details,
+        %Move{side: side} = move,
         %{prev_file: prev, next_file: next}
       ) do
     {prev, next} = {Point.norm_file(prev, side), Point.norm_file(next, side)}
-    %{details | prev_file: prev, next_file: next, delta_file: next - prev}
+    %{move | prev_file: prev, next_file: next, delta_file: next - prev}
   end
 
-  def derive_rank(%MoveDetails{sign: sign} = details, %{mvmt: mvmt}),
-    do: %{details | delta_rank: mvmt * sign}
+  def derive_rank(%Move{sign: sign} = move, %{mvmt: mvmt}),
+    do: %{move | delta_rank: mvmt * sign}
 
-  def derive_rank(%MoveDetails{ch: ch, sign: sign, delta_file: df} = details),
-    do: %{details | delta_rank: fixed_delta(ch, df) * sign}
+  def derive_rank(%Move{ch: ch, sign: sign, delta_file: df} = move),
+    do: %{move | delta_rank: fixed_delta(ch, df) * sign}
 
-  def derive_rank(details), do: details
+  def derive_rank(move), do: move
 
   defp maybe_horizontal(dir, value, side, default),
     do: if(dir == "=", do: Point.norm_file(value, side), else: default)
 
   defp fixed_delta(:elephant, _), do: 2
-  defp fixed_delta(:horse, delta_file), do: if(abs(delta_file) == 2, do: 1, else: 2)
+  defp fixed_delta(:horse, df), do: if(abs(df) == 2, do: 1, else: 2)
   defp fixed_delta(_, _), do: 1
 
   defp safe_parse(match) do

@@ -22,6 +22,6 @@ parsers:
       macro: no
 
 comment:
-  layout: "reach, diff, flags, files"
+  layout: "reach, diff, flags, tree"
   behavior: default
   require_changes: true

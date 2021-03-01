@@ -55,11 +55,10 @@ defmodule XQ.Core.Point do
       (point.file == other.file or is_front_or_rear(other))
   end
 
-  # -1 for previous_file is a standin for front/rear move
-  # In which case the resolved file will be -1 or 11 (depending on the side)
-  defp is_front_or_rear(point) do
-    point.file == -1 or point.file == 11
-  end
+  # When the exact file is unspecified, the piece is referred to positionally
+  # by front or rear (has an identical piece on the same side lying on the same file)
+  defp is_front_or_rear(%{file: nil}), do: true
+  defp is_front_or_rear(%{file: _}), do: false
 
   def update(point, next_file, diff_rank) do
     point
