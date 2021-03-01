@@ -1,4 +1,6 @@
 defmodule XQ.Core.Move do
+  alias XQ.Core.Point
+
   defstruct ch: :soldier,
             side: :red,
             sign: 1,
@@ -22,4 +24,18 @@ defmodule XQ.Core.Move do
           delta_rank: integer() | nil,
           is_front: boolean()
         }
+
+  def to_new_point(%__MODULE__{next_file: nf, delta_rank: dr} = move, old_point) do
+    delta_rank =
+      if is_nil(dr),
+        do: Point.fixed_delta_rank(move.ch, nf - old_point.file, move.sign),
+        else: dr
+
+    file =
+      if is_nil(nf),
+        do: old_point.file,
+        else: nf
+
+    %{old_point | rank: old_point.rank + delta_rank, file: file}
+  end
 end

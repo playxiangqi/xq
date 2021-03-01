@@ -11,9 +11,12 @@ defmodule XQ.Parser.AXFTest do
   @range 0..9
   @default %Move{}
 
-  test "Parametrize exact axis notation" do
-    matches = Enum.map([@axis, @range, @direction, @range], &Enum.random(&1))
-    params = AXF.parametrize(matches)
+  test "Parametrize - exact axis notation" do
+    # TODO: Move to fixture
+    params =
+      [@axis, @range, @direction, @range]
+      |> Enum.map(&Enum.random/1)
+      |> AXF.parametrize()
 
     assert Map.has_key?(params, :abbrev)
     assert Map.has_key?(params, :prev_file)
@@ -21,9 +24,11 @@ defmodule XQ.Parser.AXFTest do
     assert Map.has_key?(params, :mvmt)
   end
 
-  test "Parametrize positional axis notation" do
-    matches = Enum.map([@position, @axis, @direction, @range], &Enum.random(&1))
-    params = AXF.parametrize(matches)
+  test "Parametrize - positional axis notation" do
+    params =
+      [@position, @axis, @direction, @range]
+      |> Enum.map(&Enum.random/1)
+      |> AXF.parametrize()
 
     assert Map.has_key?(params, :pos)
     assert Map.has_key?(params, :abbrev)
@@ -32,9 +37,11 @@ defmodule XQ.Parser.AXFTest do
     assert Map.has_key?(params, :mvmt)
   end
 
-  test "Parametrize exact fixed notation" do
-    matches = Enum.map([@fixed, @range, @direction, @range], &Enum.random(&1))
-    params = AXF.parametrize(matches)
+  test "Parametrize - exact fixed notation" do
+    params =
+      [@fixed, @range, @direction, @range]
+      |> Enum.map(&Enum.random/1)
+      |> AXF.parametrize()
 
     assert Map.has_key?(params, :abbrev)
     assert Map.has_key?(params, :prev_file)
@@ -42,9 +49,11 @@ defmodule XQ.Parser.AXFTest do
     assert Map.has_key?(params, :next_file)
   end
 
-  test "Parametrize positional fixed notation" do
-    matches = Enum.map([@position, @fixed, @direction, @range], &Enum.random(&1))
-    params = AXF.parametrize(matches)
+  test "Parametrize - positional fixed notation" do
+    params =
+      [@position, @fixed, @direction, @range]
+      |> Enum.map(&Enum.random/1)
+      |> AXF.parametrize()
 
     assert Map.has_key?(params, :pos)
     assert Map.has_key?(params, :abbrev)
