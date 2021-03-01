@@ -10,6 +10,7 @@ export type BoardState = {
   layouts: Layout[];
   moves: Move[];
   turn: Side;
+  facing: Side;
 };
 
 export function createBoardState(dimensions: Dimensions) {
@@ -20,6 +21,7 @@ export function createBoardState(dimensions: Dimensions) {
     layouts: [activeLayout],
     moves: [],
     turn: RED,
+    facing: RED,
   });
   const { update } = store;
 
@@ -116,6 +118,12 @@ export function createBoardState(dimensions: Dimensions) {
     movePiece: (index: number, position: [number, number]) => {
       update((state) => {
         state.activeLayout[index].position = position;
+        return state;
+      });
+    },
+    flipBoard: () => {
+      update((state) => {
+        state.facing = state.facing === RED ? BLACK : RED;
         return state;
       });
     },

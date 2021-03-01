@@ -2,6 +2,7 @@
   import Piece from './Piece.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { createBoardState } from './store';
+  import { RED } from './pieces';
 
   export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
@@ -23,6 +24,8 @@
   } = dimensions;
 
   const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
+  $: finalLayout =
+    $store.facing === RED ? $store.activeLayout : $store.activeLayout;
 
   // Utils
   function generateLinePath(
@@ -78,7 +81,7 @@
       {/each}
     </g>
     <g class="layout">
-      {#each $store.activeLayout as { side, ch, grabbing, position }, index}
+      {#each finalLayout as { side, ch, grabbing, position }, index}
         <Piece
           {index}
           {side}

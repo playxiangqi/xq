@@ -27,6 +27,8 @@ export default {
     sourcemap: true,
   },
 
+  preserveEntrySignatures: 'strict',
+
   watch: {
     clearScreen: false,
     include: 'src/**',
