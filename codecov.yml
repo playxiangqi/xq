@@ -13,6 +13,14 @@ coverage:
         threshold: 5%
     patch: false
 
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
 comment:
   layout: "reach, diff, flags, files"
   behavior: default
