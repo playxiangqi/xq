@@ -10,7 +10,7 @@ jobs:
   portal:
     docker:
       - image: circleci/elixir:1.11.2
-      - image: circleci/postgres:12-alpine
+      - image: circleci/postgres:12-alpine-ram
     environment:
       MIX_ENV: test
       POSTGRES_USER: postgres
