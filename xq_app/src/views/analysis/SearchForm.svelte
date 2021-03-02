@@ -43,7 +43,7 @@
   }
 </script>
 
-<div class="search-form p-2">
+<div class="search-form p-1">
   <div class="search-form-field field is-grouped">
     <div class="control red-player-input">
       <label for="red-player-input" class="label">Player</label>
@@ -122,7 +122,7 @@
         <label for="limit-input" class="label">Limit</label>
         <div class="select">
           <select bind:value={limit}>
-            {#each [10, 25, 50, 100] as o}
+            {#each [10, 25, 50, 100, 250] as o}
               <option>{o}</option>
             {/each}
           </select>
