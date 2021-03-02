@@ -6,18 +6,13 @@
   export let gameID: number | string;
   export let boardState: ReturnType<typeof createBoardState>;
 
-  const {
-    store,
-    updateBoardState,
-    transitionBoardState,
-    flipBoard,
-  } = boardState;
+  const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
-  opStore.subscribe(async (store) => {
+  opStore.subscribe((store) => {
     if (!store.fetching && !store.stale) {
-      updateBoardState(store.data?.game?.boardStates);
+      loadBoardState(store.data?.game?.boardStates);
     }
   });
 
