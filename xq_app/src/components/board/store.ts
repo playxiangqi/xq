@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { Dimensions } from './dimensions';
+import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
 import { createInitialLayout, Move, Point, Side, RED, BLACK } from './pieces';
 
 export type Layout = Point[];
@@ -123,7 +123,25 @@ export function createBoardState(dimensions: Dimensions) {
     },
     flipBoard: () => {
       update((state) => {
+        const invertPoint = ({ rank, file, position, ...point }: Point) => {
+          rank = RANK_MAX - rank;
+          file = FILE_MAX - file;
+          const newPosition = dimensions.pointToCoords(rank, file) as [
+            number,
+            number,
+          ];
+          return {
+            ...point,
+            rank,
+            file,
+            prevPosition: newPosition,
+            position: newPosition,
+          };
+        };
+
         state.facing = state.facing === RED ? BLACK : RED;
+        state.layouts = state.layouts.map((l) => l.map(invertPoint));
+        state.activeLayout = state.activeLayout.map(invertPoint);
         return state;
       });
     },

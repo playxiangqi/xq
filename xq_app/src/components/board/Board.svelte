@@ -25,10 +25,10 @@
   } = dimensions;
 
   const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
-  $: finalLayout =
-    $store.facing === RED
-      ? $store.activeLayout
-      : $store.activeLayout.map(invertPoint);
+  // $: finalLayout =
+  //   $store.facing === RED
+  //     ? $store.activeLayout
+  //     : $store.activeLayout.map(invertPoint);
 
   // Utils
   function invertPoint({ rank, file, position, ...point }: Point) {
@@ -95,7 +95,7 @@
       {/each}
     </g>
     <g class="layout">
-      {#each finalLayout as { side, ch, grabbing, position }, index}
+      {#each $store.activeLayout as { side, ch, grabbing, position }, index}
         <Piece
           {index}
           {side}
