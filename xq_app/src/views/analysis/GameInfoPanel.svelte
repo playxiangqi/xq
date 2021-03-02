@@ -175,8 +175,9 @@
       span.move-red,
       span.move-black {
         width: 60px;
-        padding-right: 10px;
-        text-align: right;
+        text-align: center;
+
+        font-family: 'Courier New', monospace;
 
         &:hover {
           cursor: pointer;
