@@ -24,6 +24,7 @@
 
   const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
 
+  // Utils
   function generateLinePath(
     [fromRank, fromFile]: [number, number],
     [toRank, toFile]: [number, number],
