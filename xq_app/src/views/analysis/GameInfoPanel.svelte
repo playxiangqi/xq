@@ -24,6 +24,7 @@
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
 
+  let movesContainer: HTMLDivElement;
   let currentTurnIndex = 0;
 
   // Utils
@@ -40,11 +41,24 @@
     return moveStrs;
   }
 
+  function scrollIntoView(turnIndex: number) {
+    const clampedIndex = Math.max(0, Math.min(turnIndex, maxTurnIndex - 1));
+    const moveIndex = Math.floor((clampedIndex + 1) / 2);
+    movesContainer.children?.[moveIndex].scrollIntoView({ block: 'center' });
+  }
+
+  function updateTurn(eventHandler: () => void) {
+    return () => {
+      eventHandler();
+      transitionBoardState(currentTurnIndex);
+      scrollIntoView(currentTurnIndex);
+    };
+  }
+
   // Event Handlers
   function skipToBeginning() {
     currentTurnIndex = 0;
     playSound();
-    transitionBoardState(0);
     // TODO: reset turn to red, because grabbing pieces while using the
     //       move replay puts things out of sync
   }
@@ -56,24 +70,20 @@
   function previousMove() {
     currentTurnIndex = Math.max(0, currentTurnIndex - 1);
     playSound();
-    transitionBoardState(currentTurnIndex);
   }
 
   function nextMove() {
     currentTurnIndex = Math.min(maxTurnIndex, currentTurnIndex + 1);
     playSound();
-    transitionBoardState(currentTurnIndex);
   }
 
   function skipToEnd() {
     currentTurnIndex = maxTurnIndex;
     playSound();
-    transitionBoardState(currentTurnIndex);
   }
 
   function gotoMove(turnIndex: number) {
     currentTurnIndex = turnIndex;
-    transitionBoardState(currentTurnIndex);
   }
 
   // Sound Effects
@@ -106,22 +116,23 @@
         {gameInfo.openingCode}: {gameInfo.openingName}
       </div>
     </div>
-    <div class="moves-container">
+    <div class="moves-container" bind:this={movesContainer}>
       {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
         <div class="panel-block move">
           <span class="move-num">{moveNum}.</span>
           <span
             class="move-red"
             class:current={currentTurnIndex - 1 === i * 2}
-            on:click={() => gotoMove(i * 2 + 1)}>{moveRed}</span
+            on:click={updateTurn(() => gotoMove(i * 2 + 1))}>{moveRed}</span
           >
           <span
             class="move-black"
             class:current={currentTurnIndex - 1 === i * 2 + 1}
-            on:click={() => gotoMove((i + 1) * 2)}>{moveBlack}</span
+            on:click={updateTurn(() => gotoMove((i + 1) * 2))}>{moveBlack}</span
           >
         </div>
       {/each}
+      <div class="panel-block move-end-padding" />
     </div>
   {/if}
   <div class="panel-block move-buttons">
@@ -132,22 +143,22 @@
     </button>
     <button
       class="button"
-      on:click={skipToBeginning}
+      on:click={updateTurn(skipToBeginning)}
       disabled={currentTurnIndex <= 0}>{'⏮'}</button
     >
     <button
       class="button"
-      on:click={previousMove}
+      on:click={updateTurn(previousMove)}
       disabled={currentTurnIndex <= 0}>{'◀️'}</button
     >
     <button
       class="button"
-      on:click={nextMove}
+      on:click={updateTurn(nextMove)}
       disabled={currentTurnIndex >= maxTurnIndex}>{'▶️'}</button
     >
     <button
       class="button"
-      on:click={skipToEnd}
+      on:click={updateTurn(skipToEnd)}
       disabled={currentTurnIndex >= maxTurnIndex}>{'⏭️'}</button
     >
   </div>
