@@ -74,6 +74,7 @@
       {:else}
         <div class="select">
           <select bind:value={opening}>
+            <option selected value={undefined}>Any</option>
             {#each resp.data?.openings || [] as o}
               <option>{o.id} - {o.name}</option>
             {/each}
@@ -85,6 +86,7 @@
       <label for="result-dropdown" class="label">Result</label>
       <div class="select">
         <select bind:value={result}>
+          <option selected value={undefined}>Any</option>
           {#each ['Red Victory', 'Draw', 'Black Victory'] as o}
             <option>{o}</option>
           {/each}
