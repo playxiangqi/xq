@@ -5,7 +5,12 @@
   export let gameID: number | string;
   export let boardState: ReturnType<typeof createBoardState>;
 
-  const { store, updateBoardState, transitionBoardState } = boardState;
+  const {
+    store,
+    updateBoardState,
+    transitionBoardState,
+    flipBoard,
+  } = boardState;
 
   const opStore = operationStore(`
     query getGameBoardStates {
@@ -130,6 +135,11 @@
     </div>
   {/if}
   <div class="panel-block move-buttons">
+    <button class="button" on:click={flipBoard}>
+      <span class="icon">
+        <i class="fas fa-repeat" />
+      </span>
+    </button>
     <button
       class="button"
       on:click={skipToBeginning}
