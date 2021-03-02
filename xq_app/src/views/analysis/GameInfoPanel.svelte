@@ -1,6 +1,7 @@
 <script lang="ts">
   import { operationStore, query } from '@urql/svelte';
   import { createBoardState } from 'components/board';
+  import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
   export let gameID: number | string;
   export let boardState: ReturnType<typeof createBoardState>;
@@ -12,28 +13,7 @@
     flipBoard,
   } = boardState;
 
-  const opStore = operationStore(`
-    query getGameBoardStates {
-      game(id: "${gameID}") {
-        info {
-          redPlayer
-          blackPlayer
-          result
-          event
-          date
-          openingCode
-          openingName
-          moves
-        }
-        boardStates {
-          ch
-          side
-          rank
-          file
-        }
-      }
-    }
-  `);
+  const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
   opStore.subscribe((store) => {
     if (!store.fetching && !store.stale) {
@@ -42,9 +22,11 @@
   });
 
   $: maxTurnIndex = $store.layouts.length - 1;
+  $: gameInfo = $resp.data?.game?.info;
 
   let currentTurnIndex = 0;
 
+  // Utils
   function prepareMoveNotation(moves: string[]) {
     let turnNum = 0;
     let moveStrs = [];
@@ -58,6 +40,7 @@
     return moveStrs;
   }
 
+  // Event Handlers
   function skipToBeginning() {
     currentTurnIndex = 0;
     playSound();
@@ -88,6 +71,11 @@
     transitionBoardState(currentTurnIndex);
   }
 
+  function gotoMove(turnIndex: number) {
+    currentTurnIndex = turnIndex;
+    transitionBoardState(currentTurnIndex);
+  }
+
   // Sound Effects
   const audio = new Audio('./sounds/drop-piece.wav');
 
@@ -106,29 +94,31 @@
   {:else}
     <div class="game-info-section px-4 py-3">
       <div class="players">
-        {resp.data.game.info.redPlayer} vs. {resp.data.game.info.blackPlayer} — {resp
-          .data.game.info.result}
+        {gameInfo.redPlayer} vs. {gameInfo.blackPlayer} — {gameInfo.result}
       </div>
       <div class="venue">
-        {resp.data.game.info.event}
+        {gameInfo.event}
       </div>
       <div class="date">
-        {new Date(resp.data.game.info.date).toDateString()}
+        {new Date(gameInfo.date).toDateString()}
       </div>
       <div class="opening-name">
-        {resp.data.game.info.openingCode}: {resp.data.game.info.openingName}
+        {gameInfo.openingCode}: {gameInfo.openingName}
       </div>
     </div>
     <div class="moves-container">
-      {#each prepareMoveNotation(resp.data.game.info.moves) as { moveNum, moveRed, moveBlack }, i}
+      {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
         <div class="panel-block move">
           <span class="move-num">{moveNum}.</span>
-          <span class="move-red" class:current={currentTurnIndex - 1 === i * 2}
-            >{moveRed}</span
+          <span
+            class="move-red"
+            class:current={currentTurnIndex - 1 === i * 2}
+            on:click={() => gotoMove(i * 2 + 1)}>{moveRed}</span
           >
           <span
             class="move-black"
-            class:current={currentTurnIndex - 1 === i * 2 + 1}>{moveBlack}</span
+            class:current={currentTurnIndex - 1 === i * 2 + 1}
+            on:click={() => gotoMove((i + 1) * 2)}>{moveBlack}</span
           >
         </div>
       {/each}
@@ -177,14 +167,20 @@
       overflow-y: scroll;
 
       span.move-num {
-        width: 30px;
+        width: 40px;
+        margin-right: 10px;
         text-align: right;
       }
 
       span.move-red,
       span.move-black {
         width: 60px;
+        padding-right: 10px;
         text-align: right;
+
+        &:hover {
+          cursor: pointer;
+        }
       }
 
       span.current {
