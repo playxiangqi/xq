@@ -43,7 +43,7 @@
   }
 </script>
 
-<div class="search-form p-2">
+<div class="search-form p-1">
   <div class="search-form-field field is-grouped">
     <div class="control red-player-input">
       <label for="red-player-input" class="label">Player</label>
@@ -74,6 +74,7 @@
       {:else}
         <div class="select">
           <select bind:value={opening}>
+            <option selected value={undefined}>Any</option>
             {#each resp.data?.openings || [] as o}
               <option>{o.id} - {o.name}</option>
             {/each}
@@ -85,6 +86,7 @@
       <label for="result-dropdown" class="label">Result</label>
       <div class="select">
         <select bind:value={result}>
+          <option selected value={undefined}>Any</option>
           {#each ['Red Victory', 'Draw', 'Black Victory'] as o}
             <option>{o}</option>
           {/each}
@@ -120,7 +122,7 @@
         <label for="limit-input" class="label">Limit</label>
         <div class="select">
           <select bind:value={limit}>
-            {#each [10, 25, 50, 100] as o}
+            {#each [10, 25, 50, 100, 250] as o}
               <option>{o}</option>
             {/each}
           </select>
