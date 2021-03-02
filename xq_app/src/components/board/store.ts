@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
+import { Dimensions } from './dimensions';
 import {
   newPoint,
   createInitialLayout,
@@ -39,11 +39,12 @@ export function createBoardState(dimensions: Dimensions) {
 
   return {
     store,
-    updateBoardState: (boardStates: Layout[]) =>
+    loadBoardState: (boardStates: Layout[]) =>
       update((state) => {
         state.layouts = boardStates.map((layout) =>
           layout.map(newPoint(dimensions, state.facing !== RED)),
         );
+        state.activeLayout = state.layouts[0];
         return state;
       }),
     transitionBoardState: (turnIndex: number) =>
