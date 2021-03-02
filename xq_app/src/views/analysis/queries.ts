@@ -1,3 +1,26 @@
+export const GET_GAME_BOARD_STATES_QUERY = (gameID: number | string) => `
+  query getGameBoardStates {
+    game(id: "${gameID}") {
+      info {
+        redPlayer
+        blackPlayer
+        result
+        event
+        date
+        openingCode
+        openingName
+        moves
+      }
+      boardStates {
+        ch
+        side
+        rank
+        file
+      }
+    }
+  }
+`;
+
 export const GET_OPENINGS_QUERY = `
   query getOpenings {
     openings {

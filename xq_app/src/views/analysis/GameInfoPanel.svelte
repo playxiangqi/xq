@@ -1,6 +1,7 @@
 <script lang="ts">
   import { operationStore, query } from '@urql/svelte';
   import { createBoardState } from 'components/board';
+  import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
   export let gameID: number | string;
   export let boardState: ReturnType<typeof createBoardState>;
@@ -12,28 +13,7 @@
     flipBoard,
   } = boardState;
 
-  const opStore = operationStore(`
-    query getGameBoardStates {
-      game(id: "${gameID}") {
-        info {
-          redPlayer
-          blackPlayer
-          result
-          event
-          date
-          openingCode
-          openingName
-          moves
-        }
-        boardStates {
-          ch
-          side
-          rank
-          file
-        }
-      }
-    }
-  `);
+  const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
   opStore.subscribe((store) => {
     if (!store.fetching && !store.stale) {
@@ -46,6 +26,7 @@
 
   let currentTurnIndex = 0;
 
+  // Utils
   function prepareMoveNotation(moves: string[]) {
     let turnNum = 0;
     let moveStrs = [];
@@ -59,6 +40,7 @@
     return moveStrs;
   }
 
+  // Event Handlers
   function skipToBeginning() {
     currentTurnIndex = 0;
     playSound();
