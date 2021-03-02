@@ -15,7 +15,7 @@
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
-  opStore.subscribe((store) => {
+  opStore.subscribe(async (store) => {
     if (!store.fetching && !store.stale) {
       updateBoardState(store.data?.game?.boardStates);
     }
