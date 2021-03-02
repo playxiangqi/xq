@@ -1,4 +1,4 @@
-import { Dimensions } from './dimensions';
+import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
 import {
   TRAD_HORSE_RED,
   TRAD_CHARIOT_RED,
@@ -56,6 +56,26 @@ export type Point = {
   prevPosition: [number, number];
   grabbing: boolean;
 };
+
+export function newPoint(
+  dimensions: Dimensions,
+  shouldInvert: boolean = false,
+) {
+  return (point: Point) => {
+    const [rank, file] = shouldInvert
+      ? [RANK_MAX - point.rank, FILE_MAX - point.file]
+      : [point.rank, point.file];
+    const position = dimensions.pointToCoords(rank, file) as [number, number];
+    return {
+      ...point,
+      rank,
+      file,
+      position,
+      prevPosition: position,
+      grabbing: false,
+    };
+  };
+}
 
 export type Move = Omit<Point, 'grabbing'>;
 
@@ -120,7 +140,7 @@ export type Glyph = string;
 export function getGlyph(
   side: Side,
   ch: Character,
-  style: GlyphStyle = TRADITIONAL
+  style: GlyphStyle = TRADITIONAL,
 ): Glyph {
   const glyphs: {
     [style: string]: {
