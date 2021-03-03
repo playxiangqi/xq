@@ -1,5 +1,6 @@
 <script lang="ts">
   import Piece from './Piece.svelte';
+  import PieceShadow from './PieceShadow.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { createBoardState } from './store';
 
@@ -20,9 +21,11 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
+    pieceSize,
   } = dimensions;
 
   const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
+  $: ({ prevPoint, nextPoint } = $store.activeTransition);
 
   // Utils
   function generateLinePath(
@@ -78,6 +81,18 @@
       {/each}
     </g>
     <g class="layout">
+      {#if prevPoint && nextPoint}
+        <PieceShadow
+          size={pieceSize}
+          position={nextPoint.position}
+          fill="green"
+        />
+        <PieceShadow
+          size={pieceSize}
+          position={prevPoint.position}
+          opacity={0.25}
+        />
+      {/if}
       {#each $store.activeLayout as { side, ch, grabbing, position }, index}
         <Piece
           {index}

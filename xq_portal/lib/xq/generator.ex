@@ -61,8 +61,10 @@ defmodule XQ.Generator do
   def generate(_), do: [@starting_state] |> to_zero_indices()
 
   defp to_zero_indices(boards) do
-    Enum.map(boards, fn %Board{state: state} = board ->
-      %{board | state: Enum.map(state, &Point.to_zero_index/1)}
+    Enum.map(boards, fn %Board{} = board ->
+      for {k, v} <- Map.from_struct(board),
+          into: %{},
+          do: {k, Point.to_zero_index(v)}
     end)
   end
 

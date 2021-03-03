@@ -12,7 +12,7 @@
   const resp = query(opStore);
   opStore.subscribe((store) => {
     if (!store.fetching && !store.stale) {
-      loadBoardState(store.data?.game?.boardStates);
+      loadBoardState(store.data?.game?.boards);
     }
   });
 
