@@ -12,6 +12,12 @@ import {
 
 export type Layout = Point[];
 
+export type BoardTransitions = {
+  state: Point[];
+  prevPoint?: Point;
+  nextPoint?: Point;
+};
+
 // TODO: AnalysisState which contains/extends a BoardState
 export type BoardState = {
   activeLayout: Layout;
@@ -39,12 +45,11 @@ export function createBoardState(dimensions: Dimensions) {
 
   return {
     store,
-    loadBoardState: (boardStates: Layout[]) =>
+    updateBoardState: (boardStates: Layout[]) =>
       update((state) => {
         state.layouts = boardStates.map((layout) =>
           layout.map(newPoint(dimensions, state.facing !== RED)),
         );
-        state.activeLayout = state.layouts[0];
         return state;
       }),
     transitionBoardState: (turnIndex: number) =>

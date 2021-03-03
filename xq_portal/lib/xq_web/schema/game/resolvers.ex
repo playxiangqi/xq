@@ -4,8 +4,6 @@ defmodule XQWeb.Schema.Game.Resolvers do
   def get_game(_root, %{id: id}, _info) do
     case fetch_games("/#{id}") do
       {:ok, content} ->
-        boards = XQ.Generator.generate(content)
-
         {:ok,
          %{
            # TODO:
@@ -16,7 +14,7 @@ defmodule XQWeb.Schema.Game.Resolvers do
            # However:
            #  Run-time processing gives the most flexibility, since
            #  there is minimal support and an assumption of only one move notation.
-           board_states: Enum.map(boards, & &1.state),
+           boards: XQ.Generator.generate(content),
            info: content
          }}
 
