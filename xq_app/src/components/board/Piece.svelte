@@ -8,6 +8,7 @@
   export let side: Side;
   export let ch: Character;
   export let position: [number, number];
+  export let nextPosition: [number, number] | undefined;
   export let grabbing: boolean;
   export let dimensions: Dimensions;
 
@@ -25,6 +26,10 @@
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
+  $: justMoved =
+    nextPosition &&
+    nextPosition[0] === position[0] &&
+    nextPosition[1] === position[1];
 
   // Sound Effects
   const audio = new Audio('./sounds/drop-piece.wav');
@@ -92,7 +97,7 @@
     r={outerRadius}
     cx={borderRadius}
     cy={borderRadius}
-    stroke="black"
+    stroke={justMoved ? 'greenyellow' : 'black'}
     stroke-width={strokeWidth}
   />
   <circle
