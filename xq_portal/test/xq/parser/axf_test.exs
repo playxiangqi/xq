@@ -62,11 +62,19 @@ defmodule XQ.Parser.AXFTest do
     assert Map.has_key?(params, :next_file)
   end
 
-  test "Derive position" do
+  test "derive_position/2" do
     wrapper = &AXF.derive_position(@default, %{pos: &1})
 
     assert wrapper.("+") == %Move{is_front: true}
     assert wrapper.("-") == %Move{is_front: false}
     assert AXF.derive_position(@default, %{}) == @default
+  end
+
+  test "derive_file/1 - axis - vertical" do
+    assert AXF.derive_file(%Move{ch: :chariot, side: :red}, %{
+             prev_file: 4,
+             dir: "+",
+             mvmt: 5
+           }) == %Move{ch: :chariot, side: :red, prev_file: 6, next_file: 6}
   end
 end
