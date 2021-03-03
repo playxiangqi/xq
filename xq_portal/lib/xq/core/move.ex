@@ -25,7 +25,7 @@ defmodule XQ.Core.Move do
           is_front: boolean()
         }
 
-  def to_new_point(%__MODULE__{next_file: nf, delta_rank: dr} = move, old_point) do
+  def next(%__MODULE__{next_file: nf, delta_rank: dr} = move, old_point) do
     delta_rank =
       if is_nil(dr),
         do: Point.fixed_delta_rank(move.ch, nf - old_point.file, move.sign),

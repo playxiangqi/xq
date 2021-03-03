@@ -48,6 +48,12 @@ defmodule XQ.Core.Point do
       point.side != other.side and
         point.file == other.file and point.rank == other.rank
 
+  def to_zero_index(points) when is_list(points) do
+    Enum.map(points, &to_zero_index/1)
+  end
+
+  def to_zero_index(nil), do: nil
+
   def to_zero_index(point) do
     point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
   end

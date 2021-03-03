@@ -12,7 +12,7 @@
   const resp = query(opStore);
   opStore.subscribe((store) => {
     if (!store.fetching && !store.stale) {
-      loadBoardState(store.data?.game?.boardStates);
+      loadBoardState(store.data?.game?.boards);
     }
   });
 
@@ -174,6 +174,7 @@
 
       span.move-num {
         width: 40px;
+
         margin-right: 10px;
         text-align: right;
       }
@@ -181,9 +182,9 @@
       span.move-red,
       span.move-black {
         width: 60px;
-        text-align: center;
 
         font-family: 'Courier New', monospace;
+        text-align: center;
 
         &:hover {
           cursor: pointer;

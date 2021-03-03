@@ -27,8 +27,14 @@ defmodule XQWeb.Schema.Game.Types do
     field :file, non_null(:integer)
   end
 
+  object :board do
+    field :state, non_null(list_of(:point))
+    field :prev_point, :point
+    field :next_point, :point
+  end
+
   object :game do
     field :info, non_null(:game_info)
-    field :board_states, non_null(list_of(list_of(:point)))
+    field :boards, non_null(list_of(:board))
   end
 end

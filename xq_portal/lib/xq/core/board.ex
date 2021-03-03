@@ -1,10 +1,18 @@
 defmodule XQ.Core.Board do
   alias XQ.Core.{Point, Move}
 
-  def update(board, old_index, new_point) do
+  defstruct [:state, :prev_point, :next_point]
+
+  @type t :: %__MODULE__{
+          state: list(Point),
+          prev_point: Point | nil,
+          next_point: Point | nil
+        }
+
+  def update(board, next_point, old_index) do
     board
     |> remove_piece_at(old_index)
-    |> maybe_capture_piece(new_point)
+    |> maybe_capture_piece(next_point)
   end
 
   def find_point(board, %Move{ch: ch, side: side} = move) do

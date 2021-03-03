@@ -11,11 +11,25 @@ export const GET_GAME_BOARD_STATES_QUERY = (gameID: number | string) => `
         openingName
         moves
       }
-      boardStates {
-        ch
-        side
-        rank
-        file
+      boards {
+        state {
+          ch
+          side
+          rank
+          file
+        }
+        prevPoint {
+          ch
+          side
+          rank
+          file
+        }
+        nextPoint {
+          ch
+          side
+          rank
+          file
+        }
       }
     }
   }
