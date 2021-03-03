@@ -12,16 +12,20 @@ import {
 
 export type Layout = Point[];
 
-export type BoardTransitions = {
-  state: Point[];
+export type Transition = {
   prevPoint?: Point;
   nextPoint?: Point;
 };
+
+export type LayoutWithTransitions = {
+  state: Layout;
+} & Transition;
 
 // TODO: AnalysisState which contains/extends a BoardState
 export type BoardState = {
   activeLayout: Layout;
   layouts: Layout[];
+  transitions: Transition[];
   moves: Move[];
   turn: Side;
   facing: Side;
@@ -33,6 +37,7 @@ export function createBoardState(dimensions: Dimensions) {
   const store = writable<BoardState>({
     activeLayout,
     layouts: [activeLayout],
+    transitions: [],
     moves: [],
     turn: RED,
     facing: RED,
@@ -45,11 +50,15 @@ export function createBoardState(dimensions: Dimensions) {
 
   return {
     store,
-    updateBoardState: (boardStates: Layout[]) =>
+    loadBoardState: (layoutWithTrans: LayoutWithTransitions[]) =>
       update((state) => {
-        state.layouts = boardStates.map((layout) =>
-          layout.map(newPoint(dimensions, state.facing !== RED)),
+        state.layouts = layoutWithTrans.map(({ state: s }) =>
+          s.map(newPoint(dimensions, state.facing !== RED)),
         );
+        state.transitions = layoutWithTrans.map(({ prevPoint, nextPoint }) => ({
+          prevPoint,
+          nextPoint,
+        }));
         return state;
       }),
     transitionBoardState: (turnIndex: number) =>

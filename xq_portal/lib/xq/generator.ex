@@ -61,8 +61,6 @@ defmodule XQ.Generator do
   def generate(_), do: [@starting_state] |> to_zero_indices()
 
   defp to_zero_indices(boards) do
-    Logger.info("boards: #{inspect(boards)}")
-
     Enum.map(boards, fn %Board{state: state} = board ->
       %{board | state: Enum.map(state, &Point.to_zero_index/1)}
     end)
