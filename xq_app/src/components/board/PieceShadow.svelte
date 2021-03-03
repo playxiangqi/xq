@@ -1,12 +1,17 @@
 <script lang="ts">
   export let size: number;
-  export let position: [number, number];
-  export let fill = 'gray';
-  export let opacity = 0.4;
+  export let radius: number;
+  export let prevPosition: [number, number];
+  export let stroke = 'black';
+  export let fill = 'black';
+  export let opacity = 0.1;
 
-  $: [posY, posX] = position;
+  $: [posY, posX] = prevPosition;
+  $: [height, width] = [size * 2, size * 2];
+  $: r = radius * 0.5;
+  $: transform = `translate(${275 / r}, ${275 / r})`;
 </script>
 
-<svg class="piece-shadow" height={size} width={size} y={posY} x={posX}>
-  <rect height={size} width={size} {fill} {opacity} />
+<svg class="piece-shadow-prev" {height} {width} y={posY} x={posX} {transform}>
+  <circle {r} cx={r} cy={r} {stroke} {fill} {opacity} {transform} />
 </svg>

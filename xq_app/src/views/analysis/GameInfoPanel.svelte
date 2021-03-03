@@ -183,7 +183,7 @@
       span.move-black {
         width: 60px;
 
-        font-family: 'Courier New', monospace;
+        font-family: 'Courier Prime', monospace;
         text-align: center;
 
         &:hover {

@@ -21,7 +21,9 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
+    pieceScale,
     pieceSize,
+    pieceOuterRadius,
   } = dimensions;
 
   const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
@@ -83,14 +85,10 @@
     <g class="layout">
       {#if prevPoint && nextPoint}
         <PieceShadow
+          scale={pieceScale}
           size={pieceSize}
-          position={nextPoint.position}
-          fill="green"
-        />
-        <PieceShadow
-          size={pieceSize}
-          position={prevPoint.position}
-          opacity={0.25}
+          radius={pieceOuterRadius}
+          prevPosition={prevPoint.position}
         />
       {/if}
       {#each $store.activeLayout as { side, ch, grabbing, position }, index}
@@ -99,6 +97,7 @@
           {side}
           {ch}
           {position}
+          nextPosition={nextPoint?.position}
           {grabbing}
           {dimensions}
           {dropPiece}
