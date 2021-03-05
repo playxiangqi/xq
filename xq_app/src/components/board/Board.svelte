@@ -21,7 +21,6 @@
     innerFrameOffsetX,
     rankSpacing,
     fileSpacing,
-    pieceScale,
     pieceSize,
     pieceOuterRadius,
   } = dimensions;
@@ -85,7 +84,6 @@
     <g class="layout">
       {#if prevPoint && nextPoint}
         <PieceShadow
-          scale={pieceScale}
           size={pieceSize}
           radius={pieceOuterRadius}
           prevPosition={prevPoint.position}

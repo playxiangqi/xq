@@ -16,13 +16,17 @@ defmodule XQ.Application do
       # Start the Endpoint (HTTP/HTTPS)
       XQWeb.Endpoint,
       # Start the Finch HTTP Client pools
-      {Finch, name: XQ.Finch}
+      {Finch, name: XQ.Finch},
+      # Start the XQ Engine supervisor
+      XQNative.Supervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: XQ.Supervisor]
     Supervisor.start_link(children, opts)
+
+    DynamicSupervisor.start_child(XQNative.Supervisor, {XQNative.Engine, self()})
   end
 
   # Tell Phoenix to update the endpoint configuration
