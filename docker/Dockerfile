@@ -36,6 +36,9 @@ COPY xq_app xq_app
 RUN yarn --cwd xq_app install && yarn --cwd xq_app deploy
 RUN cd xq_portal && mix phx.digest
 
+# Compile and install engines
+COPY xq_engine/fairy-stockfish /usr/local/bin/fairy-stockfish
+
 # Compile and build release
 COPY scripts/start.sh ./xq_portal/
 RUN cd xq_portal && mix do compile, release

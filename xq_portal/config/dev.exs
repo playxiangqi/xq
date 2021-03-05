@@ -2,7 +2,7 @@ use Mix.Config
 
 config :xq,
   archive_service: "http://localhost:6391/api",
-  engine_path: "xq_engine/fairy-stockfish"
+  engine_path: Path.expand("../../xq_engine/fairy-stockfish", __DIR__)
 
 # Configure your database
 config :xq, XQ.Repo,

@@ -27,14 +27,12 @@ defmodule XQNative.Engine do
         [:binary]
       )
 
-    Port.command(port, "uci\n")
-
     Logger.debug("successfully started #{__MODULE__} engine server")
 
     {:noreply, %{state | port: port}}
   end
 
-  def handle_info({port, {:data, "ok" <> _rem}}, state) do
+  def handle_info({port, {:data, "id name " <> _rem}}, state) do
     Logger.debug("Engine UCI ok")
 
     set_option(port, "UCI_Variant", "xiangqi")
@@ -47,6 +45,12 @@ defmodule XQNative.Engine do
     Logger.debug("Engine is ready")
 
     {:noreply, %{state | ready: true}}
+  end
+
+  def handle_info({_port, {:data, msg}}, state) do
+    Logger.debug("Reply from engine: #{inspect(msg)}")
+
+    {:noreply, state}
   end
 
   defp set_option(port, option, value) do

@@ -61,6 +61,7 @@ jobs:
       - checkout
       - aws-cli/setup
       - setup_remote_docker:
+          docker_layer_caching: true
           version: 19.03.13
       - aws-ecr/ecr-login
       - run:

@@ -1,16 +1,12 @@
 defmodule XQNative.Supervisor do
-  use Supervisor
+  use DynamicSupervisor, restart: :temporary
 
   def start_link(init_arg) do
-    Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
+    DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
   end
 
   @impl true
   def init(_init_arg) do
-    children = [
-      {XQNative.Engine, []}
-    ]
-
-    Supervisor.init(children, strategy: :one_for_one)
+    DynamicSupervisor.init(strategy: :one_for_one)
   end
 end

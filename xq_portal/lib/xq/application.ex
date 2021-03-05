@@ -16,7 +16,9 @@ defmodule XQ.Application do
       # Start the Endpoint (HTTP/HTTPS)
       XQWeb.Endpoint,
       # Start the Finch HTTP Client pools
-      {Finch, name: XQ.Finch}
+      {Finch, name: XQ.Finch},
+      # Start the XQ Engine,
+      {XQNative.Engine, self()}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
