@@ -50,6 +50,7 @@ defmodule XQ.MixProject do
 
       # Web
       {:absinthe, "~> 1.6"},
+      {:absinthe_phoenix, "~> 2.0"},
       {:absinthe_plug, "~> 1.5"},
       {:finch, "~> 0.6.0"},
       {:plug_cowboy, "~> 2.0"},

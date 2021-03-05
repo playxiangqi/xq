@@ -1,5 +1,6 @@
 defmodule XQWeb.UserSocket do
   use Phoenix.Socket
+  use Absinthe.Phoenix.Socket, schema: XQWeb.Schema
 
   ## Channels
   channel "user:*", XQWeb.AuthChannel

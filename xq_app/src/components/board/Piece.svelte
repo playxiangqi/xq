@@ -26,7 +26,7 @@
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
-  $: justMoved =
+  $: moved =
     nextPosition &&
     nextPosition[0] === position[0] &&
     nextPosition[1] === position[1];
@@ -94,10 +94,11 @@
 >
   <circle
     class="outer"
+    class:moved
     r={outerRadius}
     cx={borderRadius}
     cy={borderRadius}
-    stroke={justMoved ? 'greenyellow' : 'black'}
+    stroke="black"
     stroke-width={strokeWidth}
   />
   <circle
@@ -126,14 +127,18 @@
 
     circle {
       shape-rendering: geometricPrecision;
-    }
 
-    circle.outer {
-      fill: #ffddaa;
-    }
+      &.outer {
+        fill: #ffddaa;
+      }
 
-    circle.inner {
-      fill: none;
+      &.inner {
+        fill: none;
+      }
+
+      &.moved {
+        stroke: greenyellow;
+      }
     }
 
     path.glyph {

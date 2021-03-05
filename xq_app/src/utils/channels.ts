@@ -1,11 +1,13 @@
-import { Socket } from 'phoenix';
+import { subscriptionExchange } from '@urql/core';
+import { Channel, Socket } from 'phoenix';
+import { make, pipe, toObservable } from 'wonka';
 
 const socket = new Socket('/socket');
 socket.connect();
 
 export type PhoenixEvent = (
   event: string,
-  payload: Record<string, any>
+  payload: Record<string, any>,
 ) => void;
 
 export function createChannel(topic: string, onMessage: PhoenixEvent) {
@@ -31,3 +33,33 @@ export function createChannel(topic: string, onMessage: PhoenixEvent) {
   return (event: string, payload: Record<string, any>) =>
     channel.push(event, payload);
 }
+
+const absintheChannel = socket.channel('__absinthe__:control');
+absintheChannel.join();
+
+export const absintheExchange = subscriptionExchange({
+  forwardSubscription({ query, variables }) {
+    let subscriptionChannel: Channel;
+
+    const source = make((observer) => {
+      const { next } = observer;
+
+      absintheChannel
+        .push('doc', { query, variables })
+        .receive('ok', ({ subscriptionId }) => {
+          if (subscriptionId) {
+            subscriptionChannel = socket.channel(subscriptionId);
+            subscriptionChannel.on('subscription:data', (value) => {
+              next(value.result);
+            });
+          }
+        });
+
+      return () => {
+        subscriptionChannel?.leave();
+      };
+    });
+
+    return pipe(source, toObservable);
+  },
+});

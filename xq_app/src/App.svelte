@@ -2,8 +2,12 @@
   import 'bulma/bulma.sass';
 
   // GraphQL Client
-  import { initClient } from '@urql/svelte';
-  initClient({ url: '/graphql' });
+  import { initClient, dedupExchange, fetchExchange } from '@urql/svelte';
+  import { absintheExchange } from 'utils/channels';
+  initClient({
+    url: '/graphql',
+    exchanges: [dedupExchange, fetchExchange, absintheExchange],
+  });
 
   // Components
   import Demo from './views/Demo.svelte';
