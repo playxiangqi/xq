@@ -49,19 +49,22 @@ defmodule XQNative.Engine do
     {:noreply, %{state | ready: true}}
   end
 
+  def handle_info({_port, {:data, "info " <> moves}}, %{respond_to: pid} = state) do
+    Logger.debug("Reply from engine: #{inspect(moves)}")
+    send(pid, %{moves: moves})
+    {:noreply, state}
+  end
+
   def handle_info({_port, {:data, msg}}, state) do
     Logger.debug("Reply from engine: #{inspect(msg)}")
 
     {:noreply, state}
   end
 
-  def handle_cast({:send, command}, state) do
-    state
-    |> Map.get(:port)
-    |> Port.command(command <> "\n")
+  def handle_cast({:send, command}, %{port: port} = state) do
+    Port.command(port, command <> "\n")
 
-    state
-    |> Map.put(:status, :thinking)
+    Map.put(state, :status, :thinking)
 
     {:noreply, state}
   end

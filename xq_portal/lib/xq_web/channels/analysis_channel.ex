@@ -1,17 +1,23 @@
 defmodule XQWeb.AnaylsisChannel do
   use Phoenix.Channel
-  use XQ.Analysis
+
+  require Logger
 
   @impl true
   def join("analysis:*", _payload, socket) do
-    Phoenix.PubSub.subscribe(XQ.PubSub, @internal_topic)
-    XQ.Analysis.start_link(self())
+    XQ.Analysis.new_session()
     {:ok, socket}
   end
 
   @impl true
-  def handle_info(%{event: event, payload: payload}, socket) do
-    Phoenix.Channel.broadcast!(socket, event, payload)
+  def handle_info(%{moves: moves}, socket) do
+    Phoenix.Channel.broadcast!(socket, "analysis:moves", %{moves: moves})
+    {:noreply, socket}
+  end
+
+  def handle_info(event, socket) do
+    Logger.debug("AnalysisChannel received unhandled event: #{inspect(event)}")
+
     {:noreply, socket}
   end
 end

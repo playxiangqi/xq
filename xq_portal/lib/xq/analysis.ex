@@ -1,17 +1,11 @@
 defmodule XQ.Analysis do
   use Agent
 
-  defmacro __using__(_) do
-    quote do
-      @internal_topic "_analysis:*"
-    end
-  end
-
-  def start_link(pid) do
+  def new_session() do
     {:ok, engine} =
       DynamicSupervisor.start_child(
         XQNative.Supervisor,
-        {XQNative.Engine, pid}
+        {XQNative.Engine, self()}
       )
 
     GenServer.cast(engine, {:send, "position startpos"})
