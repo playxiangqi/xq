@@ -1,6 +1,8 @@
 defmodule XQ.Core.Board do
   alias XQ.Core.{Point, Move}
 
+  require Logger
+
   defstruct [:state, :prev_point, :next_point]
 
   @type t :: %__MODULE__{
@@ -22,6 +24,7 @@ defmodule XQ.Core.Board do
       |> Enum.filter(fn {p, _} ->
         Point.is_matching(p, %{ch: ch, side: side, file: move.prev_file})
       end)
+      |> get_tandem_soldier(move)
       |> Enum.sort(fn {a, _}, {b, _} ->
         Point.by_rank(side, a, b)
       end)
@@ -30,6 +33,33 @@ defmodule XQ.Core.Board do
       do: List.first(potential_points),
       else: List.last(potential_points)
   end
+
+  defp get_tandem_soldier(points, %Move{ch: :soldier}) do
+    Logger.debug("matching points: #{inspect(points)}")
+
+    potential_points =
+      points
+      |> Enum.group_by(fn {p, _i} ->
+        Map.get(p, :file, nil)
+      end)
+
+    Logger.debug("grouped points: #{inspect(potential_points)}")
+
+    potential_points =
+      if map_size(potential_points) == 1,
+        do: List.first(Map.values(potential_points)),
+        else:
+          Enum.find_value(potential_points, fn {_file, matching_points} ->
+            Logger.debug("same file: #{inspect(matching_points)}")
+            if length(matching_points) > 1, do: matching_points
+          end)
+
+    Logger.debug("tandem soldier potential points: #{inspect(potential_points)}")
+
+    potential_points
+  end
+
+  defp get_tandem_soldier(points, _move), do: points
 
   defp remove_piece_at(board, index) do
     board
