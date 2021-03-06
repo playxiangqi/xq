@@ -1,5 +1,5 @@
 defmodule XQ.Parser.AXFTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias XQ.Core.Move
   alias XQ.Parser.AXF
@@ -11,55 +11,57 @@ defmodule XQ.Parser.AXFTest do
   @range 0..9
   @default %Move{}
 
-  test "Parametrize - exact axis notation" do
-    # TODO: Move to fixture
-    params =
-      [@axis, @range, @direction, @range]
-      |> Enum.map(&Enum.random/1)
-      |> AXF.parametrize()
+  describe "AXF.parametrize/1" do
+    test "exact axis notation" do
+      # TODO: Move to fixture
+      params =
+        [@axis, @range, @direction, @range]
+        |> Enum.map(&Enum.random/1)
+        |> AXF.parametrize()
 
-    assert Map.has_key?(params, :abbrev)
-    assert Map.has_key?(params, :prev_file)
-    assert Map.has_key?(params, :dir)
-    assert Map.has_key?(params, :mvmt)
-  end
+      assert Map.has_key?(params, :abbrev)
+      assert Map.has_key?(params, :prev_file)
+      assert Map.has_key?(params, :dir)
+      assert Map.has_key?(params, :mvmt)
+    end
 
-  test "Parametrize - positional axis notation" do
-    params =
-      [@position, @axis, @direction, @range]
-      |> Enum.map(&Enum.random/1)
-      |> AXF.parametrize()
+    test "positional axis notation" do
+      params =
+        [@position, @axis, @direction, @range]
+        |> Enum.map(&Enum.random/1)
+        |> AXF.parametrize()
 
-    assert Map.has_key?(params, :pos)
-    assert Map.has_key?(params, :abbrev)
-    assert params[:prev_file] == nil
-    assert Map.has_key?(params, :dir)
-    assert Map.has_key?(params, :mvmt)
-  end
+      assert Map.has_key?(params, :pos)
+      assert Map.has_key?(params, :abbrev)
+      assert params[:prev_file] == nil
+      assert Map.has_key?(params, :dir)
+      assert Map.has_key?(params, :mvmt)
+    end
 
-  test "Parametrize - exact fixed notation" do
-    params =
-      [@fixed, @range, @direction, @range]
-      |> Enum.map(&Enum.random/1)
-      |> AXF.parametrize()
+    test "exact fixed notation" do
+      params =
+        [@fixed, @range, @direction, @range]
+        |> Enum.map(&Enum.random/1)
+        |> AXF.parametrize()
 
-    assert Map.has_key?(params, :abbrev)
-    assert Map.has_key?(params, :prev_file)
-    assert Map.has_key?(params, :dir)
-    assert Map.has_key?(params, :next_file)
-  end
+      assert Map.has_key?(params, :abbrev)
+      assert Map.has_key?(params, :prev_file)
+      assert Map.has_key?(params, :dir)
+      assert Map.has_key?(params, :next_file)
+    end
 
-  test "Parametrize - positional fixed notation" do
-    params =
-      [@position, @fixed, @direction, @range]
-      |> Enum.map(&Enum.random/1)
-      |> AXF.parametrize()
+    test "positional fixed notation" do
+      params =
+        [@position, @fixed, @direction, @range]
+        |> Enum.map(&Enum.random/1)
+        |> AXF.parametrize()
 
-    assert Map.has_key?(params, :pos)
-    assert Map.has_key?(params, :abbrev)
-    assert params[:prev_file] == nil
-    assert Map.has_key?(params, :dir)
-    assert Map.has_key?(params, :next_file)
+      assert Map.has_key?(params, :pos)
+      assert Map.has_key?(params, :abbrev)
+      assert params[:prev_file] == nil
+      assert Map.has_key?(params, :dir)
+      assert Map.has_key?(params, :next_file)
+    end
   end
 
   test "derive_position/2" do

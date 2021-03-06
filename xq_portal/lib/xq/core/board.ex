@@ -11,34 +11,34 @@ defmodule XQ.Core.Board do
 
   def update(board, next_point, old_index) do
     board
-    |> remove_piece_at(old_index)
-    |> maybe_capture_piece(next_point)
+    |> List.delete_at(old_index)
+    |> Enum.reject(&Point.can_capture(&1, next_point))
   end
 
-  def find_point(board, %Move{ch: ch, side: side} = move) do
+  def find_point(board, %Move{ch: ch, side: side, prev_file: file} = move) do
     potential_points =
       board
-      |> Enum.with_index()
-      |> Enum.filter(fn {p, _} ->
-        Point.is_matching(p, %{ch: ch, side: side, file: move.prev_file})
-      end)
-      |> Enum.sort(fn {a, _}, {b, _} ->
-        Point.by_rank(side, a, b)
-      end)
+      |> Enum.filter(&Point.is_matching(&1, %{ch: ch, side: side, file: file}))
+      |> find_tandem_soldiers(move)
+      |> Enum.sort(&Point.by_rank(side, &1, &2))
 
-    if move.is_front,
-      do: List.first(potential_points),
-      else: List.last(potential_points)
+    found_point =
+      if move.is_front,
+        do: List.first(potential_points),
+        else: List.last(potential_points)
+
+    {found_point, Enum.find_index(board, &(&1 == found_point))}
   end
 
-  defp remove_piece_at(board, index) do
-    board
-    |> Enum.with_index()
-    |> Enum.filter(fn {_, i} -> i != index end)
-    |> Enum.map(&elem(&1, 0))
-  end
+  def find_tandem_soldiers(points, %Move{ch: ch})
+      when length(points) == 1 or ch != :soldier,
+      do: points
 
-  defp maybe_capture_piece(board, point) do
-    Enum.reject(board, &Point.can_capture(&1, point))
+  def find_tandem_soldiers(points, %Move{ch: :soldier}) do
+    points
+    |> Enum.group_by(&Map.get(&1, :file))
+    |> Enum.find_value(fn {_file, soldiers} ->
+      if length(soldiers) > 1, do: soldiers
+    end)
   end
 end
