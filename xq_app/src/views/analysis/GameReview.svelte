@@ -18,15 +18,19 @@
 
   const analysisChannel = createChannel('analysis:*', analysisChannelHandler);
 
-  function analysisChannelHandler(
-    event: string,
-    payload: Record<string, any>,
-  ) {}
+  let moves: string;
+  function analysisChannelHandler(event: string, payload: Record<string, any>) {
+    switch (event) {
+      case 'analysis:moves': {
+        moves = payload.moves;
+      }
+    }
+  }
 </script>
 
 <div class="game-review">
   <div class="col-1">
-    <EngineAnalysisPanel />
+    <EngineAnalysisPanel {moves} />
   </div>
   <div class="col-2">
     <Board {dimensions} {boardState} />

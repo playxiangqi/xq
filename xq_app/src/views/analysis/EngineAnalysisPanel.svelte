@@ -1,4 +1,5 @@
 <script lang="ts">
+  export let moves: string;
 </script>
 
 <div class="panel engine-analysis-panel">
@@ -8,7 +9,9 @@
     <a>Engine Selection</a>
     <a>Board Setup</a>
   </div>
-  <div class="content-container" />
+  <div class="content-container">
+    {moves ?? 'Waiting for engine...'}
+  </div>
 </div>
 
 <style lang="scss">

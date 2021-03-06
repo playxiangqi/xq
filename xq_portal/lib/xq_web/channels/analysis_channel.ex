@@ -10,6 +10,11 @@ defmodule XQWeb.AnaylsisChannel do
   end
 
   @impl true
+  def handle_info(%{status: :ready}, socket) do
+    XQ.Analysis.setup()
+    {:noreply, socket}
+  end
+
   def handle_info(%{moves: moves}, socket) do
     Phoenix.Channel.broadcast!(socket, "analysis:moves", %{moves: moves})
     {:noreply, socket}

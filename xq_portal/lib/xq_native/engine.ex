@@ -43,9 +43,10 @@ defmodule XQNative.Engine do
     {:noreply, state}
   end
 
-  def handle_info({_port, {:data, "readyok" <> _rem}}, state) do
+  def handle_info({_port, {:data, "readyok" <> _rem}}, %{respond_to: pid} = state) do
     Logger.debug("Engine is ready")
 
+    send(pid, %{status: :ready})
     {:noreply, %{state | ready: true}}
   end
 
