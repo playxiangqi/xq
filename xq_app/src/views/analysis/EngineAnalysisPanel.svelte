@@ -6,7 +6,7 @@
   <div class="panel-heading">Engine Analysis</div>
   <div class="panel-tabs">
     <a>Evaluation</a>
-    <a>Engine Selection</a>
+    <a>Engine Settings</a>
     <a>Board Setup</a>
   </div>
   <div class="content-container">

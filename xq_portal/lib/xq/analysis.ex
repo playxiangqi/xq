@@ -17,6 +17,7 @@ defmodule XQ.Analysis do
 
   def setup do
     GenServer.cast(engine(), {:send, "position startpos"})
+    GenServer.cast(engine(), {:send, "setoption name multipv value 3"})
     GenServer.cast(engine(), {:send, "go depth 15 searchmoves"})
   end
 end
