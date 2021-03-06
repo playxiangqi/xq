@@ -12,5 +12,19 @@ defmodule XQ.Core.BoardTest do
                %Move{ch: :elephant}
              ) == elephant_point
     end
+
+    test "next move is an ambiguous soldier move" do
+      soldier_points = [
+        %{ch: :soldier, side: :red, rank: 5, file: 9},
+        %{ch: :soldier, side: :red, rank: 3, file: 9},
+        %{ch: :soldier, side: :red, rank: 5, file: 7}
+      ]
+
+      assert Board.find_tandem_soldiers(soldier_points, %Move{ch: :soldier}) ==
+               [
+                 %{ch: :soldier, side: :red, rank: 5, file: 9},
+                 %{ch: :soldier, side: :red, rank: 3, file: 9}
+               ]
+    end
   end
 end
