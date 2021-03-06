@@ -25,13 +25,15 @@
       .query(
         SEARCH_GAMES_QUERY,
         {
-          redPlayer,
-          blackPlayer,
-          openingCode: opening?.split('-')?.[0].trim(),
-          result,
-          limit,
-          minMoves,
-          maxMoves,
+          filter: {
+            redPlayer,
+            blackPlayer,
+            openingCode: opening?.split('-')?.[0].trim(),
+            result,
+            limit,
+            minMoves,
+            maxMoves,
+          },
         },
         {
           requestPolicy: 'network-only', // Always resend search (for now)

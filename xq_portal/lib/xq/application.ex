@@ -15,6 +15,8 @@ defmodule XQ.Application do
       {Phoenix.PubSub, name: XQ.PubSub},
       # Start the Endpoint (HTTP/HTTPS)
       XQWeb.Endpoint,
+      # Start the Absinthe GraphQL Subscription supervisor
+      {Absinthe.Subscription, XQWeb.Endpoint},
       # Start the Finch HTTP Client pools
       {Finch, name: XQ.Finch},
       # Start the XQ Engine supervisor

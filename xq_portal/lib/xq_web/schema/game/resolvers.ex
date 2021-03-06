@@ -23,7 +23,7 @@ defmodule XQWeb.Schema.Game.Resolvers do
     end
   end
 
-  def get_game_info(_root, %{} = args, _info) do
+  def get_game_info(_root, %{filter: args}, _info) do
     query_string =
       args
       |> URI.encode_query()

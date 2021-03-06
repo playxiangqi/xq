@@ -27,6 +27,7 @@ defmodule XQWeb.Router do
   scope "/graphql" do
     forward "/ui", Absinthe.Plug.GraphiQL,
       schema: XQWeb.Schema,
+      socket: XQWeb.UserSocket,
       default_url: "http://localhost:4000/graphql",
       interface: :playground
 
