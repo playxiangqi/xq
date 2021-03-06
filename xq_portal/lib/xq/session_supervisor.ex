@@ -1,4 +1,4 @@
-defmodule XQNative.Supervisor do
+defmodule XQ.SessionSupervisor do
   use DynamicSupervisor, restart: :temporary
 
   def start_link(init_arg) do

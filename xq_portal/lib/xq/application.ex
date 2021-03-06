@@ -19,8 +19,8 @@ defmodule XQ.Application do
       {Absinthe.Subscription, XQWeb.Endpoint},
       # Start the Finch HTTP Client pools
       {Finch, name: XQ.Finch},
-      # Start the XQ Engine supervisor
-      XQNative.Supervisor
+      # Start the XQ Session dynamic supervisor
+      XQ.SessionSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
