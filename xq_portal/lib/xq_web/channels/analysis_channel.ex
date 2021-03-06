@@ -1,11 +1,11 @@
 defmodule XQWeb.AnaylsisChannel do
   use Phoenix.Channel
-  use XQNative.Engine
+  use XQ.Analysis
 
   @impl true
   def join("analysis:*", _payload, socket) do
     Phoenix.PubSub.subscribe(XQ.PubSub, @internal_topic)
-    XQNative.Engine.new_session(self())
+    XQ.Analysis.start_link(self())
     {:ok, socket}
   end
 
