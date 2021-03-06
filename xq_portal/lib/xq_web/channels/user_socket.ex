@@ -5,6 +5,7 @@ defmodule XQWeb.UserSocket do
   ## Channels
   channel "user:*", XQWeb.AuthChannel
   channel "match:*", XQWeb.MatchChannel
+  channel "analysis:*", XQWeb.AnaylsisChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

@@ -30,8 +30,10 @@ export function createChannel(topic: string, onMessage: PhoenixEvent) {
       console.error(`failed to join channel ${topic}: ${reason}`);
     });
 
-  return (event: string, payload: Record<string, any>) =>
-    channel.push(event, payload);
+  return {
+    broadcast: (event: string, payload: Record<string, any>) =>
+      channel.push(event, payload),
+  };
 }
 
 const absintheChannel = socket.channel('__absinthe__:control');

@@ -7,6 +7,7 @@
   // Modules
   // TODO: Move dimensions to utilities and rebrand boardState into matchState
   import { createBoardState, Dimensions } from 'components/board';
+  import { createChannel } from 'utils/channels';
 
   export let params: { id: number | string };
 
@@ -14,6 +15,13 @@
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
+
+  const analysisChannel = createChannel('analysis:*', analysisChannelHandler);
+
+  function analysisChannelHandler(
+    event: string,
+    payload: Record<string, any>,
+  ) {}
 </script>
 
 <div class="game-review">

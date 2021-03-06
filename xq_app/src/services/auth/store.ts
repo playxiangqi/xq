@@ -4,7 +4,7 @@ import { createChannel } from '../../utils/channels';
 export function createAuthStore() {
   const store = writable({ username: '' });
 
-  const broadcast = createChannel(
+  const { broadcast } = createChannel(
     'user:guest',
     (event: string, payload: any) => {
       if (event === 'phx_reply' && payload.status === 'ok') {
@@ -15,7 +15,7 @@ export function createAuthStore() {
       } else {
         console.log(`event: ${event}, payload: `, payload);
       }
-    }
+    },
   );
 
   return {

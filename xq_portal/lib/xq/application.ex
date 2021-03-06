@@ -27,8 +27,6 @@ defmodule XQ.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: XQ.Supervisor]
     Supervisor.start_link(children, opts)
-
-    DynamicSupervisor.start_child(XQNative.Supervisor, {XQNative.Engine, self()})
   end
 
   # Tell Phoenix to update the endpoint configuration
