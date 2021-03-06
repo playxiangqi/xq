@@ -45,24 +45,8 @@ export const GET_OPENINGS_QUERY = `
 `;
 
 export const SEARCH_GAMES_QUERY = `
-  query searchGames(
-    $redPlayer: String
-    $blackPlayer: String
-    $openingCode: String
-    $result: String
-    $limit: Int
-    $minMoves: Int
-    $maxMoves: Int
-  ) {
-    games(
-      redPlayer: $redPlayer
-      blackPlayer: $blackPlayer
-      openingCode: $openingCode
-      result: $result
-      limit: $limit
-      minMoves: $minMoves
-      maxMoves: $maxMoves
-    ) {
+  query searchGames($filter: SearchGameFilter!) {
+    games(filter: $filter) {
       id
       redPlayer
       blackPlayer
