@@ -14,7 +14,7 @@ defmodule XQ.Core.Board do
   def update(board, next_point, old_index) do
     board
     |> List.delete_at(old_index)
-    |> maybe_capture_piece(next_point)
+    |> Enum.reject(&Point.can_capture(&1, next_point))
   end
 
   def find_point(board, %Move{ch: ch, side: side, prev_file: file} = move) do
@@ -58,8 +58,4 @@ defmodule XQ.Core.Board do
   end
 
   defp get_tandem_soldier(points, _move), do: points
-
-  defp maybe_capture_piece(board, point) do
-    Enum.reject(board, &Point.can_capture(&1, point))
-  end
 end
