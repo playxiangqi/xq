@@ -1,8 +1,6 @@
 defmodule XQ.Core.Board do
   alias XQ.Core.{Point, Move}
 
-  require Logger
-
   defstruct [:state, :prev_point, :next_point]
 
   @type t :: %__MODULE__{
