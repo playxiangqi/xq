@@ -21,7 +21,7 @@ defmodule XQ.Core.Board do
     potential_points =
       board
       |> Enum.filter(&Point.is_matching(&1, %{ch: ch, side: side, file: file}))
-      |> get_tandem_soldier(move)
+      |> find_tandem_soldiers(move)
       |> Enum.sort(&Point.by_rank(side, &1, &2))
 
     found_point =
@@ -32,30 +32,15 @@ defmodule XQ.Core.Board do
     {found_point, Enum.find_index(board, &(&1 == found_point))}
   end
 
-  defp get_tandem_soldier(points, %Move{ch: :soldier}) do
-    Logger.debug("matching points: #{inspect(points)}")
+  def find_tandem_soldiers(points, %Move{ch: ch})
+      when length(points) == 1 or ch != :soldier,
+      do: points
 
-    potential_points =
-      points
-      |> Enum.group_by(fn p ->
-        Map.get(p, :file, nil)
-      end)
-
-    Logger.debug("grouped points: #{inspect(potential_points)}")
-
-    potential_points =
-      if map_size(potential_points) == 1,
-        do: List.first(Map.values(potential_points)),
-        else:
-          Enum.find_value(potential_points, fn {_file, matching_points} ->
-            Logger.debug("same file: #{inspect(matching_points)}")
-            if length(matching_points) > 1, do: matching_points
-          end)
-
-    Logger.debug("tandem soldier potential points: #{inspect(potential_points)}")
-
-    potential_points
+  def find_tandem_soldiers(points, %Move{ch: :soldier}) do
+    points
+    |> Enum.group_by(&Map.get(&1, :file))
+    |> Enum.find_value(fn {_file, soldiers} ->
+      if length(soldiers) > 1, do: soldiers
+    end)
   end
-
-  defp get_tandem_soldier(points, _move), do: points
 end
