@@ -20,6 +20,7 @@
 
   const analysisChannel = createChannel('analysis:*', dispatcher);
 
+  let currentTurnIndex = 0;
   let metadata: EngineMetadata[];
   let lines: [string, string | undefined][][];
 
@@ -42,13 +43,13 @@
 
 <div class="game-review">
   <div class="col-1">
-    <EngineAnalysisPanel bind:lines bind:metadata />
+    <EngineAnalysisPanel {lines} {metadata} {currentTurnIndex} />
   </div>
   <div class="col-2">
     <Board {dimensions} {boardState} />
   </div>
   <div class="col-3">
-    <GameInfoPanel gameID={params.id} {boardState} />
+    <GameInfoPanel bind:currentTurnIndex gameID={params.id} {boardState} />
   </div>
 </div>
 

@@ -3,6 +3,7 @@
   import { createBoardState } from 'components/board';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
+  export let currentTurnIndex = 0;
   export let gameID: number | string;
   export let boardState: ReturnType<typeof createBoardState>;
 
@@ -20,7 +21,6 @@
   $: gameInfo = $resp.data?.game?.info;
 
   let movesContainer: HTMLDivElement;
-  let currentTurnIndex = 0;
 
   // Utils
   function prepareMoveNotation(moves: string[]) {

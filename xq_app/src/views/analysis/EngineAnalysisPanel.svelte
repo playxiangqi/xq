@@ -1,8 +1,11 @@
 <script lang="ts">
   import type { EngineMetadata } from './types';
 
+  export let currentTurnIndex: number;
   export let metadata: EngineMetadata[];
   export let lines: [string, string | undefined][][];
+
+  $: moveIndex = Math.floor(currentTurnIndex / 2);
 
   function formatCPScore(scorecp: number) {
     const v = scorecp / 100;
@@ -25,16 +28,26 @@
     <a>Board Setup</a>
   </div>
   <div class="content-container">
+    <div class="engine panel-block">
+      Fairy-Stockfish 11.2 LB 64 by Fabian Fichter
+    </div>
+    <div class="top-metadata panel-block">
+      depth={metadata?.[0].depth ?? '0'}
+      knps={metadata?.[0].nps ? Math.floor(metadata[0].nps / 1000) : '0'}
+    </div>
     {#if lines}
       {#each lines as line, i}
-        <div class="panel-block">
+        <div class="top-results panel-block">
           <span
             class={`scorecp tag ${cpScoreClassName(metadata[i].scorecp)} mr-2`}
             >{formatCPScore(metadata[i].scorecp)}</span
           >
-          <p class="lines">
+          <p class="line">
             {#each line as [redMove, blackMove], j}
-              {j + 1}. {redMove} {blackMove ?? ''}{' '}
+              {moveIndex + j + 1}. {currentTurnIndex % 2 !== 0 && j === 0
+                ? '...'
+                : redMove}
+              {blackMove ?? ''}{' '}
             {/each}
           </p>
         </div>
@@ -49,9 +62,6 @@
   .engine-analysis-panel {
     margin-left: 50px;
 
-    li {
-      list-style-type: none;
-    }
     .content-container {
       min-height: 700px;
       height: 700px;
@@ -60,10 +70,13 @@
         font-weight: bold;
       }
 
-      .lines {
+      /* .line {
+        max-width: 400px;
+
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-      }
+      } */
     }
   }
 </style>

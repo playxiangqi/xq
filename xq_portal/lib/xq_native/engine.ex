@@ -37,7 +37,7 @@ defmodule XQNative.Engine do
   def handle_info({port, {:data, "id name " <> _rem}}, state) do
     Logger.debug("Engine UCI ok")
 
-    set_option(port, "UCI_Variant", "xiangqi")
+    Port.command(port, "setoption name UCI_Variant value xiangqi\n")
     Port.command(port, "isready\n")
 
     {:noreply, state}
@@ -53,32 +53,12 @@ defmodule XQNative.Engine do
   def handle_info({_port, {:data, "info " <> info}}, %{respond_to: pid} = state) do
     Logger.debug("Reply from engine: #{inspect(info)}")
 
-    {best_move, results} =
-      info
-      |> String.trim()
-      |> String.split(~r/\R/)
-      |> Enum.map(&String.replace_leading(&1, "info ", ""))
-      |> Enum.split_with(&String.starts_with?(&1, "bestmove"))
+    {best_move, results} = split_best_move_and_results(info)
 
     results =
       results
       |> Enum.map(&String.split(&1, " pv "))
-      |> Enum.map(fn [metadata | lines] ->
-        %{
-          metadata:
-            metadata
-            |> String.replace("score cp", "scorecp")
-            |> String.split(" ")
-            |> Enum.chunk_every(2)
-            |> Enum.map(&List.to_tuple(&1))
-            |> Enum.into(%{}, fn {k, v} -> {k, String.to_integer(v)} end),
-          lines:
-            lines
-            |> List.first()
-            |> String.split(" ")
-            |> Enum.chunk_every(2)
-        }
-      end)
+      |> Enum.map(&serialize_results/1)
 
     send(pid, {:engine_search, %{best_move: best_move, results: results}})
     {:noreply, state}
@@ -97,7 +77,34 @@ defmodule XQNative.Engine do
     {:noreply, state}
   end
 
-  defp set_option(port, option, value) do
-    Port.command(port, "setoption name #{option} value #{value}\n")
+  def split_best_move_and_results(info) do
+    info
+    |> String.trim()
+    |> String.split(~r/\R/)
+    |> Enum.map(&String.replace_leading(&1, "info ", ""))
+    |> Enum.split_with(&String.starts_with?(&1, "bestmove"))
+  end
+
+  def serialize_results([metadata | lines]) do
+    %{
+      metadata: serialize_metadata(metadata),
+      lines: serialize_lines(lines)
+    }
+  end
+
+  def serialize_metadata(metadata) do
+    metadata
+    |> String.replace("score cp", "scorecp")
+    |> String.split(" ")
+    |> Enum.chunk_every(2)
+    |> Enum.map(&List.to_tuple(&1))
+    |> Enum.into(%{}, fn {k, v} -> {k, String.to_integer(v)} end)
+  end
+
+  def serialize_lines(lines) do
+    lines
+    |> List.first()
+    |> String.split(" ")
+    |> Enum.chunk_every(2)
   end
 end
