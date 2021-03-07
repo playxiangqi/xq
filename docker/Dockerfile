@@ -36,8 +36,8 @@ COPY xq_app xq_app
 RUN yarn --cwd xq_app install && yarn --cwd xq_app deploy
 RUN cd xq_portal && mix phx.digest
 
-# Compile and install engines
-COPY xq_engine/fairy-stockfish /usr/local/bin/fairy-stockfish
+# Install engine
+COPY xq_engine xq_engine
 
 # Compile and build release
 COPY scripts/start.sh ./xq_portal/
@@ -59,6 +59,7 @@ USER nobody:nogroup
 
 COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/_build/${MIX_ENV}/rel/xq ./
 COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/start.sh ./
+COPY --from=build --chown=nobody:nogroup /opt/app/xq_engine/fairy-stockfish /usr/local/bin/fairy-stockfish
 
 RUN echo "export BUILD=${BUILD} >> .env"
 
