@@ -5,12 +5,14 @@ import { make, pipe, toObservable } from 'wonka';
 const socket = new Socket('/socket');
 socket.connect();
 
-export type PhoenixEvent = (
+export type PhoenixPayload = Record<string, any>;
+
+export type PhoenixEventHandler = (
   event: string,
-  payload: Record<string, any>,
+  payload: PhoenixPayload,
 ) => void;
 
-export function createChannel(topic: string, onMessage: PhoenixEvent) {
+export function createChannel(topic: string, onMessage: PhoenixEventHandler) {
   const channel = socket.channel(topic, { client: 'browser' });
 
   channel.onMessage = (event, payload) => {
@@ -31,7 +33,7 @@ export function createChannel(topic: string, onMessage: PhoenixEvent) {
     });
 
   return {
-    broadcast: (event: string, payload: Record<string, any>) =>
+    broadcast: (event: string, payload: PhoenixPayload) =>
       channel.push(event, payload),
   };
 }

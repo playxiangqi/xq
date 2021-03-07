@@ -8,6 +8,8 @@
   // TODO: Move dimensions to utilities and rebrand boardState into matchState
   import { createBoardState, Dimensions } from 'components/board';
   import { createChannel } from 'utils/channels';
+  import type { PhoenixPayload } from 'utils/channels';
+  import type { EngineMetadata, EngineResults } from './types';
 
   export let params: { id: number | string };
 
@@ -16,21 +18,31 @@
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
 
-  const analysisChannel = createChannel('analysis:*', analysisChannelHandler);
+  const analysisChannel = createChannel('analysis:*', dispatcher);
 
-  let moves: string[];
-  function analysisChannelHandler(event: string, payload: Record<string, any>) {
-    switch (event) {
-      case 'analysis:moves': {
-        moves = payload.results.map((v) => v.lines);
-      }
-    }
+  let metadata: EngineMetadata[];
+  let lines: [string, string | undefined][][];
+
+  function dispatcher(event: string, payload: PhoenixPayload) {
+    const dispatch: {
+      [event: string]: (payload: PhoenixPayload) => void;
+    } = {
+      'analysis:moves': handleEngineResults,
+    };
+
+    return dispatch[event](payload);
+  }
+
+  function handleEngineResults(payload: PhoenixPayload) {
+    const { results } = payload as EngineResults;
+    lines = results.map((v) => v.lines);
+    metadata = results.map((v) => v.metadata);
   }
 </script>
 
 <div class="game-review">
   <div class="col-1">
-    <EngineAnalysisPanel {moves} />
+    <EngineAnalysisPanel bind:lines bind:metadata />
   </div>
   <div class="col-2">
     <Board {dimensions} {boardState} />

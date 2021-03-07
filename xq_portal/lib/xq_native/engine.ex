@@ -64,7 +64,20 @@ defmodule XQNative.Engine do
       results
       |> Enum.map(&String.split(&1, " pv "))
       |> Enum.map(fn [metadata | lines] ->
-        %{metadata: metadata, lines: List.first(lines)}
+        %{
+          metadata:
+            metadata
+            |> String.replace("score cp", "scorecp")
+            |> String.split(" ")
+            |> Enum.chunk_every(2)
+            |> Enum.map(&List.to_tuple(&1))
+            |> Enum.into(%{}, fn {k, v} -> {k, String.to_integer(v)} end),
+          lines:
+            lines
+            |> List.first()
+            |> String.split(" ")
+            |> Enum.chunk_every(2)
+        }
       end)
 
     send(pid, {:engine_search, %{best_move: best_move, results: results}})
