@@ -3,7 +3,7 @@ defmodule XQNative.Engine do
 
   require Logger
 
-  @default_engine_path "/usr/local/bin/fairy-stockfish"
+  @default_engine_path "/opt/app/fairy-stockfish"
 
   def start_link(respond_to) do
     GenServer.start_link(__MODULE__, respond_to)
@@ -23,7 +23,7 @@ defmodule XQNative.Engine do
   def handle_continue(:start_engine, state) do
     port =
       Port.open(
-        {:spawn, Application.get_env(:xq, :engine_path, @default_engine_path)},
+        {:spawn_executable, Application.get_env(:xq, :engine_path, @default_engine_path)},
         [:binary]
       )
 
