@@ -1,5 +1,8 @@
 use Mix.Config
 
+config :xq,
+  engine_path: Path.expand("../../xq_engine/fairy-stockfish", __DIR__)
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used

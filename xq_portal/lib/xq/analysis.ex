@@ -11,17 +11,21 @@ defmodule XQ.Analysis do
     Agent.start_link(fn -> engine end, name: __MODULE__)
   end
 
-  def engine do
-    Agent.get(__MODULE__, & &1)
+  def send(command) do
+    GenServer.cast(engine(), {:send, command})
   end
 
   def set_option(opt, value) do
-    GenServer.cast(engine(), {:send, "setoption name #{opt} value #{value}\n"})
+    send("setoption name #{opt} value #{value}\n")
   end
 
   def setup do
-    GenServer.cast(engine(), {:send, "position startpos"})
+    send("position startpos")
     set_option("multipv", "3")
-    GenServer.cast(engine(), {:send, "go depth 15 searchmoves"})
+    send("go depth 15 searchmoves")
+  end
+
+  defp engine do
+    Agent.get(__MODULE__, & &1)
   end
 end
