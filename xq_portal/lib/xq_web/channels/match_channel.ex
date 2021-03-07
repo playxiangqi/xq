@@ -1,5 +1,5 @@
 defmodule XQWeb.MatchChannel do
-  use Phoenix.Channel
+  use XQWeb, :channel
 
   @impl true
   def join("match:lobby", _message, socket) do

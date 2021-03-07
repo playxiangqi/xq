@@ -1,5 +1,5 @@
 defmodule XQWeb.AuthChannel do
-  use Phoenix.Channel
+  use XQWeb, :channel
 
   @impl true
   def join("user:guest", _message, socket) do

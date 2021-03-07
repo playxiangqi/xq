@@ -9,6 +9,8 @@
 
   const openingStore = operationStore<{ openings: ArrayLike<Opening> }>(
     GET_OPENINGS_QUERY,
+    undefined,
+    { requestPolicy: 'cache-and-network' },
   );
   const resp = query(openingStore);
 
@@ -35,9 +37,7 @@
             maxMoves,
           },
         },
-        {
-          requestPolicy: 'network-only', // Always resend search (for now)
-        },
+        { requestPolicy: 'network-only' },
       )
       .toPromise();
 

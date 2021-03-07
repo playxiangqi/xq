@@ -1,7 +1,7 @@
 defmodule XQ.Core.BoardTest do
   use ExUnit.Case, async: true
 
-  alias XQ.Core.{Board, Move, Point}
+  alias XQ.Core.{Board, Move}
 
   describe "Board.find_tandem_soldiers/2" do
     test "next move is not a soldier move" do

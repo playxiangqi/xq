@@ -7,6 +7,9 @@
   // Modules
   // TODO: Move dimensions to utilities and rebrand boardState into matchState
   import { createBoardState, Dimensions } from 'components/board';
+  import { createChannel } from 'utils/channels';
+  import type { PhoenixPayload } from 'utils/channels';
+  import type { EngineMove, EngineMetadata, EngineResults } from './types';
 
   export let params: { id: number | string };
 
@@ -14,17 +17,39 @@
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
+
+  const analysisChannel = createChannel('analysis:*', dispatcher);
+
+  let currentTurnIndex = 0;
+  let metadata: EngineMetadata[];
+  let lines: EngineMove[][];
+
+  function dispatcher(event: string, payload: PhoenixPayload) {
+    const dispatch: {
+      [event: string]: (payload: PhoenixPayload) => void;
+    } = {
+      'analysis:moves': handleEngineResults,
+    };
+
+    return dispatch[event](payload);
+  }
+
+  function handleEngineResults(payload: PhoenixPayload) {
+    const { results } = payload as EngineResults;
+    lines = results.map((v) => v.lines);
+    metadata = results.map((v) => v.metadata);
+  }
 </script>
 
 <div class="game-review">
   <div class="col-1">
-    <EngineAnalysisPanel />
+    <EngineAnalysisPanel {lines} {metadata} {currentTurnIndex} />
   </div>
   <div class="col-2">
     <Board {dimensions} {boardState} />
   </div>
   <div class="col-3">
-    <GameInfoPanel gameID={params.id} {boardState} />
+    <GameInfoPanel bind:currentTurnIndex gameID={params.id} {boardState} />
   </div>
 </div>
 
