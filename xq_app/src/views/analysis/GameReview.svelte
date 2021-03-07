@@ -31,7 +31,7 @@
       'analysis:moves': handleEngineResults,
     };
 
-    return dispatch[event](payload);
+    return dispatch[event]?.(payload);
   }
 
   function handleEngineResults(payload: PhoenixPayload) {
