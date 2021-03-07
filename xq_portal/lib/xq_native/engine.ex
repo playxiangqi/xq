@@ -34,6 +34,12 @@ defmodule XQNative.Engine do
     {:noreply, %{state | port: port, uci: true}}
   end
 
+  def handle_info({:DOWN, _ref, :port, _object, reason}, state) do
+    Logger.error("Engine crashed because: #{reason}")
+
+    {:noreply, state}
+  end
+
   def handle_info({port, {:data, "id name " <> _rem}}, state) do
     Logger.info("Engine UCI ok")
 
