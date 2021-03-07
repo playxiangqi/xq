@@ -14,7 +14,7 @@ config :xq,
 
 # Configures the endpoint
 config :xq, XQWeb.Endpoint,
-  url: [host: "https://dev.playxiangqi.xyz"],
+  url: [host: "localhost"],
   secret_key_base: "LipoQCJjWGtBPaLpn9aDNSA7x/dXGylGpEMGr3srcTYNvxa8FKvwUxJiBNnSt+qm",
   render_errors: [view: XQWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: XQ.PubSub,
