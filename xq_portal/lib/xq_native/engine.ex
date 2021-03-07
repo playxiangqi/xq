@@ -29,13 +29,13 @@ defmodule XQNative.Engine do
 
     Port.command(port, "uci\n")
 
-    Logger.debug("successfully started #{__MODULE__} engine server")
+    Logger.info("successfully started #{__MODULE__} engine server")
 
     {:noreply, %{state | port: port, uci: true}}
   end
 
   def handle_info({port, {:data, "id name " <> _rem}}, state) do
-    Logger.debug("Engine UCI ok")
+    Logger.info("Engine UCI ok")
 
     Port.command(port, "setoption name UCI_Variant value xiangqi\n")
     Port.command(port, "isready\n")
@@ -44,14 +44,14 @@ defmodule XQNative.Engine do
   end
 
   def handle_info({_port, {:data, "readyok" <> _rem}}, %{respond_to: pid} = state) do
-    Logger.debug("Engine is ready")
+    Logger.info("Engine is ready")
 
     send(pid, {:status, :ready})
     {:noreply, %{state | ready: true}}
   end
 
   def handle_info({_port, {:data, "info " <> info}}, %{respond_to: pid} = state) do
-    Logger.debug("Reply from engine: #{inspect(info)}")
+    Logger.info("Reply from engine: #{inspect(info)}")
 
     {best_move, results} = split_best_move_and_results(info)
 
@@ -60,7 +60,7 @@ defmodule XQNative.Engine do
   end
 
   def handle_info({_port, {:data, msg}}, state) do
-    Logger.debug("Reply from engine: #{inspect(msg)}")
+    Logger.info("Reply from engine: #{inspect(msg)}")
     {:noreply, state}
   end
 
