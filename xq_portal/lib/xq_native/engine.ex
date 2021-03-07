@@ -55,12 +55,7 @@ defmodule XQNative.Engine do
 
     {best_move, results} = split_best_move_and_results(info)
 
-    results =
-      results
-      |> Enum.map(&String.split(&1, " pv "))
-      |> Enum.map(&serialize_results/1)
-
-    send(pid, {:engine_search, %{best_move: best_move, results: results}})
+    send(pid, {:engine_search, %{best_move: best_move, results: serialize_results(results)}})
     {:noreply, state}
   end
 
@@ -85,11 +80,15 @@ defmodule XQNative.Engine do
     |> Enum.split_with(&String.starts_with?(&1, "bestmove"))
   end
 
-  def serialize_results([metadata | lines]) do
-    %{
-      metadata: serialize_metadata(metadata),
-      lines: serialize_lines(lines)
-    }
+  def serialize_results(results) do
+    results
+    |> Enum.map(&String.split(&1, " pv "))
+    |> Enum.map(fn [metadata | lines] ->
+      %{
+        metadata: serialize_metadata(metadata),
+        lines: serialize_lines(lines)
+      }
+    end)
   end
 
   def serialize_metadata(metadata) do
