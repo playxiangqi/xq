@@ -10,10 +10,12 @@ export type EngineMetadata = {
   time: number;
 };
 
+export type EngineMove = readonly [string, string | undefined];
+
 export type EngineResults = {
   best_move: string;
   results: {
-    lines: [string, string | undefined][];
+    lines: EngineMove[];
     metadata: EngineMetadata;
   }[];
 };

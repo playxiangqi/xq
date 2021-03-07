@@ -9,7 +9,7 @@
   import { createBoardState, Dimensions } from 'components/board';
   import { createChannel } from 'utils/channels';
   import type { PhoenixPayload } from 'utils/channels';
-  import type { EngineMetadata, EngineResults } from './types';
+  import type { EngineMove, EngineMetadata, EngineResults } from './types';
 
   export let params: { id: number | string };
 
@@ -22,7 +22,7 @@
 
   let currentTurnIndex = 0;
   let metadata: EngineMetadata[];
-  let lines: [string, string | undefined][][];
+  let lines: EngineMove[][];
 
   function dispatcher(event: string, payload: PhoenixPayload) {
     const dispatch: {

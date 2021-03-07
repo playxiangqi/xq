@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { EngineMetadata } from './types';
+  import type { EngineMetadata, EngineMove } from './types';
 
   export let currentTurnIndex: number;
   export let metadata: EngineMetadata[];
-  export let lines: [string, string | undefined][][];
+  export let lines: EngineMove[][];
 
   $: moveIndex = Math.floor(currentTurnIndex / 2);
 

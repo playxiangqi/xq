@@ -1,5 +1,5 @@
 defmodule XQWeb.AnaylsisChannel do
-  use Phoenix.Channel
+  use XQWeb, :channel
 
   require Logger
 

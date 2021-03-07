@@ -1,5 +1,5 @@
 defmodule XQNative.EngineTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias XQNative.Engine
 
@@ -51,5 +51,13 @@ defmodule XQNative.EngineTest do
              ["c3e4", "e9d8"],
              ["h1g3"]
            ]
+  end
+
+  test "Engine.serialize_results/1" do
+    results = [
+      "depth 15 seldepth 21 multipv 1 score cp 44 nodes 572914 nps 347010 hashfull 289 tbhits 0 time 1651 pv g4g5 h10g8 c4c5 b10c8 b1c3 c10e8 h1g3 d10e9 d1e2 a10d10 c1e3 c7c6 c5c6 e8c6 a1d1 d10d1 e1d1 g10e8 b3b7 g7g6 g5g6"
+    ]
+
+    assert [%{metadata: _, lines: _}] = Engine.serialize_results(results)
   end
 end
