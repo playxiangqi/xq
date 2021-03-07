@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let moves: string;
+  export let moves: string[];
 </script>
 
 <div class="panel engine-analysis-panel">
@@ -10,7 +10,13 @@
     <a>Board Setup</a>
   </div>
   <div class="content-container">
-    {moves ?? 'Waiting for engine...'}
+    {#if moves}
+      {#each moves as line}
+        <div class="panel-block">{line}</div>
+      {/each}
+    {:else}
+      <div class="panel-block">Waiting for engine...</div>
+    {/if}
   </div>
 </div>
 

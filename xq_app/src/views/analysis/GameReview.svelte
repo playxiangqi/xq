@@ -18,11 +18,11 @@
 
   const analysisChannel = createChannel('analysis:*', analysisChannelHandler);
 
-  let moves: string;
+  let moves: string[];
   function analysisChannelHandler(event: string, payload: Record<string, any>) {
     switch (event) {
       case 'analysis:moves': {
-        moves = payload.moves;
+        moves = payload.results.map((v) => v.lines);
       }
     }
   }

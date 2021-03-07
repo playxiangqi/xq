@@ -46,19 +46,33 @@ defmodule XQNative.Engine do
   def handle_info({_port, {:data, "readyok" <> _rem}}, %{respond_to: pid} = state) do
     Logger.debug("Engine is ready")
 
-    send(pid, %{status: :ready})
+    send(pid, {:status, :ready})
     {:noreply, %{state | ready: true}}
   end
 
-  def handle_info({_port, {:data, "info " <> moves}}, %{respond_to: pid} = state) do
-    Logger.debug("Reply from engine: #{inspect(moves)}")
-    send(pid, %{moves: moves})
+  def handle_info({_port, {:data, "info " <> info}}, %{respond_to: pid} = state) do
+    Logger.debug("Reply from engine: #{inspect(info)}")
+
+    {best_move, results} =
+      info
+      |> String.trim()
+      |> String.split(~r/\R/)
+      |> Enum.map(&String.replace_leading(&1, "info ", ""))
+      |> Enum.split_with(&String.starts_with?(&1, "bestmove"))
+
+    results =
+      results
+      |> Enum.map(&String.split(&1, " pv "))
+      |> Enum.map(fn [metadata | lines] ->
+        %{metadata: metadata, lines: List.first(lines)}
+      end)
+
+    send(pid, {:engine_search, %{best_move: best_move, results: results}})
     {:noreply, state}
   end
 
   def handle_info({_port, {:data, msg}}, state) do
     Logger.debug("Reply from engine: #{inspect(msg)}")
-
     {:noreply, state}
   end
 
