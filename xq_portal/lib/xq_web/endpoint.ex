@@ -12,7 +12,9 @@ defmodule XQWeb.Endpoint do
   ]
 
   socket "/socket", XQWeb.UserSocket,
-    websocket: true,
+    websocket: [
+      check_origin: ["//localhost", "//*.playxiangqi.xyz"]
+    ],
     longpoll: false
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
