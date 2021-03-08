@@ -39,7 +39,7 @@ RUN cd xq_portal && mix phx.digest
 # COPY xq_engine xq_engine
 RUN git clone https://github.com/ianfab/Fairy-Stockfish.git && \
   cd Fairy-Stockfish && git checkout fairy_sf_11_2 && \
-  cd src && make build ARCH=x86-64-modern
+  cd src && make build ARCH=x86-64-modern largeboards=yes
 
 # Compile and build release
 COPY scripts/start.sh ./xq_portal/
@@ -67,4 +67,5 @@ RUN echo "export BUILD=${BUILD} >> .env"
 
 ENV HOME=/opt/app
 
-CMD ["./start.sh"]
+# CMD ["./start.sh"]
+CMD ["/opt/app/fairy-stockfish"]
