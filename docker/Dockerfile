@@ -1,5 +1,5 @@
 # Version of alpine used by base image
-ARG ALPINE_VERSION=3.11
+ARG ALPINE_VERSION=3.13
 
 FROM elixir:1.11.2-alpine AS build
 
@@ -12,8 +12,7 @@ WORKDIR /opt/app
 # Install dependencies and build tools
 RUN apk update && \
   apk upgrade --no-cache && \
-  apk add --no-cache git yarn && \
-  # apk add --no-cache git build-base yarn && \
+  apk add --no-cache git g++ make yarn && \
   mix local.rebar --force && \
   mix local.hex --force
 
@@ -37,19 +36,22 @@ RUN yarn --cwd xq_app install && yarn --cwd xq_app deploy
 RUN cd xq_portal && mix phx.digest
 
 # Install engine
-COPY xq_engine xq_engine
+# COPY xq_engine xq_engine
+RUN git clone https://github.com/ianfab/Fairy-Stockfish.git && \
+  cd Fairy-Stockfish && git checkout fairy_sf_11_2 && \
+  cd src && make build ARCH=x86-64-modern
 
 # Compile and build release
 COPY scripts/start.sh ./xq_portal/
 RUN cd xq_portal && mix do compile, release
 
 # Prepare release image
-FROM alpine:3.11 AS app
+FROM alpine:3.13 AS app
 
 ARG BUILD
 ARG MIX_ENV
 
-RUN apk add --no-cache openssl ncurses-libs
+RUN apk add --no-cache openssl ncurses-libs libstdc++
 
 WORKDIR /opt/app
 
@@ -59,7 +61,7 @@ USER nobody:nogroup
 
 COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/_build/${MIX_ENV}/rel/xq ./
 COPY --from=build --chown=nobody:nogroup /opt/app/xq_portal/start.sh ./
-COPY --from=build --chown=nobody:nogroup /opt/app/xq_engine/fairy-stockfish ./
+COPY --from=build --chown=nobody:nogroup /opt/app/Fairy-Stockfish/src/stockfish ./fairy-stockfish
 
 RUN echo "export BUILD=${BUILD} >> .env"
 
