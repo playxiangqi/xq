@@ -71,7 +71,7 @@ defmodule XQNative.Engine do
   end
 
   def handle_cast({:send, command}, %{port: port} = state) do
-    Port.command(port, command <> "\n")
+    Port.command(port, "#{command}\n")
 
     Map.put(state, :status, :thinking)
 

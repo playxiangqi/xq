@@ -4,7 +4,7 @@ defmodule XQ.AnalysisTest do
   setup do
     {:ok, agent_pid} = XQ.Analysis.new_session()
 
-    XQ.Analysis.send("uci")
+    XQ.Analysis.send_command("uci")
 
     %{agent: agent_pid}
   end
