@@ -67,5 +67,4 @@ RUN echo "export BUILD=${BUILD} >> .env"
 
 ENV HOME=/opt/app
 
-# CMD ["./start.sh"]
-CMD ["/opt/app/fairy-stockfish"]
+CMD ["./start.sh"]
