@@ -15,6 +15,6 @@ defmodule XQWeb.AuthChannel do
     {min, max} = {String.to_integer("100000", 36), String.to_integer("ZZZZZZ", 36)}
 
     id = max |> Kernel.-(min) |> :rand.uniform() |> Kernel.+(min) |> Integer.to_string(36)
-    "Guest_" <> id
+    "guest_" <> id
   end
 end

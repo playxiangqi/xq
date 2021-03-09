@@ -4,9 +4,9 @@ defmodule XQWeb.AnaylsisChannel do
   require Logger
 
   @impl true
-  def join("analysis:*", _payload, socket) do
+  def join("analysis:guest_" <> guest_id, _payload, socket) do
     XQ.Analysis.new_session()
-    {:ok, socket}
+    {:ok, assign(socket, :guest_id, guest_id)}
   end
 
   @impl true
@@ -16,7 +16,11 @@ defmodule XQWeb.AnaylsisChannel do
   end
 
   def handle_info({:engine_search, search_results}, socket) do
-    Phoenix.Channel.broadcast!(socket, "analysis:moves", search_results)
+    Phoenix.Channel.broadcast!(
+      socket,
+      "analysis:guest_#{socket.assigns.guest_id}",
+      search_results
+    )
 
     {:noreply, socket}
   end
