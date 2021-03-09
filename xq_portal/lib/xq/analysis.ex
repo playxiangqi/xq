@@ -21,7 +21,7 @@ defmodule XQ.Analysis do
 
   def setup do
     send_command("position startpos")
-    set_option("multipv", "3")
+    set_option("MultiPV", "3")
     send_command("go depth 15 searchmoves")
   end
 
