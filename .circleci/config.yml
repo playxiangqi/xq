@@ -57,6 +57,7 @@ jobs:
     executor: aws-cli/default
     environment:
       AWS_ECR_URL: ${AWS_ECR_ACCOUNT_URL}/playxiangqi/xq
+      ENGINE_IMAGE: ${AWS_ECR_ACCOUNT_URL}/playxiangqi/fairy-stockfish
     steps:
       - checkout
       - aws-cli/setup

@@ -1,0 +1,11 @@
+FROM alpine:3.13 AS base
+
+WORKDIR /opt/app
+
+RUN apk update && \
+  apk upgrade --no-cache && \
+  apk add --no-cache git g++ make
+
+RUN git clone https://github.com/ianfab/Fairy-Stockfish.git && \
+  cd Fairy-Stockfish && git checkout fairy_sf_11_2 && \
+  cd src && LDFLAGS='-Wl,-z,stack-size=0xA0000' make build ARCH=x86-64-modern largeboards=yes

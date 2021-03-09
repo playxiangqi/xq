@@ -45,14 +45,21 @@ docker-compose-dev:
 .PHONY: docker-dev-local
 docker-dev-local:
 	docker build --build-arg MIX_ENV=dev --build-arg BUILD=$(BUILD) \
+		--build-arg ENGINE_IMAGE=$(ENGINE_IMAGE) \
 		-f docker/Dockerfile -t $(APP_NAME):$(APP_VSN) .
 
 .PHONY: docker-dev
 docker-dev:
 	docker build --build-arg APP_VSN=$(APP_VSN) --build-arg MIX_ENV=prod \
 		--build-arg BUILD=$(BUILD) \
+		--build-arg ENGINE_IMAGE=$(ENGINE_IMAGE) \
 		-f docker/Dockerfile -t ${AWS_ECR_URL}:latest .
 
 .PHONY: push-dev
 push-dev:
 	docker push ${AWS_ECR_URL}:latest
+
+.PHONY: docker-engine-local
+docker-engine-local:
+	docker build -f docker/Dockerfile.$(ENGINE_NAME) \
+		-t $(AWS_ECR_URL_BASE)/$(ENGINE_NAME)/:latest .
