@@ -59,6 +59,7 @@ docker-dev:
 push-dev:
 	docker push ${AWS_ECR_URL}:latest
 
-.PHONY: docker-engine
-docker-engine:
-	docker build -f docker/Dockerfile.$(ENGINE_NAME) -t $(AWS_ECR_URL):latest .
+.PHONY: docker-engine-local
+docker-engine-local:
+	docker build -f docker/Dockerfile.$(ENGINE_NAME) \
+		-t $(AWS_ECR_URL_BASE)/$(ENGINE_NAME)/:latest .
