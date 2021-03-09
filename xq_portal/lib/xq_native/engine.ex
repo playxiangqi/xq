@@ -59,9 +59,12 @@ defmodule XQNative.Engine do
   def handle_info({_port, {:data, "info " <> info}}, %{respond_to: pid} = state) do
     Logger.info("Reply from engine: #{inspect(info)}")
 
-    {best_move, results} = split_best_move_and_results(info)
+    if not String.contains?(info, "currmove") do
+      {best_move, results} = split_best_move_and_results(info)
 
-    send(pid, {:engine_search, %{best_move: best_move, results: serialize_results(results)}})
+      send(pid, {:engine_search, %{best_move: best_move, results: serialize_results(results)}})
+    end
+
     {:noreply, state}
   end
 
