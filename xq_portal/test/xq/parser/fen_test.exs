@@ -8,11 +8,12 @@ defmodule XQ.Parser.FENTest do
     test "produce FEN from internal board representation" do
       board = %Board{
         state: [
-          %{ch: :general, side: :black, rank: 0, file: 4}
+          %{ch: :general, side: :black, rank: 0, file: 4},
+          %{ch: :advisor, side: :black, rank: 0, file: 5}
         ]
       }
 
-      assert FEN.produce(board) == "4k w---1"
+      assert FEN.produce(board) == "4ka w---1"
     end
   end
 end

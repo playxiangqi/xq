@@ -100,7 +100,7 @@ defmodule XQNative.Engine do
     end)
   end
 
-  def serialize_metadata(metadata) do
+  def serialize_metadata(metadata) when is_binary(metadata) do
     metadata
     |> String.replace("score cp", "scorecp")
     |> String.split(" ")
