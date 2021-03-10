@@ -103,13 +103,12 @@ defmodule XQNative.Engine do
   def serialize_metadata(metadata) when is_binary(metadata) do
     metadata
     |> String.replace("score cp", "scorecp")
+    |> String.replace("readyok\n", "")
     |> String.split(" ")
     |> Enum.chunk_every(2)
     |> Enum.map(&List.to_tuple(&1))
     |> Enum.into(%{}, fn {k, v} -> {k, String.to_integer(v)} end)
   end
-
-  def serialize_metadata(_), do: %{}
 
   def serialize_lines(lines) do
     lines

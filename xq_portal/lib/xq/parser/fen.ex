@@ -13,8 +13,7 @@ defmodule XQ.Parser.FEN do
           acc.fen
           |> append_solidus(point, acc)
           |> append_num_spaces(point, acc)
-
-        fen = "#{fen}#{piece(point.ch, point.side)}"
+          |> append_abbrev(point)
 
         temp_file = point.file + 1
         curr_rank = if temp_file > 9, do: point.rank + 1, else: point.rank
@@ -35,6 +34,8 @@ defmodule XQ.Parser.FEN do
     do: "#{fen}#{point.file - acc.curr_file}"
 
   defp append_num_spaces(fen, _point, _acc), do: fen
+
+  defp append_abbrev(fen, point), do: "#{fen}#{piece(point.ch, point.side)}"
 
   defp append_active_color(fen, prev_point)
        when is_nil(prev_point) or prev_point.side == :black,
