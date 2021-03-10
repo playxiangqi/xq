@@ -16,6 +16,7 @@ defmodule XQ.Core.Point do
 
   def norm_file(prev, _side), do: prev
 
+  # TODO: move sign/2 to AXF specific
   def sign(side, "+"), do: sign(side)
   def sign(side, "-"), do: -1 * sign(side)
   def sign(_side, "="), do: 0
@@ -23,6 +24,7 @@ defmodule XQ.Core.Point do
   def sign(@side_facing), do: -1
   def sign(_side), do: 1
 
+  # TODO: piece/1 to AXF specific
   def piece("A"), do: {:advisor, :red}
   def piece("a"), do: {:advisor, :black}
   def piece("P"), do: {:soldier, :red}
@@ -58,11 +60,14 @@ defmodule XQ.Core.Point do
     point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
   end
 
-  def by_rank(side, a, b) do
-    if side == :red,
-      do: a.rank < b.rank,
-      else: a.rank > b.rank
-  end
+  def by_rank(a, b), do: a.rank < b.rank
+
+  def by_rank(:red, a, b), do: by_rank(a, b)
+  def by_rank(:black, a, b), do: not by_rank(a, b)
+
+  def by_file(a, b), do: a.file < b.file
+  def by_file(:red, a, b), do: not by_file(a, b)
+  def by_file(:black, a, b), do: by_file(a, b)
 
   def is_matching(point, other) do
     point.ch == other.ch and point.side == other.side and
