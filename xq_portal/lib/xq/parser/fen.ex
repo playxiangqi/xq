@@ -1,5 +1,5 @@
 defmodule XQ.Parser.FEN do
-  alias XQ.Core.Board
+  alias XQ.Core.{Board, Point}
 
   def parse(_notation) do
   end
@@ -7,9 +7,7 @@ defmodule XQ.Parser.FEN do
   def produce(%Board{state: state, prev_point: prev_point}) do
     %{fen: fen} =
       state
-      |> Enum.sort(fn a, b ->
-        a.file + a.rank * 9 < b.file + b.rank * 9
-      end)
+      |> Enum.sort(&Point.by_abs_index/2)
       |> Enum.reduce(%{curr_rank: 0, curr_file: 0, fen: ""}, fn point, acc ->
         fen =
           acc.fen

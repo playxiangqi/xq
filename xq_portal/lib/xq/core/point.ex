@@ -9,6 +9,7 @@ defmodule XQ.Core.Point do
         }
 
   @max_file 10
+  @max_rank 9
   @side_facing :red
 
   def norm_file(prev, side) when side == @side_facing and not is_nil(prev),
@@ -50,11 +51,11 @@ defmodule XQ.Core.Point do
       point.side != other.side and
         point.file == other.file and point.rank == other.rank
 
+  def to_zero_index(nil), do: nil
+
   def to_zero_index(points) when is_list(points) do
     Enum.map(points, &to_zero_index/1)
   end
-
-  def to_zero_index(nil), do: nil
 
   def to_zero_index(point) do
     point |> Map.update!(:rank, &(&1 - 1)) |> Map.update!(:file, &(&1 - 1))
@@ -68,6 +69,10 @@ defmodule XQ.Core.Point do
   def by_file(a, b), do: a.file < b.file
   def by_file(:red, a, b), do: not by_file(a, b)
   def by_file(:black, a, b), do: by_file(a, b)
+
+  def by_abs_index(a, b), do: abs_index(a) < abs_index(b)
+
+  def abs_index(point), do: point.file + point.rank * @max_rank
 
   def is_matching(point, other) do
     point.ch == other.ch and point.side == other.side and

@@ -109,6 +109,8 @@ defmodule XQNative.Engine do
     |> Enum.into(%{}, fn {k, v} -> {k, String.to_integer(v)} end)
   end
 
+  def serialize_metadata(_), do: %{}
+
   def serialize_lines(lines) do
     lines
     |> List.first()
