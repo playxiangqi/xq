@@ -70,10 +70,6 @@ defmodule XQ.Core.Point do
   def by_file(:red, a, b), do: not by_file(a, b)
   def by_file(:black, a, b), do: by_file(a, b)
 
-  def by_abs_index(a, b), do: abs_index(a) < abs_index(b)
-
-  def abs_index(point), do: point.file + point.rank * @max_rank
-
   def is_matching(point, other) do
     point.ch == other.ch and point.side == other.side and
       (point.file == other.file or multiple_on_same_file(other))
