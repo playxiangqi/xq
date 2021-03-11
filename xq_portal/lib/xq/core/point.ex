@@ -12,6 +12,8 @@ defmodule XQ.Core.Point do
   @max_rank 9
   @side_facing :red
 
+  def max_rank, do: @max_rank
+
   def norm_file(prev, side) when side == @side_facing and not is_nil(prev),
     do: @max_file - prev
 
