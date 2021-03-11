@@ -25,7 +25,7 @@ defmodule XQ.Parser.FEN do
           %{curr_file: point.file + 1, fen: fen}
         end)
 
-      num_spaces = 9 - curr_file
+      num_spaces = Point.max_rank() - curr_file
       "#{fen}#{if num_spaces > 0, do: num_spaces}"
     end)
     |> Enum.join("/")

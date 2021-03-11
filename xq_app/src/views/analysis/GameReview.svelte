@@ -20,6 +20,7 @@
   const boardState = createBoardState(dimensions);
 
   const { store: authStore } = createAuthStore();
+  let pushAnalysis: (event: string, payload: PhoenixPayload) => void;
 
   $: if ($authStore.username !== '') {
     function dispatcher(event: string, payload: PhoenixPayload) {
@@ -32,10 +33,11 @@
       return dispatch[event]?.(payload);
     }
 
-    const analysisChannel = createChannel(
+    const { broadcast } = createChannel(
       `analysis:${$authStore.username}`,
       dispatcher,
     );
+    pushAnalysis = broadcast;
   }
 
   let currentTurnIndex = 0;
@@ -57,7 +59,12 @@
     <Board {dimensions} {boardState} />
   </div>
   <div class="col-3">
-    <GameInfoPanel bind:currentTurnIndex gameID={params.id} {boardState} />
+    <GameInfoPanel
+      bind:currentTurnIndex
+      gameID={params.id}
+      {boardState}
+      {pushAnalysis}
+    />
   </div>
 </div>
 

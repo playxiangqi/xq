@@ -1,11 +1,15 @@
 <script lang="ts">
   import { operationStore, query } from '@urql/svelte';
   import { createBoardState } from 'components/board';
+  import type { PhoenixPayload } from 'utils/channels';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
   export let currentTurnIndex = 0;
   export let gameID: number | string;
   export let boardState: ReturnType<typeof createBoardState>;
+  export let pushAnalysis:
+    | ((event: string, payload: PhoenixPayload) => void)
+    | undefined;
 
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
@@ -47,6 +51,7 @@
       eventHandler();
       transitionBoardState(currentTurnIndex);
       scrollIntoView(currentTurnIndex);
+      pushAnalysis?.('analysis:board_state', $store.activeLayout);
     };
   }
 

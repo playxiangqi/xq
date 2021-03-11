@@ -10,6 +10,32 @@ defmodule XQWeb.AnaylsisChannel do
   end
 
   @impl true
+  def handle_in("analysis:board_state", payload, socket) do
+    board_state =
+      payload
+      |> Enum.map(&Map.take(&1, ["ch", "side", "rank", "file"]))
+      |> Enum.map(
+        &Map.new(&1, fn {k, v} ->
+          {String.to_atom(k),
+           case v do
+             s when is_binary(s) ->
+               String.to_atom(s)
+
+             v ->
+               v
+           end}
+        end)
+      )
+
+    Logger.info("board state: #{inspect(board_state)}")
+
+    fen = XQ.Parser.produce(:fen, %XQ.Core.Board{state: board_state})
+    Logger.info("fen: #{fen}")
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info({:status, :ready}, socket) do
     XQ.Analysis.setup()
     {:noreply, socket}
