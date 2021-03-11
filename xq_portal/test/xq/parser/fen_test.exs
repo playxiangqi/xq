@@ -18,7 +18,7 @@ defmodule XQ.Parser.FENTest do
         ]
       }
 
-      assert FEN.produce(board) == "4kaR2/4a4/3hR4/7H1 w---1"
+      assert FEN.produce(board) == "4kaR2/4a4/3hR4/7H1/9/9/9/9/9/9 w---1"
     end
   end
 end

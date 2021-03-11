@@ -5,9 +5,14 @@ defmodule XQ.Parser.FEN do
   end
 
   def produce(%Board{state: state, prev_point: prev_point}) do
-    state
-    |> Enum.sort(&Point.by_rank/2)
-    |> Enum.group_by(&Map.get(&1, :rank))
+    state_grouped_by_rank =
+      state
+      |> Enum.sort(&Point.by_rank/2)
+      |> Enum.group_by(&Map.get(&1, :rank))
+
+    0..9
+    |> Map.new(&{&1, []})
+    |> Map.merge(state_grouped_by_rank)
     |> Enum.map(fn {_rank, points} -> Enum.sort(points, &Point.by_file/2) end)
     |> Enum.reduce([], fn points, acc ->
       %{curr_file: curr_file, fen: fen} =
