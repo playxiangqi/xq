@@ -63,6 +63,7 @@
     <GameInfoPanel
       bind:currentTurnIndex
       gameID={params.id}
+      {dimensions}
       {boardState}
       {pushAnalysis}
     />
