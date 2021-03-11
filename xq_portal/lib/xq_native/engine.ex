@@ -103,6 +103,7 @@ defmodule XQNative.Engine do
   def serialize_metadata(metadata) when is_binary(metadata) do
     metadata
     |> String.replace("score cp", "scorecp")
+    |> String.replace("upperbound ", "")
     |> String.replace("readyok\n", "")
     |> String.split(" ")
     |> Enum.chunk_every(2)

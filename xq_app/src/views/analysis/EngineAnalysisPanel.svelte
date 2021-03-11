@@ -8,8 +8,8 @@
   $: moveIndex = Math.floor(currentTurnIndex / 2);
 
   function formatCPScore(scorecp: number) {
-    const v = scorecp / 100;
-    return v > 0 ? `+${v}` : v < 0 ? `-${v}` : v;
+    const v = scorecp / 100; // TODO: score +/- is relative to side to move, not absolute
+    return v > 0 ? `+${v}` : v;
   }
 
   function cpScoreClassName(scorecp: number) {

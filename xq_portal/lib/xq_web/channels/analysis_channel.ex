@@ -25,6 +25,7 @@ defmodule XQWeb.AnaylsisChannel do
       )
 
     Logger.info("fen: #{fen}")
+    XQ.Analysis.submit_board(fen)
 
     {:noreply, socket}
   end

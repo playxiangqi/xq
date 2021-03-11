@@ -44,15 +44,22 @@
     movesContainer.children?.[moveIndex].scrollIntoView({ block: 'center' });
   }
 
+  let timer: number;
+
   function updateTurn(eventHandler: () => void) {
     return () => {
       eventHandler();
       transitionBoardState(currentTurnIndex);
       scrollIntoView(currentTurnIndex);
-      pushAnalysis({
-        state: $store.activeLayout,
-        prev_point: $store.activeTransition.prevPoint,
-      });
+
+      // Debounce engine analysis
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        pushAnalysis({
+          state: $store.activeLayout,
+          prev_point: $store.activeTransition.prevPoint,
+        });
+      }, 700);
     };
   }
 
