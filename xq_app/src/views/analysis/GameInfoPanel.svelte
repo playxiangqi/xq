@@ -7,9 +7,7 @@
   export let currentTurnIndex = 0;
   export let gameID: number | string;
   export let boardState: ReturnType<typeof createBoardState>;
-  export let pushAnalysis:
-    | ((event: string, payload: PhoenixPayload) => void)
-    | undefined;
+  export let pushAnalysis = (payload: PhoenixPayload) => {};
 
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
@@ -51,7 +49,7 @@
       eventHandler();
       transitionBoardState(currentTurnIndex);
       scrollIntoView(currentTurnIndex);
-      pushAnalysis?.('analysis:board_state', $store.activeLayout);
+      pushAnalysis($store.activeLayout);
     };
   }
 

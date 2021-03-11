@@ -20,7 +20,7 @@
   const boardState = createBoardState(dimensions);
 
   const { store: authStore } = createAuthStore();
-  let pushAnalysis: (event: string, payload: PhoenixPayload) => void;
+  let pushAnalysis: (payload: PhoenixPayload) => void;
 
   $: if ($authStore.username !== '') {
     function dispatcher(event: string, payload: PhoenixPayload) {
@@ -37,7 +37,8 @@
       `analysis:${$authStore.username}`,
       dispatcher,
     );
-    pushAnalysis = broadcast;
+    pushAnalysis = (payload: PhoenixPayload) =>
+      broadcast('analysis:board_state', payload);
   }
 
   let currentTurnIndex = 0;
