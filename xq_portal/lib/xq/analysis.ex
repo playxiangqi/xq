@@ -22,6 +22,16 @@ defmodule XQ.Analysis do
   def setup do
     send_command("position startpos")
     set_option("MultiPV", "3")
+    search()
+  end
+
+  def submit_board(fen) do
+    send_command("stop")
+    send_command("position fen #{fen}")
+    search()
+  end
+
+  defp search do
     send_command("go depth 15 searchmoves")
   end
 

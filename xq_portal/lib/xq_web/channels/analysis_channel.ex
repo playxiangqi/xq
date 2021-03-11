@@ -10,26 +10,20 @@ defmodule XQWeb.AnaylsisChannel do
   end
 
   @impl true
-  def handle_in("analysis:board_state", payload, socket) do
-    board_state =
-      payload
-      |> Enum.map(&Map.take(&1, ["ch", "side", "rank", "file"]))
-      |> Enum.map(
-        &Map.new(&1, fn {k, v} ->
-          {String.to_atom(k),
-           case v do
-             s when is_binary(s) ->
-               String.to_atom(s)
-
-             v ->
-               v
-           end}
-        end)
+  def handle_in(
+        "analysis:board_state",
+        %{"state" => state, "prev_point" => prev_point},
+        socket
+      ) do
+    fen =
+      XQ.Parser.produce(
+        :fen,
+        %XQ.Core.Board{
+          state: Enum.map(state, &unmarshal_point/1),
+          prev_point: unmarshal_point(prev_point)
+        }
       )
 
-    Logger.info("board state: #{inspect(board_state)}")
-
-    fen = XQ.Parser.produce(:fen, %XQ.Core.Board{state: board_state})
     Logger.info("fen: #{fen}")
 
     {:noreply, socket}
@@ -55,5 +49,22 @@ defmodule XQWeb.AnaylsisChannel do
     Logger.debug("AnalysisChannel received unhandled event: #{inspect(event)}")
 
     {:noreply, socket}
+  end
+
+  defp unmarshal_point(nil), do: nil
+
+  defp unmarshal_point(%{} = point) do
+    point
+    |> Map.take(["ch", "side", "rank", "file"])
+    |> Map.new(fn {k, v} ->
+      {String.to_atom(k),
+       case v do
+         s when is_binary(s) ->
+           String.to_atom(s)
+
+         v ->
+           v
+       end}
+    end)
   end
 end

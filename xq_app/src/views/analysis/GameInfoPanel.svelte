@@ -49,7 +49,10 @@
       eventHandler();
       transitionBoardState(currentTurnIndex);
       scrollIntoView(currentTurnIndex);
-      pushAnalysis($store.activeLayout);
+      pushAnalysis({
+        state: $store.activeLayout,
+        prev_point: $store.activeTransition.prevPoint,
+      });
     };
   }
 
