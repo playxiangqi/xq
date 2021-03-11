@@ -8,12 +8,20 @@
   $: moveIndex = Math.floor(currentTurnIndex / 2);
 
   function formatCPScore(scorecp: number) {
-    const v = scorecp / 100; // TODO: score +/- is relative to side to move, not absolute
+    // TODO: Eventually keep track of side-to-move in boardState properly
+    let v = scorecp / 100;
+    if (currentTurnIndex % 2 != 0) {
+      v = -v;
+    }
     return v > 0 ? `+${v}` : v;
   }
 
   function cpScoreClassName(scorecp: number) {
-    return scorecp > 0 ? 'is-danger' : scorecp < 0 ? 'is-black' : 'is-light';
+    let v = scorecp;
+    if (currentTurnIndex % 2 != 0) {
+      v = -v;
+    }
+    return v > 0 ? 'is-danger' : v < 0 ? 'is-black' : 'is-light';
   }
 </script>
 
