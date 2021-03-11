@@ -1,8 +1,6 @@
 defmodule XQWeb.AnaylsisChannel do
   use XQWeb, :channel
 
-  require Logger
-
   @impl true
   def join("analysis:guest_" <> guest_id, _payload, socket) do
     XQ.Analysis.new_session()
@@ -30,12 +28,6 @@ defmodule XQWeb.AnaylsisChannel do
       "analysis:guest_#{socket.assigns.guest_id}",
       search_results
     )
-
-    {:noreply, socket}
-  end
-
-  def handle_info(event, socket) do
-    Logger.debug("AnalysisChannel received unhandled event: #{inspect(event)}")
 
     {:noreply, socket}
   end
