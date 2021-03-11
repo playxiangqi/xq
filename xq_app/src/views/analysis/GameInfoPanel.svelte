@@ -59,7 +59,7 @@
           state: $store.activeLayout,
           prev_point: $store.activeTransition.prevPoint,
         });
-      }, 700);
+      }, 500);
     };
   }
 

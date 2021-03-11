@@ -52,9 +52,10 @@
           >
           <p class="line">
             {#each line as [redMove, blackMove], j}
-              {moveIndex + j + 1}. {currentTurnIndex % 2 !== 0 && j === 0
+              <!-- {moveIndex + j + 1}. {currentTurnIndex % 2 !== 0 && j === 0
                 ? '...'
-                : redMove}
+                : redMove} -->
+              {moveIndex + j + 1}. {redMove}
               {blackMove ?? ''}{' '}
             {/each}
           </p>
