@@ -9,11 +9,12 @@ defmodule XQ.Parser.FENTest do
       board = %Board{
         state: [
           %{ch: :general, side: :black, rank: 0, file: 4},
-          %{ch: :advisor, side: :black, rank: 0, file: 5}
+          %{ch: :advisor, side: :black, rank: 0, file: 5},
+          %{ch: :chariot, side: :red, rank: 0, file: 6}
         ]
       }
 
-      assert FEN.produce(board) == "4ka w---1"
+      assert FEN.produce(board) == "4kaR2 w---1"
     end
   end
 end

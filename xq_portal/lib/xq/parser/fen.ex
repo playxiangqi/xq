@@ -5,30 +5,28 @@ defmodule XQ.Parser.FEN do
   end
 
   def produce(%Board{state: state, prev_point: prev_point}) do
-    %{fen: fen} =
-      state
-      |> Enum.sort(&Point.by_abs_index/2)
-      |> Enum.reduce(%{curr_rank: 0, curr_file: 0, fen: ""}, fn point, acc ->
-        fen =
-          acc.fen
-          |> append_solidus(point, acc)
-          |> append_num_spaces(point, acc)
-          |> append_abbrev(point)
+    state
+    |> Enum.sort(&Point.by_rank/2)
+    |> Enum.group_by(&Map.get(&1, :rank))
+    |> Enum.map(fn {_rank, points} -> Enum.sort(points, &Point.by_file/2) end)
+    |> Enum.reduce([], fn points, acc ->
+      %{curr_file: curr_file, fen: fen} =
+        Enum.reduce(points, %{curr_file: 0, fen: ""}, fn point, acc ->
+          fen =
+            acc.fen
+            |> append_num_spaces(point, acc)
+            |> append_abbrev(point)
 
-        temp_file = point.file + 1
-        curr_rank = if temp_file > 9, do: point.rank + 1, else: point.rank
-        curr_file = if temp_file > 9, do: 0, else: temp_file
+          %{curr_file: point.file + 1, fen: fen}
+        end)
 
-        %{curr_rank: curr_rank, curr_file: curr_file, fen: fen}
-      end)
-
-    fen
+      ["#{fen}#{9 - curr_file}" | acc]
+    end)
+    |> Enum.reverse()
+    |> Enum.join("/")
     |> append_active_color(prev_point)
     |> append_fullmove_number()
   end
-
-  defp append_solidus(fen, point, acc) when point.rank != acc.curr_rank, do: "#{fen}/"
-  defp append_solidus(fen, _point, _acc), do: fen
 
   defp append_num_spaces(fen, point, acc) when point.file - acc.curr_file != 0,
     do: "#{fen}#{point.file - acc.curr_file}"
