@@ -10,22 +10,10 @@ defmodule XQWeb.AnaylsisChannel do
   end
 
   @impl true
-  def handle_in(
-        "analysis:board_state",
-        %{"state" => state, "prev_point" => prev_point},
-        socket
-      ) do
-    fen =
-      XQ.Parser.produce(
-        :fen,
-        %XQ.Core.Board{
-          state: Enum.map(state, &unmarshal_point/1),
-          prev_point: unmarshal_point(prev_point)
-        }
-      )
-
-    Logger.info("fen: #{fen}")
-    XQ.Analysis.submit_board(fen)
+  def handle_in("analysis:board_state", payload, socket) do
+    :fen
+    |> XQ.Parser.produce(unmarshal_board(payload))
+    |> XQ.Analysis.submit_board()
 
     {:noreply, socket}
   end
@@ -50,6 +38,13 @@ defmodule XQWeb.AnaylsisChannel do
     Logger.debug("AnalysisChannel received unhandled event: #{inspect(event)}")
 
     {:noreply, socket}
+  end
+
+  defp unmarshal_board(%{"state" => state, "prev_point" => prev_point}) do
+    %XQ.Core.Board{
+      state: Enum.map(state, &unmarshal_point/1),
+      prev_point: unmarshal_point(prev_point)
+    }
   end
 
   defp unmarshal_point(nil), do: nil
