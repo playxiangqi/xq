@@ -11,7 +11,6 @@
   import { createChannel } from 'utils/channels';
   import type { PhoenixPayload } from 'utils/channels';
   import type { EngineMove, EngineMetadata, EngineResults } from './types';
-  import { Push } from 'phoenix';
 
   export let params: { id: number | string };
 
