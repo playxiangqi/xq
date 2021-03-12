@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { params } from '@roxi/routify';
   import GameReview from '@xq/views/analysis/GameReview.svelte';
+
+  export let id: number;
 </script>
 
-<GameReview gameID={$params.id} />
+<GameReview gameID={id} />
