@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import Enum from 'utils/enum';
 import { Dimensions } from './dimensions';
 import {
   newPoint,
@@ -32,6 +33,16 @@ export type BoardState = {
   facing: Side;
 };
 
+const isValidMove = (movingSide: Side, turn: Side) => {
+  return movingSide === turn;
+};
+
+// TODO: Need consistent naming on both Frontend/Backend with respect to
+//       the following terminologies:
+// * board / state / board state
+// * point / piece
+// * board state / layout
+// * move / turn / transition
 export function createBoardState(dimensions: Dimensions) {
   const activeLayout = createInitialLayout(dimensions);
 
@@ -46,120 +57,116 @@ export function createBoardState(dimensions: Dimensions) {
   });
   const { update } = store;
 
-  const isValidMove = (movingSide: Side, turn: Side) => {
-    return movingSide === turn;
+  const loadBoardState = (layoutWithTrans: LayoutWithTransitions[]) =>
+    update((state) => {
+      const np = newPoint(dimensions, state.facing !== RED);
+      return {
+        ...state,
+        layouts: layoutWithTrans.map(({ state: s }) => s.map(np)),
+        transitions: layoutWithTrans.map(({ prevPoint, nextPoint }) => ({
+          prevPoint: prevPoint && np(prevPoint),
+          nextPoint: nextPoint && np(nextPoint),
+        })),
+      };
+    });
+
+  const transitionBoardState = (turnIndex: number) =>
+    update(({ activeLayout, activeTransition, ...state }) => ({
+      ...state,
+      activeLayout: state.layouts[turnIndex],
+      activeTransition: state.transitions[turnIndex],
+    }));
+
+  const dropPiece = (index: number, side: Side): boolean => {
+    let movedFromPrev = false;
+
+    update(({ activeLayout, ...state }) => {
+      activeLayout[index].grabbing = false;
+
+      // Track if piece was moved
+      movedFromPrev = !Enum.strictEquals(
+        activeLayout[index].position,
+        activeLayout[index].prevPosition,
+      );
+
+      // Confirm drop by updating prevPosition
+      if (isValidMove(side, state.turn) && movedFromPrev) {
+        // Update position
+        activeLayout[index].prevPosition = activeLayout[index].position;
+
+        const { side, ch, position, prevPosition } = activeLayout[index];
+        const [rank, file] = dimensions.coordsToPoint(position[0], position[1]);
+        state.moves = [
+          ...state.moves,
+          { side, ch, rank, file, position, prevPosition },
+        ];
+        state.turn = state.turn === RED ? BLACK : RED;
+      } else {
+        movedFromPrev = false;
+
+        // Return to previous position
+        activeLayout[index].position = activeLayout[index].prevPosition;
+      }
+      return { ...state, activeLayout };
+    });
+
+    return movedFromPrev;
   };
+
+  const focusPiece = (index: number) =>
+    update((state) => {
+      const lastIndex = state.activeLayout.length - 1;
+      [state.activeLayout[index], state.activeLayout[lastIndex]] = [
+        state.activeLayout[lastIndex],
+        state.activeLayout[index],
+      ];
+      return state;
+    });
+
+  const grabPiece = (index: number) =>
+    update((state) => {
+      state.activeLayout[index].grabbing = true;
+      return state;
+    });
+
+  const movePiece = (index: number, position: [number, number]) =>
+    update((state) => {
+      state.activeLayout[index].position = position;
+      return state;
+    });
+
+  const flipBoard = () =>
+    update(({ activeTransition, transitions, ...state }) => {
+      const invertPoint = newPoint(dimensions, true);
+
+      return {
+        ...state,
+        facing: state.facing === RED ? BLACK : RED,
+        layouts: state.layouts.map((l) => l.map(invertPoint)),
+        activeLayout: state.activeLayout.map(invertPoint),
+        activeTransition: {
+          prevPoint:
+            activeTransition.prevPoint &&
+            invertPoint(activeTransition.prevPoint),
+          nextPoint:
+            activeTransition.nextPoint &&
+            invertPoint(activeTransition.nextPoint),
+        },
+        transitions: transitions.map(({ prevPoint, nextPoint }) => ({
+          prevPoint: prevPoint && invertPoint(prevPoint),
+          nextPoint: nextPoint && invertPoint(nextPoint),
+        })),
+      };
+    });
 
   return {
     store,
-    loadBoardState: (layoutWithTrans: LayoutWithTransitions[]) =>
-      update((state) => {
-        const np = newPoint(dimensions, state.facing !== RED);
-
-        state.layouts = layoutWithTrans.map(({ state: s }) => s.map(np));
-        state.transitions = layoutWithTrans.map(({ prevPoint, nextPoint }) => ({
-          prevPoint: prevPoint ? np(prevPoint) : prevPoint,
-          nextPoint: nextPoint ? np(nextPoint) : nextPoint,
-        }));
-        return state;
-      }),
-    transitionBoardState: (turnIndex: number) =>
-      update((state) => {
-        state.activeLayout = state.layouts[turnIndex];
-        state.activeTransition = state.transitions[turnIndex];
-        return state;
-      }),
-    dropPiece: (index: number, side: Side): boolean => {
-      let movedFromPrev = false;
-
-      update((state) => {
-        state.activeLayout[index].grabbing = false;
-
-        // BUG: movedFromPrev returning false when dropping pieces
-        // that don't actually move after call to slidePiece
-
-        // TODO: helper type + function for tuples
-        // Track if piece was moved
-        movedFromPrev =
-          state.activeLayout[index].position[0] !==
-            state.activeLayout[index].prevPosition[0] ||
-          state.activeLayout[index].position[1] !==
-            state.activeLayout[index].prevPosition[1];
-
-        // Confirm drop by updating prevPosition
-        if (isValidMove(side, state.turn) && movedFromPrev) {
-          state.activeLayout[index].prevPosition =
-            state.activeLayout[index].position;
-
-          const { side, ch, position, prevPosition } = state.activeLayout[
-            index
-          ];
-          const [rank, file] = dimensions.coordsToPoint(
-            position[0],
-            position[1],
-          );
-          state.moves = [
-            ...state.moves,
-            { side, ch, rank, file, position, prevPosition },
-          ];
-          state.turn = state.turn === RED ? BLACK : RED;
-        } else {
-          movedFromPrev = false;
-          state.activeLayout[index].position =
-            state.activeLayout[index].prevPosition;
-        }
-        console.log(state.moves);
-        return state;
-      });
-
-      return movedFromPrev;
-    },
-    focusPiece: (index: number) => {
-      update((state) => {
-        const lastIndex = state.activeLayout.length - 1;
-        [state.activeLayout[index], state.activeLayout[lastIndex]] = [
-          state.activeLayout[lastIndex],
-          state.activeLayout[index],
-        ];
-        return state;
-      });
-    },
-    grabPiece: (index: number) => {
-      update((state) => {
-        state.activeLayout[index].grabbing = true;
-        return state;
-      });
-    },
-    movePiece: (index: number, position: [number, number]) => {
-      update((state) => {
-        state.activeLayout[index].position = position;
-        return state;
-      });
-    },
-    flipBoard: () => {
-      update((state) => {
-        // TODO: Horrendous code that needs to be cleaned up
-        const invertPoint = newPoint(dimensions, true);
-
-        state.facing = state.facing === RED ? BLACK : RED;
-        state.layouts = state.layouts.map((l) => l.map(invertPoint));
-        state.activeLayout = state.activeLayout.map(invertPoint);
-        state.activeTransition = {
-          prevPoint: state.activeTransition.prevPoint
-            ? invertPoint(state.activeTransition.prevPoint)
-            : state.activeTransition.prevPoint,
-          nextPoint: state.activeTransition.nextPoint
-            ? invertPoint(state.activeTransition.nextPoint)
-            : state.activeTransition.nextPoint,
-        };
-        state.transitions = state.transitions.map(
-          ({ prevPoint, nextPoint }) => ({
-            prevPoint: prevPoint ? invertPoint(prevPoint) : prevPoint,
-            nextPoint: nextPoint ? invertPoint(nextPoint) : nextPoint,
-          }),
-        );
-        return state;
-      });
-    },
+    loadBoardState,
+    transitionBoardState,
+    dropPiece,
+    focusPiece,
+    grabPiece,
+    movePiece,
+    flipBoard,
   };
 }

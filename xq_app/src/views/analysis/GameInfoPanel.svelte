@@ -63,9 +63,9 @@
       timer = setTimeout(() => {
         const invertPoint = newPoint(dimensions, $store.facing === BLACK);
         const state = $store.activeLayout.map((l) => invertPoint(l));
-        const prev_point = $store.activeTransition.prevPoint
-          ? invertPoint($store.activeTransition.prevPoint)
-          : null;
+        const prev_point =
+          $store.activeTransition.prevPoint &&
+          invertPoint($store.activeTransition.prevPoint);
 
         pushAnalysis({ state, prev_point });
       }, 500);

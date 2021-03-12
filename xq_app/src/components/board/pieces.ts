@@ -81,8 +81,6 @@ export type Move = Omit<Point, 'grabbing'>;
 
 // TODO: eventually load as parseFEN
 export function createInitialLayout(dimensions: Dimensions): Point[] {
-  // fetchBoardState();
-
   const layout: [Side, Character, number, number][] = [
     [BLACK, CHARIOT, 0, 0],
     [BLACK, HORSE, 0, 1],
