@@ -32,6 +32,9 @@ node_modules/
 # production
 /build
 
+# intermediates
+.routify
+
 # misc
 .DS_Store
 .env.local
