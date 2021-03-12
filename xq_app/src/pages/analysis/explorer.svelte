@@ -1,7 +1,6 @@
 <script lang="ts">
-  import GameInfoTable from '@xq/core/analysis/GameInfoTable.svelte';
-  import SearchForm from '@xq/core/analysis/SearchForm.svelte';
-  import type { GameInfo } from '@xq/utils/game';
+  import { GameInfoTable, SearchForm } from '@xq/core/analysis';
+  import type { GameInfo } from '@xq/core/analysis';
 
   let gameInfos: GameInfo[] = [];
 </script>
