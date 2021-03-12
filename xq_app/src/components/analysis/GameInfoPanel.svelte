@@ -5,7 +5,7 @@
     createBoardState,
     Dimensions,
     newPoint,
-  } from '@xq/components/board';
+  } from '@xq/core/board';
   import type { PhoenixPayload } from '@xq/utils/channels';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
