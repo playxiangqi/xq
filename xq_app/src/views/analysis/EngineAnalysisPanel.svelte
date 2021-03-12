@@ -1,9 +1,17 @@
 <script lang="ts">
-  import type { EngineMetadata, EngineMove } from './types';
+  import type { Writable } from 'svelte/store';
+  import type { EngineResults } from './types';
 
   export let currentTurnIndex: number;
-  export let metadata: EngineMetadata[];
-  export let lines: EngineMove[][];
+  export let analysisStore: Writable<EngineResults>;
+
+  $: metadata = $analysisStore.results.map((v) => v.metadata);
+  $: lines = $analysisStore.results.map((v) => v.lines);
+
+  $: {
+    console.log('metadata: ', metadata);
+    console.log('lines: ', lines);
+  }
 
   $: moveIndex = Math.floor(currentTurnIndex / 2);
 
@@ -40,8 +48,8 @@
       Fairy-Stockfish 11.2 LB 64 by Fabian Fichter
     </div>
     <div class="top-metadata panel-block">
-      depth={metadata?.[0].depth ?? '0'}
-      knps={metadata?.[0].nps ? Math.floor(metadata[0].nps / 1000) : '0'}
+      depth={metadata?.[0]?.depth ?? '0'}
+      knps={metadata?.[0]?.nps ? Math.floor(metadata[0]?.nps / 1000) : '0'}
     </div>
     {#if lines}
       {#each lines as line, i}

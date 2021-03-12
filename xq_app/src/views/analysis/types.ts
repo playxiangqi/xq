@@ -13,7 +13,7 @@ export type EngineMetadata = {
 export type EngineMove = readonly [string, string | undefined];
 
 export type EngineResults = {
-  best_move: string;
+  best_move: string[];
   results: {
     lines: EngineMove[];
     metadata: EngineMetadata;

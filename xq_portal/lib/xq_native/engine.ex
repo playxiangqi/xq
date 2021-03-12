@@ -105,7 +105,7 @@ defmodule XQNative.Engine do
     |> String.replace("score cp", "scorecp")
     |> String.replace("score mate", "scoremate")
     |> String.replace("upperbound ", "")
-    |> String.replace("readyok\n", "")
+    |> String.replace("readyok\R", "")
     |> String.split(" ")
     |> Enum.chunk_every(2)
     |> Enum.map(&List.to_tuple(&1))

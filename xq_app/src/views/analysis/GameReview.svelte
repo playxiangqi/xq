@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { writable } from 'svelte/store';
+
   // Components
   import Board from '../../components/board/Board.svelte';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
@@ -7,9 +9,9 @@
   // Modules
   import { createBoardState, Dimensions } from 'components/board';
   import { createAuthStore } from 'services/auth/store';
-  import { createChannel } from 'utils/channels';
   import type { PhoenixPayload } from 'utils/channels';
-  import type { EngineMove, EngineMetadata, EngineResults } from './types';
+  import { createAnalysisStore } from './store';
+  import type { EngineResults } from './types';
 
   export let params: { id: number | string };
 
@@ -18,42 +20,25 @@
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
 
+  let analysisStore = writable<EngineResults>({
+    best_move: [],
+    results: [],
+  });
+  let pushAnalysis: (payload: PhoenixPayload) => {};
+
   const { store: authStore } = createAuthStore();
-  let pushAnalysis: (payload: PhoenixPayload) => void;
-
   $: if ($authStore.username !== '') {
-    function dispatcher(event: string, payload: PhoenixPayload) {
-      const dispatch: {
-        [event: string]: (payload: PhoenixPayload) => void;
-      } = {
-        [`analysis:${$authStore.username}`]: handleEngineResults,
-      };
-
-      return dispatch[event]?.(payload);
-    }
-
-    const { broadcast } = createChannel(
-      `analysis:${$authStore.username}`,
-      dispatcher,
-    );
-    pushAnalysis = (payload: PhoenixPayload) =>
-      broadcast('analysis:board_state', payload);
+    ({ store: analysisStore, pushAnalysis } = createAnalysisStore(
+      $authStore.username,
+    ));
   }
 
   let currentTurnIndex = 0;
-  let metadata: EngineMetadata[];
-  let lines: EngineMove[][];
-
-  function handleEngineResults(payload: PhoenixPayload) {
-    const { results } = payload as EngineResults;
-    lines = results.map((v) => v.lines);
-    metadata = results.map((v) => v.metadata);
-  }
 </script>
 
 <div class="game-review">
   <div class="col-1">
-    <EngineAnalysisPanel {lines} {metadata} {currentTurnIndex} />
+    <EngineAnalysisPanel {analysisStore} {currentTurnIndex} />
   </div>
   <div class="col-2">
     <Board {dimensions} {boardState} />

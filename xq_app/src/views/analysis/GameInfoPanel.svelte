@@ -50,6 +50,14 @@
     movesContainer.children?.[moveIndex].scrollIntoView({ block: 'center' });
   }
 
+  function prepareBoardState() {
+    const { facing, activeLayout: al, activeTransition: at } = $store;
+    const invertPoint = newPoint(dimensions, facing === BLACK);
+    const state = al.map((l) => invertPoint(l));
+    const prev_point = at.prevPoint ? invertPoint(at.prevPoint) : null;
+    return { state, prev_point };
+  }
+
   function updateTurn(eventHandler: () => void) {
     let timer: number;
 
@@ -60,15 +68,7 @@
 
       // Debounce engine analysis
       clearTimeout(timer);
-      timer = setTimeout(() => {
-        const invertPoint = newPoint(dimensions, $store.facing === BLACK);
-        const state = $store.activeLayout.map((l) => invertPoint(l));
-        const prev_point =
-          $store.activeTransition.prevPoint &&
-          invertPoint($store.activeTransition.prevPoint);
-
-        pushAnalysis({ state, prev_point });
-      }, 500);
+      timer = setTimeout(() => pushAnalysis(prepareBoardState()), 500);
     };
   }
 
