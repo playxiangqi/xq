@@ -3,7 +3,7 @@
 
   // GraphQL Client
   import { initClient, dedupExchange, fetchExchange } from '@urql/svelte';
-  import { absintheExchange } from 'utils/channels';
+  import { absintheExchange } from '@xq/utils/channels';
   initClient({
     url: '/graphql',
     exchanges: [dedupExchange, fetchExchange, absintheExchange],

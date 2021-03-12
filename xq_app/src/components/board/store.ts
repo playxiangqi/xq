@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import Enum from 'utils/enum';
+import Enum from '@xq/utils/enum';
 import { Dimensions } from './dimensions';
 import {
   newPoint,

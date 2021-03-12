@@ -2,14 +2,14 @@
   import { writable } from 'svelte/store';
 
   // Components
-  import Board from '../../components/board/Board.svelte';
+  import Board from '@xq/components/board/Board.svelte';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
   import GameInfoPanel from './GameInfoPanel.svelte';
 
   // Modules
-  import { createBoardState, Dimensions } from 'components/board';
-  import { createAuthStore } from 'services/auth/store';
-  import type { PhoenixPayload } from 'utils/channels';
+  import { createBoardState, Dimensions } from '@xq/components/board';
+  import { createAuthStore } from '@xq/services/auth/store';
+  import type { PhoenixPayload } from '@xq/utils/channels';
   import { createAnalysisStore } from './store';
   import type { EngineResults } from './types';
 

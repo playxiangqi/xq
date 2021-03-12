@@ -1,7 +1,7 @@
 <script lang="ts">
   import { link } from 'svelte-spa-router';
-  import type { GameInfo } from 'utils/game';
-  import pagination from 'utils/pagination';
+  import type { GameInfo } from '@xq/utils/game';
+  import pagination from '@xq/utils/pagination';
 
   export let gameInfos: GameInfo[];
   export let pageSize = 15;

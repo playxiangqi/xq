@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { createChannel } from '../../utils/channels';
+import { createChannel } from '@xq/utils/channels';
 
 export function createAuthStore() {
   const store = writable({ username: '' });
