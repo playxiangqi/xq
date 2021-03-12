@@ -37,6 +37,12 @@ const isValidMove = (movingSide: Side, turn: Side) => {
   return movingSide === turn;
 };
 
+// TODO: Need consistent naming on both Frontend/Backend with respect to
+//       the following terminologies:
+// * board / state / board state
+// * point / piece
+// * board state / layout
+// * move / turn / transition
 export function createBoardState(dimensions: Dimensions) {
   const activeLayout = createInitialLayout(dimensions);
 
@@ -51,61 +57,66 @@ export function createBoardState(dimensions: Dimensions) {
   });
   const { update } = store;
 
-  const flipBoard = () =>
-    update(
-      ({
-        facing,
-        layouts,
-        activeLayout,
-        activeTransition,
-        transitions,
-        ...state
-      }) => {
-        // TODO: Horrendous code that needs to be cleaned up
-        const invertPoint = newPoint(dimensions, true);
+  const loadBoardState = (layoutWithTrans: LayoutWithTransitions[]) =>
+    update((state) => {
+      const np = newPoint(dimensions, state.facing !== RED);
+      return {
+        ...state,
+        layouts: layoutWithTrans.map(({ state: s }) => s.map(np)),
+        transitions: layoutWithTrans.map(({ prevPoint, nextPoint }) => ({
+          prevPoint: prevPoint && np(prevPoint),
+          nextPoint: nextPoint && np(nextPoint),
+        })),
+      };
+    });
 
-        activeTransition = {
-          prevPoint: activeTransition.prevPoint
-            ? invertPoint(activeTransition.prevPoint)
-            : activeTransition.prevPoint,
-          nextPoint: activeTransition.nextPoint
-            ? invertPoint(activeTransition.nextPoint)
-            : activeTransition.nextPoint,
-        };
-        transitions = transitions.map(({ prevPoint, nextPoint }) => ({
-          prevPoint: prevPoint ? invertPoint(prevPoint) : prevPoint,
-          nextPoint: nextPoint ? invertPoint(nextPoint) : nextPoint,
-        }));
-        return {
-          ...state,
-          facing: facing === RED ? BLACK : RED,
-          layouts: layouts.map((l) => l.map(invertPoint)),
-          activeLayout: activeLayout.map(invertPoint),
-          activeTransition,
-          transitions,
-        };
-      },
-    );
+  const transitionBoardState = (turnIndex: number) =>
+    update(({ activeLayout, activeTransition, ...state }) => ({
+      ...state,
+      activeLayout: state.layouts[turnIndex],
+      activeTransition: state.transitions[turnIndex],
+    }));
+
+  const flipBoard = () =>
+    update(({ activeTransition, transitions, ...state }) => {
+      const invertPoint = newPoint(dimensions, true);
+
+      return {
+        ...state,
+        facing: state.facing === RED ? BLACK : RED,
+        layouts: state.layouts.map((l) => l.map(invertPoint)),
+        activeLayout: state.activeLayout.map(invertPoint),
+        activeTransition: {
+          prevPoint:
+            activeTransition.prevPoint &&
+            invertPoint(activeTransition.prevPoint),
+          nextPoint:
+            activeTransition.nextPoint &&
+            invertPoint(activeTransition.nextPoint),
+        },
+        transitions: transitions.map(({ prevPoint, nextPoint }) => ({
+          prevPoint: prevPoint && invertPoint(prevPoint),
+          nextPoint: nextPoint && invertPoint(nextPoint),
+        })),
+      };
+    });
+
+  const grabPiece = (index: number) =>
+    update((state) => {
+      state.activeLayout[index].grabbing = true;
+      return state;
+    });
+
+  const movePiece = (index: number, position: [number, number]) =>
+    update((state) => {
+      state.activeLayout[index].position = position;
+      return state;
+    });
 
   return {
     store,
-    loadBoardState: (layoutWithTrans: LayoutWithTransitions[]) =>
-      update((state) => {
-        const np = newPoint(dimensions, state.facing !== RED);
-
-        state.layouts = layoutWithTrans.map(({ state: s }) => s.map(np));
-        state.transitions = layoutWithTrans.map(({ prevPoint, nextPoint }) => ({
-          prevPoint: prevPoint ? np(prevPoint) : prevPoint,
-          nextPoint: nextPoint ? np(nextPoint) : nextPoint,
-        }));
-        return state;
-      }),
-    transitionBoardState: (turnIndex: number) =>
-      update((state) => {
-        state.activeLayout = state.layouts[turnIndex];
-        state.activeTransition = state.transitions[turnIndex];
-        return state;
-      }),
+    loadBoardState,
+    transitionBoardState,
     dropPiece: (index: number, side: Side): boolean => {
       let movedFromPrev = false;
 
@@ -159,18 +170,8 @@ export function createBoardState(dimensions: Dimensions) {
         return state;
       });
     },
-    grabPiece: (index: number) => {
-      update((state) => {
-        state.activeLayout[index].grabbing = true;
-        return state;
-      });
-    },
-    movePiece: (index: number, position: [number, number]) => {
-      update((state) => {
-        state.activeLayout[index].position = position;
-        return state;
-      });
-    },
+    grabPiece,
+    movePiece,
     flipBoard,
   };
 }
