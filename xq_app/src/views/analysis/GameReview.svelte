@@ -13,7 +13,7 @@
   import { createAnalysisStore } from './store';
   import type { EngineResults } from './types';
 
-  export let params: { id: number | string };
+  export let gameID: number | string;
 
   // TODO: Derive dimensions and scale from viewport and set globally
   const DEFAULT_SCALE = 1.0;
@@ -46,7 +46,7 @@
   <div class="col-3">
     <GameInfoPanel
       bind:currentTurnIndex
-      gameID={params.id}
+      {gameID}
       {dimensions}
       {boardState}
       {pushAnalysis}

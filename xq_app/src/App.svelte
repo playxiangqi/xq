@@ -12,17 +12,6 @@
   // Routes
   import { Router } from '@roxi/routify';
   import { routes } from '../.routify/routes';
-  // import Router, { link } from 'svelte-spa-router';
-  // import { wrap } from 'svelte-spa-router/wrap';
-  // const routes = {
-  //   '/': Demo,
-  //   '/analysis/explorer': wrap({
-  //     asyncComponent: () => import('./views/analysis/DatabaseExplorer.svelte'),
-  //   }),
-  //   '/analysis/game/:id': wrap({
-  //     asyncComponent: () => import('./views/analysis/GameReview.svelte'),
-  //   }),
-  // };
 </script>
 
 <div class="app">
