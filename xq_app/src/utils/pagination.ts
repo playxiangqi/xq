@@ -1,10 +1,10 @@
-import { range } from './enum';
+import Enum from './enum';
 
 export default function (current: number, last: number) {
   const delta = 2;
   const [left, right] = [current - delta, current + delta + 1];
 
-  const numbered = range(2, last).filter(
+  const numbered = Enum.range(2, last).filter(
     (i) => i === last || (i >= left && i < right),
   );
 

@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import Enum from 'utils/enum';
 import { Dimensions } from './dimensions';
 import {
   newPoint,
@@ -32,6 +33,10 @@ export type BoardState = {
   facing: Side;
 };
 
+const isValidMove = (movingSide: Side, turn: Side) => {
+  return movingSide === turn;
+};
+
 export function createBoardState(dimensions: Dimensions) {
   const activeLayout = createInitialLayout(dimensions);
 
@@ -46,9 +51,41 @@ export function createBoardState(dimensions: Dimensions) {
   });
   const { update } = store;
 
-  const isValidMove = (movingSide: Side, turn: Side) => {
-    return movingSide === turn;
-  };
+  const flipBoard = () =>
+    update(
+      ({
+        facing,
+        layouts,
+        activeLayout,
+        activeTransition,
+        transitions,
+        ...state
+      }) => {
+        // TODO: Horrendous code that needs to be cleaned up
+        const invertPoint = newPoint(dimensions, true);
+
+        activeTransition = {
+          prevPoint: activeTransition.prevPoint
+            ? invertPoint(activeTransition.prevPoint)
+            : activeTransition.prevPoint,
+          nextPoint: activeTransition.nextPoint
+            ? invertPoint(activeTransition.nextPoint)
+            : activeTransition.nextPoint,
+        };
+        transitions = transitions.map(({ prevPoint, nextPoint }) => ({
+          prevPoint: prevPoint ? invertPoint(prevPoint) : prevPoint,
+          nextPoint: nextPoint ? invertPoint(nextPoint) : nextPoint,
+        }));
+        return {
+          ...state,
+          facing: facing === RED ? BLACK : RED,
+          layouts: layouts.map((l) => l.map(invertPoint)),
+          activeLayout: activeLayout.map(invertPoint),
+          activeTransition,
+          transitions,
+        };
+      },
+    );
 
   return {
     store,
@@ -78,13 +115,11 @@ export function createBoardState(dimensions: Dimensions) {
         // BUG: movedFromPrev returning false when dropping pieces
         // that don't actually move after call to slidePiece
 
-        // TODO: helper type + function for tuples
         // Track if piece was moved
-        movedFromPrev =
-          state.activeLayout[index].position[0] !==
-            state.activeLayout[index].prevPosition[0] ||
-          state.activeLayout[index].position[1] !==
-            state.activeLayout[index].prevPosition[1];
+        movedFromPrev = !Enum.strictEquals(
+          state.activeLayout[index].position,
+          state.activeLayout[index].prevPosition,
+        );
 
         // Confirm drop by updating prevPosition
         if (isValidMove(side, state.turn) && movedFromPrev) {
@@ -136,30 +171,6 @@ export function createBoardState(dimensions: Dimensions) {
         return state;
       });
     },
-    flipBoard: () => {
-      update((state) => {
-        // TODO: Horrendous code that needs to be cleaned up
-        const invertPoint = newPoint(dimensions, true);
-
-        state.facing = state.facing === RED ? BLACK : RED;
-        state.layouts = state.layouts.map((l) => l.map(invertPoint));
-        state.activeLayout = state.activeLayout.map(invertPoint);
-        state.activeTransition = {
-          prevPoint: state.activeTransition.prevPoint
-            ? invertPoint(state.activeTransition.prevPoint)
-            : state.activeTransition.prevPoint,
-          nextPoint: state.activeTransition.nextPoint
-            ? invertPoint(state.activeTransition.nextPoint)
-            : state.activeTransition.nextPoint,
-        };
-        state.transitions = state.transitions.map(
-          ({ prevPoint, nextPoint }) => ({
-            prevPoint: prevPoint ? invertPoint(prevPoint) : prevPoint,
-            nextPoint: nextPoint ? invertPoint(nextPoint) : nextPoint,
-          }),
-        );
-        return state;
-      });
-    },
+    flipBoard,
   };
 }
