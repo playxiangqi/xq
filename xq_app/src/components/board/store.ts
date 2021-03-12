@@ -22,7 +22,7 @@ export type LayoutWithTransitions = {
   state: Layout;
 } & Transition;
 
-// TODO: AnalysisState which contains/extends a BoardState
+// TODO: BoardState can be composable with future AnalysisState, MatchState, etc.
 export type BoardState = {
   activeLayout: Layout;
   layouts: Layout[];

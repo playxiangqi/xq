@@ -5,7 +5,6 @@
   import GameInfoPanel from './GameInfoPanel.svelte';
 
   // Modules
-  // TODO: Move dimensions to utilities and rebrand boardState into matchState
   import { createBoardState, Dimensions } from 'components/board';
   import { createAuthStore } from 'services/auth/store';
   import { createChannel } from 'utils/channels';
