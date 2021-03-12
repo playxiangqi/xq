@@ -16,7 +16,7 @@ import path from 'path';
 
 const production = process.env.MIX_ENV === 'prod';
 const STATIC_ASSET_DIR = '../xq_portal/priv/static';
-const ROOT_DIR = path.resolve(__dirname);
+const PROJECT_ROOT_DIR = path.resolve(__dirname);
 
 export default {
   // Main entry point
@@ -56,7 +56,13 @@ export default {
     }),
 
     alias({
-      entries: [{ find: '@xq', replacement: path.resolve(ROOT_DIR, 'src') }],
+      entries: [
+        {
+          find: '@xq/core',
+          replacement: path.resolve(PROJECT_ROOT_DIR, 'src/components'),
+        },
+        { find: '@xq', replacement: path.resolve(PROJECT_ROOT_DIR, 'src') },
+      ],
     }),
 
     // Resolve node modules
