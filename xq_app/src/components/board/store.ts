@@ -77,6 +77,63 @@ export function createBoardState(dimensions: Dimensions) {
       activeTransition: state.transitions[turnIndex],
     }));
 
+  const dropPiece = (index: number, side: Side): boolean => {
+    let movedFromPrev = false;
+
+    update((state) => {
+      state.activeLayout[index].grabbing = false;
+
+      // Track if piece was moved
+      movedFromPrev = !Enum.strictEquals(
+        state.activeLayout[index].position,
+        state.activeLayout[index].prevPosition,
+      );
+
+      // Confirm drop by updating prevPosition
+      if (isValidMove(side, state.turn) && movedFromPrev) {
+        state.activeLayout[index].prevPosition =
+          state.activeLayout[index].position;
+
+        const { side, ch, position, prevPosition } = state.activeLayout[index];
+        const [rank, file] = dimensions.coordsToPoint(position[0], position[1]);
+        state.moves = [
+          ...state.moves,
+          { side, ch, rank, file, position, prevPosition },
+        ];
+        state.turn = state.turn === RED ? BLACK : RED;
+      } else {
+        movedFromPrev = false;
+        state.activeLayout[index].position =
+          state.activeLayout[index].prevPosition;
+      }
+      return state;
+    });
+
+    return movedFromPrev;
+  };
+
+  const focusPiece = (index: number) =>
+    update((state) => {
+      const lastIndex = state.activeLayout.length - 1;
+      [state.activeLayout[index], state.activeLayout[lastIndex]] = [
+        state.activeLayout[lastIndex],
+        state.activeLayout[index],
+      ];
+      return state;
+    });
+
+  const grabPiece = (index: number) =>
+    update((state) => {
+      state.activeLayout[index].grabbing = true;
+      return state;
+    });
+
+  const movePiece = (index: number, position: [number, number]) =>
+    update((state) => {
+      state.activeLayout[index].position = position;
+      return state;
+    });
+
   const flipBoard = () =>
     update(({ activeTransition, transitions, ...state }) => {
       const invertPoint = newPoint(dimensions, true);
@@ -101,75 +158,12 @@ export function createBoardState(dimensions: Dimensions) {
       };
     });
 
-  const grabPiece = (index: number) =>
-    update((state) => {
-      state.activeLayout[index].grabbing = true;
-      return state;
-    });
-
-  const movePiece = (index: number, position: [number, number]) =>
-    update((state) => {
-      state.activeLayout[index].position = position;
-      return state;
-    });
-
   return {
     store,
     loadBoardState,
     transitionBoardState,
-    dropPiece: (index: number, side: Side): boolean => {
-      let movedFromPrev = false;
-
-      update((state) => {
-        state.activeLayout[index].grabbing = false;
-
-        // BUG: movedFromPrev returning false when dropping pieces
-        // that don't actually move after call to slidePiece
-
-        // Track if piece was moved
-        movedFromPrev = !Enum.strictEquals(
-          state.activeLayout[index].position,
-          state.activeLayout[index].prevPosition,
-        );
-
-        // Confirm drop by updating prevPosition
-        if (isValidMove(side, state.turn) && movedFromPrev) {
-          state.activeLayout[index].prevPosition =
-            state.activeLayout[index].position;
-
-          const { side, ch, position, prevPosition } = state.activeLayout[
-            index
-          ];
-          const [rank, file] = dimensions.coordsToPoint(
-            position[0],
-            position[1],
-          );
-          state.moves = [
-            ...state.moves,
-            { side, ch, rank, file, position, prevPosition },
-          ];
-          state.turn = state.turn === RED ? BLACK : RED;
-        } else {
-          movedFromPrev = false;
-          state.activeLayout[index].position =
-            state.activeLayout[index].prevPosition;
-        }
-        console.log(state.moves);
-        return state;
-      });
-
-      return movedFromPrev;
-    },
-    focusPiece: (index: number) => {
-      update((state) => {
-        const lastIndex = state.activeLayout.length - 1;
-        [state.activeLayout[index], state.activeLayout[lastIndex]] = [
-          state.activeLayout[lastIndex],
-          state.activeLayout[index],
-        ];
-        return state;
-      });
-    },
+    dropPiece,
+    focusPiece,
     grabPiece,
     movePiece,
     flipBoard,
