@@ -115,7 +115,7 @@ export function createBoardState(dimensions: Dimensions) {
     update(({ activeLayout: al, ...state }) => {
       const lastIndex = al.length - 1;
       [al[index], al[lastIndex]] = [al[lastIndex], al[index]];
-      return { ...state, activeLayout };
+      return { ...state, activeLayout: al };
     });
 
   const grabPiece = (index: number) =>
