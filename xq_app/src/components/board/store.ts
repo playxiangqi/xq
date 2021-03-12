@@ -80,7 +80,7 @@ export function createBoardState(dimensions: Dimensions) {
   const dropPiece = (index: number, side: Side): boolean => {
     let movedFromPrev = false;
 
-    update(({ activeLayout, ...state }) => {
+    update(({ activeLayout, moves, turn, ...state }) => {
       activeLayout[index].grabbing = false;
 
       // Track if piece was moved
@@ -90,37 +90,32 @@ export function createBoardState(dimensions: Dimensions) {
       );
 
       // Confirm drop by updating prevPosition
-      if (isValidMove(side, state.turn) && movedFromPrev) {
+      if (isValidMove(side, turn) && movedFromPrev) {
         // Update position
         activeLayout[index].prevPosition = activeLayout[index].position;
 
         const { side, ch, position, prevPosition } = activeLayout[index];
         const [rank, file] = dimensions.coordsToPoint(position[0], position[1]);
-        state.moves = [
-          ...state.moves,
-          { side, ch, rank, file, position, prevPosition },
-        ];
-        state.turn = state.turn === RED ? BLACK : RED;
+
+        moves = [...moves, { side, ch, rank, file, position, prevPosition }];
+        turn = turn === RED ? BLACK : RED;
       } else {
         movedFromPrev = false;
 
         // Return to previous position
         activeLayout[index].position = activeLayout[index].prevPosition;
       }
-      return { ...state, activeLayout };
+      return { ...state, activeLayout, moves, turn };
     });
 
     return movedFromPrev;
   };
 
   const focusPiece = (index: number) =>
-    update((state) => {
-      const lastIndex = state.activeLayout.length - 1;
-      [state.activeLayout[index], state.activeLayout[lastIndex]] = [
-        state.activeLayout[lastIndex],
-        state.activeLayout[index],
-      ];
-      return state;
+    update(({ activeLayout: al, ...state }) => {
+      const lastIndex = al.length - 1;
+      [al[index], al[lastIndex]] = [al[lastIndex], al[index]];
+      return { ...state, activeLayout };
     });
 
   const grabPiece = (index: number) =>
@@ -136,7 +131,7 @@ export function createBoardState(dimensions: Dimensions) {
     });
 
   const flipBoard = () =>
-    update(({ activeTransition, transitions, ...state }) => {
+    update(({ activeTransition: at, transitions, ...state }) => {
       const invertPoint = newPoint(dimensions, true);
 
       return {
@@ -145,12 +140,8 @@ export function createBoardState(dimensions: Dimensions) {
         layouts: state.layouts.map((l) => l.map(invertPoint)),
         activeLayout: state.activeLayout.map(invertPoint),
         activeTransition: {
-          prevPoint:
-            activeTransition.prevPoint &&
-            invertPoint(activeTransition.prevPoint),
-          nextPoint:
-            activeTransition.nextPoint &&
-            invertPoint(activeTransition.nextPoint),
+          prevPoint: at.prevPoint && invertPoint(at.prevPoint),
+          nextPoint: at.nextPoint && invertPoint(at.nextPoint),
         },
         transitions: transitions.map(({ prevPoint, nextPoint }) => ({
           prevPoint: prevPoint && invertPoint(prevPoint),

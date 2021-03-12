@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Enum from 'utils/enum';
   import { Dimensions } from './dimensions';
   import { getGlyph } from './pieces';
   import type { Character, Side } from './pieces';
@@ -26,10 +27,7 @@
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
-  $: moved =
-    nextPosition &&
-    nextPosition[0] === position[0] &&
-    nextPosition[1] === position[1];
+  $: moved = nextPosition && Enum.strictEquals(nextPosition, position);
 
   // Sound Effects
   const audio = new Audio('./sounds/drop-piece.wav');

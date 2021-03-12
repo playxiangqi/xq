@@ -7,7 +7,6 @@
 </script>
 
 <div class="database-explorer">
-  <div class="col-1" />
   <div class="main-panel panel">
     <p class="panel-heading">Database Explorer</p>
     <div class="search-form-container panel-block">
@@ -17,7 +16,6 @@
       <GameInfoTable {gameInfos} />
     </div>
   </div>
-  <div class="col-3" />
 </div>
 
 <style lang="scss">
