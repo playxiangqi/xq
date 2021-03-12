@@ -2,9 +2,7 @@ import { writable } from 'svelte/store';
 import { createChannel } from '../../utils/channels';
 
 export function createAuthStore() {
-  const store = writable({
-    username: '',
-  });
+  const store = writable({ username: '' });
 
   const { broadcast } = createChannel(
     'user:guest',
