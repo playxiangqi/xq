@@ -10,11 +10,11 @@ defmodule XQ.Parser.FEN do
       |> Enum.sort(&Point.by_rank/2)
       |> Enum.group_by(&Map.get(&1, :rank))
 
-    0..9
+    0..Point.max_rank()
     |> Map.new(&{&1, []})
     |> Map.merge(points_grouped_by_rank)
     |> Enum.map(fn {_rank, points} -> Enum.sort(points, &Point.by_file/2) end)
-    |> Enum.reduce([], fn points, acc ->
+    |> Enum.map(fn points ->
       %{curr_file: curr_file, fen: fen} =
         Enum.reduce(points, %{curr_file: 0, fen: ""}, fn point, acc ->
           fen =
@@ -25,11 +25,9 @@ defmodule XQ.Parser.FEN do
           %{curr_file: point.file + 1, fen: fen}
         end)
 
-      num_spaces = 9 - curr_file
-
-      ["#{fen}#{if num_spaces > 0, do: num_spaces}" | acc]
+      num_spaces = Point.max_rank() - curr_file
+      "#{fen}#{if num_spaces > 0, do: num_spaces}"
     end)
-    |> Enum.reverse()
     |> Enum.join("/")
     |> append_active_color(prev_point)
     |> append_fullmove_number()

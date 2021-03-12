@@ -8,12 +8,20 @@
   $: moveIndex = Math.floor(currentTurnIndex / 2);
 
   function formatCPScore(scorecp: number) {
-    const v = scorecp / 100;
-    return v > 0 ? `+${v}` : v < 0 ? `-${v}` : v;
+    // TODO: Eventually keep track of side-to-move in boardState properly
+    let v = scorecp / 100;
+    if (currentTurnIndex % 2 != 0) {
+      v = -v;
+    }
+    return v > 0 ? `+${v}` : v;
   }
 
   function cpScoreClassName(scorecp: number) {
-    return scorecp > 0 ? 'is-danger' : scorecp < 0 ? 'is-black' : 'is-light';
+    let v = scorecp;
+    if (currentTurnIndex % 2 != 0) {
+      v = -v;
+    }
+    return v > 0 ? 'is-danger' : v < 0 ? 'is-black' : 'is-light';
   }
 </script>
 
@@ -44,9 +52,10 @@
           >
           <p class="line">
             {#each line as [redMove, blackMove], j}
-              {moveIndex + j + 1}. {currentTurnIndex % 2 !== 0 && j === 0
+              <!-- {moveIndex + j + 1}. {currentTurnIndex % 2 !== 0 && j === 0
                 ? '...'
-                : redMove}
+                : redMove} -->
+              {moveIndex + j + 1}. {redMove}
               {blackMove ?? ''}{' '}
             {/each}
           </p>

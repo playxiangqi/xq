@@ -1,11 +1,19 @@
 <script lang="ts">
   import { operationStore, query } from '@urql/svelte';
-  import { createBoardState } from 'components/board';
+  import {
+    BLACK,
+    createBoardState,
+    Dimensions,
+    newPoint,
+  } from 'components/board';
+  import type { PhoenixPayload } from 'utils/channels';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
   export let currentTurnIndex = 0;
   export let gameID: number | string;
+  export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
+  export let pushAnalysis = (payload: PhoenixPayload) => {};
 
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
@@ -43,10 +51,24 @@
   }
 
   function updateTurn(eventHandler: () => void) {
+    let timer: number;
+
     return () => {
       eventHandler();
       transitionBoardState(currentTurnIndex);
       scrollIntoView(currentTurnIndex);
+
+      // Debounce engine analysis
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const invertPoint = newPoint(dimensions, $store.facing === BLACK);
+        const state = $store.activeLayout.map((l) => invertPoint(l));
+        const prev_point = $store.activeTransition.prevPoint
+          ? invertPoint($store.activeTransition.prevPoint)
+          : null;
+
+        pushAnalysis({ state, prev_point });
+      }, 500);
     };
   }
 

@@ -1,12 +1,19 @@
 defmodule XQWeb.AnaylsisChannel do
   use XQWeb, :channel
 
-  require Logger
-
   @impl true
   def join("analysis:guest_" <> guest_id, _payload, socket) do
     XQ.Analysis.new_session()
     {:ok, assign(socket, :guest_id, guest_id)}
+  end
+
+  @impl true
+  def handle_in("analysis:board_state", payload, socket) do
+    :fen
+    |> XQ.Parser.produce(unmarshal_board(payload))
+    |> XQ.Analysis.submit_board()
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -25,9 +32,27 @@ defmodule XQWeb.AnaylsisChannel do
     {:noreply, socket}
   end
 
-  def handle_info(event, socket) do
-    Logger.debug("AnalysisChannel received unhandled event: #{inspect(event)}")
+  defp unmarshal_board(%{"state" => state, "prev_point" => prev_point}) do
+    %XQ.Core.Board{
+      state: Enum.map(state, &unmarshal_point/1),
+      prev_point: unmarshal_point(prev_point)
+    }
+  end
 
-    {:noreply, socket}
+  defp unmarshal_point(nil), do: nil
+
+  defp unmarshal_point(%{} = point) do
+    point
+    |> Map.take(["ch", "side", "rank", "file"])
+    |> Map.new(fn {k, v} ->
+      {String.to_atom(k),
+       case v do
+         s when is_binary(s) ->
+           String.to_atom(s)
+
+         v ->
+           v
+       end}
+    end)
   end
 end
