@@ -1,12 +1,13 @@
 <script lang="ts">
+  import { location } from 'svelte-spa-router';
   import type { Writable } from 'svelte/store';
   import type { EngineResults } from './types';
 
   export let currentTurnIndex: number;
   export let analysisStore: Writable<EngineResults>;
 
-  $: metadata = $analysisStore.results.map((v) => v.metadata);
-  $: lines = $analysisStore.results.map((v) => v.lines);
+  $: metadata = location && $analysisStore.results.map((v) => v.metadata);
+  $: lines = location && $analysisStore.results.map((v) => v.lines);
 
   $: {
     console.log('metadata: ', metadata);
