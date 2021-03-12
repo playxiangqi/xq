@@ -104,7 +104,7 @@
   }
 
   // Sound Effects
-  const audio = new Audio('./sounds/drop-piece.wav');
+  const audio = new Audio('/sounds/drop-piece.wav');
 
   function playSound() {
     audio.currentTime = 0;

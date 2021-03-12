@@ -1,7 +1,7 @@
 <script lang="ts">
   import { url } from '@roxi/routify';
-  import type { GameInfo } from '@xq/utils/game';
   import pagination from '@xq/utils/pagination';
+  import type { GameInfo } from './types';
 
   export let gameInfos: GameInfo[];
   export let pageSize = 15;
