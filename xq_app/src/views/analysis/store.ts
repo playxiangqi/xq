@@ -9,7 +9,7 @@ export function createAnalysisStore(username: string) {
   });
 
   function loadEngineResults(payload: PhoenixPayload) {
-    console.log('engineResults: ', payload);
+    // console.log('engineResults: ', payload);
     store.update(() => payload as EngineResults);
   }
 

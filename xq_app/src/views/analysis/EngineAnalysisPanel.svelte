@@ -9,10 +9,10 @@
   $: metadata = location && $analysisStore.results.map((v) => v.metadata);
   $: lines = location && $analysisStore.results.map((v) => v.lines);
 
-  $: {
-    console.log('metadata: ', metadata);
-    console.log('lines: ', lines);
-  }
+  // $: {
+  //   console.log('metadata: ', metadata);
+  //   console.log('lines: ', lines);
+  // }
 
   $: moveIndex = Math.floor(currentTurnIndex / 2);
 
