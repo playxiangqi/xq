@@ -5,8 +5,8 @@
     createBoardState,
     Dimensions,
     newPoint,
-  } from 'components/board';
-  import type { PhoenixPayload } from 'utils/channels';
+  } from '@xq/components/board';
+  import type { PhoenixPayload } from '@xq/utils/channels';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
   export let currentTurnIndex = 0;

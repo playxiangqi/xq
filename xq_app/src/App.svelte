@@ -3,27 +3,15 @@
 
   // GraphQL Client
   import { initClient, dedupExchange, fetchExchange } from '@urql/svelte';
-  import { absintheExchange } from 'utils/channels';
+  import { absintheExchange } from '@xq/utils/channels';
   initClient({
     url: '/graphql',
     exchanges: [dedupExchange, fetchExchange, absintheExchange],
   });
 
-  // Components
-  import Demo from './views/Demo.svelte';
-
   // Routes
-  import Router, { link } from 'svelte-spa-router';
-  import { wrap } from 'svelte-spa-router/wrap';
-  const routes = {
-    '/': Demo,
-    '/analysis/explorer': wrap({
-      asyncComponent: () => import('./views/analysis/DatabaseExplorer.svelte'),
-    }),
-    '/analysis/game/:id': wrap({
-      asyncComponent: () => import('./views/analysis/GameReview.svelte'),
-    }),
-  };
+  import { Router } from '@roxi/routify';
+  import { routes } from '../.routify/routes';
 </script>
 
 <div class="app">
@@ -35,11 +23,11 @@
     </div>
     <div class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" href="/" use:link>Demo</a>
+        <a class="navbar-item" href="/">Demo</a>
         <div class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">Analysis</div>
           <div class="navbar-dropdown">
-            <a class="navbar-item" href="/analysis/explorer" use:link>
+            <a class="navbar-item" href="/analysis/explorer">
               Database Explorer
             </a>
           </div>

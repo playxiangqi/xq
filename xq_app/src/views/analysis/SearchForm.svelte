@@ -1,6 +1,6 @@
 <script lang="ts">
   import { operationStore, query, getClient } from '@urql/svelte';
-  import type { GameInfo, Opening } from 'utils/game';
+  import type { GameInfo, Opening } from '@xq/utils/game';
   import { GET_OPENINGS_QUERY, SEARCH_GAMES_QUERY } from './queries';
 
   export let gameInfos: GameInfo[];

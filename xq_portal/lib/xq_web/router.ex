@@ -16,8 +16,8 @@ defmodule XQWeb.Router do
   scope "/", XQWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
     get "/health", HealthController, :index
+    get "/*path", PageController, :index
   end
 
   scope "/api", XQWeb do

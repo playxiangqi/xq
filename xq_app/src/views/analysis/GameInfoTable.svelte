@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { link } from 'svelte-spa-router';
-  import type { GameInfo } from 'utils/game';
-  import pagination from 'utils/pagination';
+  import { url } from '@roxi/routify';
+  import type { GameInfo } from '@xq/utils/game';
+  import pagination from '@xq/utils/pagination';
 
   export let gameInfos: GameInfo[];
   export let pageSize = 15;
@@ -53,8 +53,7 @@
             <p class="control">
               <a
                 class="button is-small"
-                href={`/analysis/game/${game.id}`}
-                use:link
+                href={$url('/analysis/game/:id', { id: game.id })}
               >
                 <span class="icon">
                   <i class="fas fa-game-board" />

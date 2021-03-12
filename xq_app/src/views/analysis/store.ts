@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { createChannel, PhoenixPayload } from 'utils/channels';
+import { createChannel, PhoenixPayload } from '@xq/utils/channels';
 import type { EngineResults } from './types';
 
 export function createAnalysisStore(username: string) {

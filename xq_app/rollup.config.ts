@@ -11,9 +11,12 @@ import svelteSVG from 'rollup-plugin-svelte-svg';
 import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
+import alias from '@rollup/plugin-alias';
+import path from 'path';
 
 const production = process.env.MIX_ENV === 'prod';
 const STATIC_ASSET_DIR = '../xq_portal/priv/static';
+const ROOT_DIR = path.resolve(__dirname);
 
 export default {
   // Main entry point
@@ -49,12 +52,18 @@ export default {
         dev: !production,
         cssOutputFilename: `${STATIC_ASSET_DIR}/css/app.css`,
       },
+      extensions: ['.svelte'],
+    }),
+
+    alias({
+      entries: [{ find: '@xq', replacement: path.resolve(ROOT_DIR, 'src') }],
     }),
 
     // Resolve node modules
     nodeResolve({
       browser: true,
       preferBuiltins: false,
+      extensions: ['.svelte'],
       dedupe: ['svelte'],
     }),
 

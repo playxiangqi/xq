@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Enum from 'utils/enum';
+  import Enum from '@xq/utils/enum';
   import { Dimensions } from './dimensions';
   import { getGlyph } from './pieces';
   import type { Character, Side } from './pieces';
