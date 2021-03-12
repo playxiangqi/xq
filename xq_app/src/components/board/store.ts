@@ -80,21 +80,21 @@ export function createBoardState(dimensions: Dimensions) {
   const dropPiece = (index: number, side: Side): boolean => {
     let movedFromPrev = false;
 
-    update((state) => {
-      state.activeLayout[index].grabbing = false;
+    update(({ activeLayout, ...state }) => {
+      activeLayout[index].grabbing = false;
 
       // Track if piece was moved
       movedFromPrev = !Enum.strictEquals(
-        state.activeLayout[index].position,
-        state.activeLayout[index].prevPosition,
+        activeLayout[index].position,
+        activeLayout[index].prevPosition,
       );
 
       // Confirm drop by updating prevPosition
       if (isValidMove(side, state.turn) && movedFromPrev) {
-        state.activeLayout[index].prevPosition =
-          state.activeLayout[index].position;
+        // Update position
+        activeLayout[index].prevPosition = activeLayout[index].position;
 
-        const { side, ch, position, prevPosition } = state.activeLayout[index];
+        const { side, ch, position, prevPosition } = activeLayout[index];
         const [rank, file] = dimensions.coordsToPoint(position[0], position[1]);
         state.moves = [
           ...state.moves,
@@ -103,10 +103,11 @@ export function createBoardState(dimensions: Dimensions) {
         state.turn = state.turn === RED ? BLACK : RED;
       } else {
         movedFromPrev = false;
-        state.activeLayout[index].position =
-          state.activeLayout[index].prevPosition;
+
+        // Return to previous position
+        activeLayout[index].position = activeLayout[index].prevPosition;
       }
-      return state;
+      return { ...state, activeLayout };
     });
 
     return movedFromPrev;
