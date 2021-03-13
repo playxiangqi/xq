@@ -1,10 +1,10 @@
 import { writable } from 'svelte/store';
-import { createChannel } from '@xq/utils/channels';
+import Channel from '@xq/utils/channel';
 
 export function createAuthStore() {
   const store = writable({ username: '' });
 
-  const { broadcast } = createChannel(
+  const { push, leave } = Channel.connect(
     'user:guest',
     (event: string, payload: any) => {
       if (event === 'phx_reply' && payload.status === 'ok') {
@@ -18,8 +18,5 @@ export function createAuthStore() {
     },
   );
 
-  return {
-    store,
-    broadcast,
-  };
+  return { store, push, leave };
 }

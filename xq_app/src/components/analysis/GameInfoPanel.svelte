@@ -6,7 +6,7 @@
     Dimensions,
     newPoint,
   } from '@xq/core/board';
-  import type { PhoenixPayload } from '@xq/utils/channels';
+  import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
   export let currentTurnIndex = 0;
