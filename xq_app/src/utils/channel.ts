@@ -12,7 +12,7 @@ export type PhoenixEventHandler = (
   payload: PhoenixPayload,
 ) => void;
 
-export function createChannel(topic: string, onMessage: PhoenixEventHandler) {
+export function connect(topic: string, onMessage: PhoenixEventHandler) {
   const channel = socket.channel(topic, { client: 'browser' });
 
   channel.onMessage = (event, payload) => {
@@ -33,8 +33,9 @@ export function createChannel(topic: string, onMessage: PhoenixEventHandler) {
     });
 
   return {
-    broadcast: (event: string, payload: PhoenixPayload) =>
+    push: (event: string, payload: PhoenixPayload) =>
       channel.push(event, payload),
+    leave: () => channel.leave(),
   };
 }
 
@@ -67,3 +68,5 @@ export const absintheExchange = subscriptionExchange({
     return pipe(source, toObservable);
   },
 });
+
+export default { connect };

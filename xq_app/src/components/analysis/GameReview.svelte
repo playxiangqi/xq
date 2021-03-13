@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { writable } from 'svelte/store';
   import { createBoardState, Dimensions, Board } from '@xq/core/board';
   import { createAuthStore } from '@xq/services/auth/store';
-  import type { PhoenixPayload } from '@xq/utils/channels';
+  import type { PhoenixPayload } from '@xq/utils/channel';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
   import GameInfoPanel from './GameInfoPanel.svelte';
-  import { createAnalysisStore } from './store';
-  import type { EngineResults } from './types';
 
   export let gameID: number | string;
 
@@ -14,26 +11,19 @@
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
-
-  let analysisStore = writable<EngineResults>({
-    best_move: [],
-    results: [],
-  });
-  let pushAnalysis: (payload: PhoenixPayload) => {};
-
   const { store: authStore } = createAuthStore();
-  $: if ($authStore.username !== '') {
-    ({ store: analysisStore, pushAnalysis } = createAnalysisStore(
-      $authStore.username,
-    ));
-  }
 
   let currentTurnIndex = 0;
+  let pushAnalysis = (payload: PhoenixPayload) => {};
 </script>
 
 <div class="game-review">
   <div class="col-1">
-    <EngineAnalysisPanel {analysisStore} {currentTurnIndex} />
+    <EngineAnalysisPanel
+      {currentTurnIndex}
+      username={$authStore.username}
+      bind:pushAnalysis
+    />
   </div>
   <div class="col-2">
     <Board {dimensions} {boardState} />
