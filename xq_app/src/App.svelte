@@ -4,6 +4,7 @@
     Header,
     HeaderNav,
     HeaderNavItem,
+    HeaderNavMenu,
     SkipToContent,
   } from 'carbon-components-svelte';
 
@@ -19,7 +20,7 @@
   import { Router } from '@roxi/routify';
   import { routes } from '../.routify/routes';
 
-  let theme = 'g10';
+  let theme = 'white';
   let isSideNavOpen = false;
 
   $: document.documentElement.setAttribute('theme', theme);
@@ -27,13 +28,22 @@
 
 <div class="app">
   <div class="nav-container" role="navigation" aria-label="main navigation">
-    <Header platformName="Play XiangQi" bind:isSideNavOpen>
+    <Header
+      platformName="Play XiangQi"
+      uiShellAriaLabel="main navigation header"
+      href="https://github.com/playxiangqi"
+      bind:isSideNavOpen
+    >
       <div slot="skip-to-content">
         <SkipToContent />
       </div>
       <HeaderNav>
         <HeaderNavItem href="/" text="Demo" />
-      </HeaderNav> -->
+        <HeaderNavItem href="/play" text="Play" />
+        <HeaderNavMenu text="Analysis">
+          <HeaderNavItem href="/analysis/explorer" text="Database Explorer" />
+        </HeaderNavMenu>
+      </HeaderNav>
     </Header>
   </div>
 
@@ -69,8 +79,7 @@
     height: 100%;
     width: 100%;
 
-    .content-container {
-      height: 80%;
-    }
+    display: grid;
+    grid-template-rows: 5% 95%;
   }
 </style>

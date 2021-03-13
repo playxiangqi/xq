@@ -6,10 +6,10 @@
   <Grid>
     <Row>
       <Column>
-        <ClickableTile light>Online</ClickableTile>
+        <ClickableTile>Online</ClickableTile>
       </Column>
       <Column>
-        <ClickableTile light>Computer</ClickableTile>
+        <ClickableTile>Computer</ClickableTile>
       </Column>
     </Row>
   </Grid>
