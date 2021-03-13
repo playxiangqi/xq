@@ -52,7 +52,7 @@
     .col-2 {
       display: flex;
 
-      padding-left: 3.75%;
+      padding-left: 2%;
     }
   }
 </style>
