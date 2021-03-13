@@ -57,10 +57,7 @@ export type Point = {
   grabbing: boolean;
 };
 
-export function newPoint(
-  dimensions: Dimensions,
-  shouldInvert: boolean = false,
-) {
+export function newPoint(dimensions: Dimensions, shouldInvert = false) {
   return (point: Point) => {
     const [rank, file] = shouldInvert
       ? [RANK_MAX - point.rank, FILE_MAX - point.file]

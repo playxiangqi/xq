@@ -9,6 +9,7 @@
     "paths": {
       "@xq/core/*": ["src/components/*"],
       "@xq/*": ["src/*"]
-    }
+    },
+    "types": ["svelte", "carbon-icons-svelte"]
   }
 }

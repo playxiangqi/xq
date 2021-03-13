@@ -71,7 +71,7 @@ export function createBoardState(dimensions: Dimensions) {
     });
 
   const transitionBoardState = (turnIndex: number) =>
-    update(({ activeLayout, activeTransition, ...state }) => ({
+    update((state) => ({
       ...state,
       activeLayout: state.layouts[turnIndex],
       activeTransition: state.transitions[turnIndex],

@@ -13,6 +13,7 @@ import { terser } from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
 import alias from '@rollup/plugin-alias';
 import path from 'path';
+import { optimizeCarbonImports } from 'carbon-components-svelte/preprocess';
 
 const production = process.env.MIX_ENV === 'prod';
 const STATIC_ASSET_DIR = '../xq_portal/priv/static';
@@ -44,9 +45,12 @@ export default {
     svelte({
       // Enables <style type="scss"> or <script lang="typescript">
       // inside .svelte files
-      preprocess: sveltePreprocess({
-        sourceMap: !production,
-      }),
+      preprocess: [
+        sveltePreprocess({
+          sourceMap: !production,
+        }),
+        optimizeCarbonImports(),
+      ],
       compilerOptions: {
         // Enable run-time checks in non-production environments
         dev: !production,
@@ -69,7 +73,6 @@ export default {
     nodeResolve({
       browser: true,
       preferBuiltins: false,
-      extensions: ['.svelte'],
       dedupe: ['svelte'],
     }),
 
@@ -100,7 +103,13 @@ export default {
 
     // NODE_ENV replacement for bundling urql
     production
-      ? replace({ 'process.env.NODE_ENV': JSON.stringify('production') })
-      : replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
+      ? replace({
+          'process.env.NODE_ENV': JSON.stringify('production'),
+          preventAssignment: true,
+        })
+      : replace({
+          'process.env.NODE_ENV': JSON.stringify('development'),
+          preventAssignment: true,
+        }),
   ],
 };
