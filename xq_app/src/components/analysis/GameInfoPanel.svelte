@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import { operationStore, query } from '@urql/svelte';
   import {
     BLACK,
@@ -15,6 +16,7 @@
   export let boardState: ReturnType<typeof createBoardState>;
   export let pushAnalysis = (payload: PhoenixPayload) => {};
 
+  const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
@@ -101,15 +103,6 @@
 
   function gotoMove(turnIndex: number) {
     currentTurnIndex = turnIndex;
-  }
-
-  // Sound Effects
-  const audio = new Audio('/sounds/drop-piece.wav');
-
-  function playSound() {
-    audio.currentTime = 0;
-    audio.loop = false;
-    audio.play();
   }
 </script>
 
