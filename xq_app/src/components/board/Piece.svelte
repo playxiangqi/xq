@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import Enum from '@xq/utils/enum';
   import { Dimensions } from './dimensions';
   import { getGlyph } from './pieces';
@@ -13,6 +14,7 @@
   export let grabbing: boolean;
   export let dimensions: Dimensions;
 
+  const { playSound } = getContext('audio');
   const {
     pieceScale: scale,
     pieceSize: size,
@@ -28,15 +30,6 @@
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
   $: moved = nextPosition && Enum.strictEquals(nextPosition, position);
-
-  // Sound Effects
-  const audio = new Audio('/sounds/drop-piece.wav');
-
-  function playSound() {
-    audio.currentTime = 0;
-    audio.loop = false;
-    audio.play();
-  }
 
   // Event Props
   export let dropPiece: (index: number, side: Side) => boolean;

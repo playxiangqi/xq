@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { setContext } from 'svelte';
   import { createBoardState, Dimensions, Board } from '@xq/core/board';
   import { createAuthStore } from '@xq/services/auth/store';
   import type { PhoenixPayload } from '@xq/utils/channel';
@@ -15,6 +16,13 @@
 
   let currentTurnIndex = 0;
   let pushAnalysis = (payload: PhoenixPayload) => {};
+
+  let audio: HTMLAudioElement;
+  function playSound() {
+    audio.currentTime = 0;
+    audio.play();
+  }
+  setContext('audio', { playSound });
 </script>
 
 <div class="game-review">
@@ -26,6 +34,14 @@
     />
   </div>
   <div class="col-2">
+    <!-- svelte-ignore a11y-media-has-caption -->
+    <audio
+      bind:this={audio}
+      src="/sounds/drop-piece.wav"
+      type="audio/wav"
+      hidden
+      loop={false}
+    />
     <Board {dimensions} {boardState} />
   </div>
   <div class="col-3">
