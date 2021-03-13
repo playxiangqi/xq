@@ -1,5 +1,11 @@
 <script lang="ts">
-  import 'bulma/bulma.sass';
+  import {
+    Content,
+    Header,
+    HeaderNav,
+    HeaderNavItem,
+    SkipToContent,
+  } from 'carbon-components-svelte';
 
   // GraphQL Client
   import { initClient, dedupExchange, fetchExchange } from '@urql/svelte';
@@ -12,41 +18,40 @@
   // Routes
   import { Router } from '@roxi/routify';
   import { routes } from '../.routify/routes';
+
+  let theme = 'g10';
+  let isSideNavOpen = false;
+
+  $: document.documentElement.setAttribute('theme', theme);
 </script>
 
 <div class="app">
-  <nav class="navbar" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-      <a class="navbar-item" href="https://github.com/playxiangqi">
-        Play XiangQi
-      </a>
-    </div>
-    <div class="navbar-menu">
-      <div class="navbar-start">
-        <a class="navbar-item" href="/">Demo</a>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <div class="navbar-link">Analysis</div>
-          <div class="navbar-dropdown">
-            <a class="navbar-item" href="/analysis/explorer">
-              Database Explorer
-            </a>
-          </div>
-        </div>
+  <div class="nav-container" role="navigation" aria-label="main navigation">
+    <Header platformName="Play XiangQi" bind:isSideNavOpen>
+      <div slot="skip-to-content">
+        <SkipToContent />
       </div>
-    </div>
-  </nav>
-  <div class="view-container">
-    <Router {routes} />
+      <HeaderNav>
+        <HeaderNavItem href="/" text="Demo" />
+      </HeaderNav> -->
+    </Header>
+  </div>
+
+  <div class="content-container">
+    <Content>
+      <Router {routes} />
+    </Content>
   </div>
 </div>
 
-<style lang="scss">
-  :global(html, body) {
+<style lang="scss" global>
+  html,
+  body {
     margin: 0;
     padding: 0;
   }
 
-  :global(html) {
+  html {
     height: -moz-available;
     height: -webkit-fill-available;
     height: stretch;
@@ -56,7 +61,7 @@
     }
   }
 
-  :global(body) {
+  body {
     height: 100%;
   }
 
@@ -64,10 +69,7 @@
     height: 100%;
     width: 100%;
 
-    .navbar {
-    }
-
-    .view-container {
+    .content-container {
       height: 80%;
     }
   }
