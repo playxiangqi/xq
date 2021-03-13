@@ -66,6 +66,8 @@
     height: -webkit-fill-available;
     height: stretch;
 
+    overflow: auto;
+
     * {
       box-sizing: border-box;
     }
