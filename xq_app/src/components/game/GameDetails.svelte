@@ -1,7 +1,10 @@
 <script lang="ts">
   import type { GameInfo } from '@xq/core/analysis';
 
+  // Props
   export let gameInfo: GameInfo;
+
+  // Initialization
   const {
     redPlayer,
     blackPlayer,
@@ -24,6 +27,7 @@
     },
   ];
 
+  // Utils
   function formatResult(result: string) {
     return {
       'Red Victory': '1-0',

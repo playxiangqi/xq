@@ -5,7 +5,7 @@
   export let maxTurnIndex: number;
   export let moves: string[];
 
-  // Exposed bindings
+  // API
   export function scrollIntoView(turnIndex: number) {
     const clampedIndex = Math.max(0, Math.min(turnIndex, maxTurnIndex - 1));
     const moveIndex = Math.floor((clampedIndex + 1) / 2);

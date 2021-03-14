@@ -1,21 +1,23 @@
-<script lang="ts">
-  import { setContext } from 'svelte';
+<script context="module" lang="ts">
   import { createBoardState, Dimensions, Board } from '@xq/core/board';
   import { createAuthStore } from '@xq/services/auth/store';
-  import type { PhoenixPayload } from '@xq/utils/channel';
-  import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
-  import GameInfoPanel from './GameInfoPanel.svelte';
-
-  export let gameID: number | string;
 
   // TODO: Derive dimensions and scale from viewport and set globally
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
   const { store: authStore } = createAuthStore();
+</script>
+
+<script lang="ts">
+  import { setContext } from 'svelte';
+  import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
+  import GameInfoPanel from './GameInfoPanel.svelte';
+
+  export let gameID: number | string;
 
   let currentTurnIndex = 0;
-  let pushAnalysis = (payload: PhoenixPayload) => {};
+  let pushAnalysis = () => {};
 
   let audio: HTMLAudioElement;
   function playSound() {
@@ -28,13 +30,14 @@
 <div class="game-review">
   <div class="col-1">
     <EngineAnalysisPanel
+      bind:pushAnalysis
       {currentTurnIndex}
       username={$authStore.username}
-      bind:pushAnalysis
     />
   </div>
   <div class="col-2">
     <!-- svelte-ignore a11y-media-has-caption -->
+    <!-- TODO: Create a SoundEffect component that exports playSound -->
     <audio
       bind:this={audio}
       src="/sounds/drop-piece.wav"
