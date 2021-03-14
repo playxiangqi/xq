@@ -83,5 +83,9 @@
 
     display: grid;
     grid-template-rows: 5% 95%;
+
+    #main-content {
+      height: 100%;
+    }
   }
 </style>
