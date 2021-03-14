@@ -144,10 +144,10 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@roxi/routify@^2.14.0":
-  version "2.14.0"
-  resolved "https://registry.yarnpkg.com/@roxi/routify/-/routify-2.14.0.tgz#d3be35454516379f49b88e06e607017800926cd4"
-  integrity sha512-7hh/Nwp5uRgOGRee3/iMi40Nyc0oXxMYtpTTltfhFW/xISiXozEdRYJP7mav7IqjYgBZRJ4vIdeb1qN+aoL2bQ==
+"@roxi/routify@^2.15.0":
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/@roxi/routify/-/routify-2.15.0.tgz#b5991a77b95a63797452024c1dd2a9eee17630e7"
+  integrity sha512-RrzWwf9PKcOnSRFhoSuCTY33MmrnW7rlaIuOGMbtgkptNMF7lPrI6nqkYr6tchZVhjYT+yLQ6pN3es6xdAZ13w==
   dependencies:
     "@roxi/ssr" "^0.2.1"
     "@types/node" ">=4.2.0 < 13"
@@ -652,10 +652,10 @@ capital-case@^1.0.4:
     tslib "^2.0.3"
     upper-case-first "^2.0.2"
 
-carbon-components-svelte@^0.29.2:
-  version "0.29.2"
-  resolved "https://registry.yarnpkg.com/carbon-components-svelte/-/carbon-components-svelte-0.29.2.tgz#7420d0322a044a70a9d3be7b847eea7a261a19e0"
-  integrity sha512-bdABB1nauA+eN3xmr8QCH2Lvto8HiW+0A9eI1gHsIbwtFDhsDfG+a10oZje8E/yHOCoY5T+FFhGdB8VCq6fb2w==
+carbon-components-svelte@^0.30.0:
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/carbon-components-svelte/-/carbon-components-svelte-0.30.0.tgz#e6d422846d2130439ee994e11d9f4f929dce0ed6"
+  integrity sha512-HfLhHK6CYVjZxBx70kkKKc2AVQKyYi1E4ybzDH1L4gCnwJfejyUW4z56CgKkWQLrhecz+IJBaNKcBSSMr6Svfw==
   dependencies:
     carbon-icons-svelte "^10.21.0"
     flatpickr "4.6.9"
@@ -3056,10 +3056,10 @@ rollup-plugin-copy@^3.3.0:
     globby "10.0.1"
     is-plain-object "^3.0.0"
 
-rollup-plugin-polyfill-node@^0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-polyfill-node/-/rollup-plugin-polyfill-node-0.6.1.tgz#021db7417559dc9faf5eac7d34232f596ad95607"
-  integrity sha512-r+A3VUWVMm5tiWoQPpe9BOPycN+G+XgXQGmOyDn6REPaZNvNz16rOQ/3X9U6xE7kQAlXQCnec9L5i0fFytNYCQ==
+rollup-plugin-polyfill-node@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-polyfill-node/-/rollup-plugin-polyfill-node-0.6.2.tgz#dea62e00f5cc2c174e4b4654b5daab79b1a92fc3"
+  integrity sha512-gMCVuR0zsKq0jdBn8pSXN1Ejsc458k2QsFFvQdbHoM0Pot5hEnck+pBP/FDwFS6uAi77pD3rDTytsaUStsOMlA==
   dependencies:
     "@rollup/plugin-inject" "^4.0.0"
 

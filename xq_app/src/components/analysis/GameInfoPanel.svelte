@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import { Accordion, AccordionItem, Tile } from 'carbon-components-svelte';
   import { operationStore, query } from '@urql/svelte';
   import {
     BLACK,
@@ -7,6 +8,7 @@
     Dimensions,
     newPoint,
   } from '@xq/core/board';
+  import GameDetails from '@xq/core/game/GameDetails.svelte';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
@@ -106,44 +108,38 @@
   }
 </script>
 
-<div class="panel game-info-panel">
-  <p class="panel-heading">Details</p>
+<div class="game-info-panel">
   {#if $resp.fetching}
-    <div class="game-info-section loading p-5">Loading Game...</div>
-    <div class="moves-container loading" />
+    <Accordion skeleton count={2} />
   {:else}
-    <div class="game-info-section px-4 py-3">
-      <div class="players">
-        {gameInfo.redPlayer} vs. {gameInfo.blackPlayer} — {gameInfo.result}
-      </div>
-      <div class="venue">
-        {gameInfo.event}
-      </div>
-      <div class="date">
-        {new Date(gameInfo.date).toDateString()}
-      </div>
-      <div class="opening-name">
-        {gameInfo.openingCode}: {gameInfo.openingName}
-      </div>
-    </div>
-    <div class="moves-container" bind:this={movesContainer}>
-      {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
-        <div class="panel-block move">
-          <span class="move-num">{moveNum}.</span>
-          <span
-            class="move-red"
-            class:current={currentTurnIndex - 1 === i * 2}
-            on:click={updateTurn(() => gotoMove(i * 2 + 1))}>{moveRed}</span
-          >
-          <span
-            class="move-black"
-            class:current={currentTurnIndex - 1 === i * 2 + 1}
-            on:click={updateTurn(() => gotoMove((i + 1) * 2))}>{moveBlack}</span
-          >
+    <Accordion>
+      <AccordionItem open={true}>
+        <h5 slot="title">Game Details</h5>
+        <GameDetails {gameInfo} />
+      </AccordionItem>
+      <AccordionItem open={true}>
+        <h5 slot="title">Moves</h5>
+        <div class="moves-container" bind:this={movesContainer}>
+          {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
+            <div class="panel-block move">
+              <span class="move-num">{moveNum}.</span>
+              <span
+                class="move-red"
+                class:current={currentTurnIndex - 1 === i * 2}
+                on:click={updateTurn(() => gotoMove(i * 2 + 1))}>{moveRed}</span
+              >
+              <span
+                class="move-black"
+                class:current={currentTurnIndex - 1 === i * 2 + 1}
+                on:click={updateTurn(() => gotoMove((i + 1) * 2))}
+                >{moveBlack}</span
+              >
+            </div>
+          {/each}
+          <div class="panel-block move-end-padding" />
         </div>
-      {/each}
-      <div class="panel-block move-end-padding" />
-    </div>
+      </AccordionItem>
+    </Accordion>
   {/if}
   <div class="panel-block move-buttons">
     <button class="button" on:click={flipBoard}>
@@ -176,11 +172,8 @@
 
 <style lang="scss">
   .game-info-panel {
-    margin-right: 50px;
-
-    .game-info-section {
-      min-height: 120px;
-    }
+    height: 750px;
+    max-height: 750px;
 
     .moves-container {
       min-height: 560px;
