@@ -1,15 +1,28 @@
 <script lang="ts">
+  import {
+    Loading,
+    StructuredList,
+    StructuredListCell,
+    StructuredListBody,
+    StructuredListRow,
+  } from 'carbon-components-svelte';
+
   // Props
   export let currentTurnIndex: number;
-  export let gotoTurn: (turnIndex: number) => () => void;
   export let maxTurnIndex: number;
   export let moves: string[];
+  export let gotoTurn: (turnIndex: number) => () => void;
+
+  // Initialization
+  const preparedMoves = prepareMoveNotation(moves);
+  const moveRefs = [] as HTMLSpanElement[];
 
   // API
   export function scrollIntoView(turnIndex: number) {
-    const clampedIndex = Math.max(0, Math.min(turnIndex, maxTurnIndex - 1));
-    const moveIndex = Math.floor((clampedIndex + 1) / 2);
-    movesList.children?.[moveIndex].scrollIntoView({ block: 'center' });
+    const clampedTurnIndex = Math.max(0, Math.min(turnIndex, maxTurnIndex - 1));
+    const moveIndex = Math.floor((clampedTurnIndex + 1) / 2);
+    const clampedMoveIndex = Math.min(moveIndex, moveRefs.length - 1);
+    moveRefs[clampedMoveIndex].scrollIntoView({ block: 'center' });
   }
 
   // Locals
@@ -30,28 +43,39 @@
 </script>
 
 <div class="move-list" bind:this={movesList}>
-  {#each prepareMoveNotation(moves) as { moveNum, moveRed, moveBlack }, i}
-    <div class="panel-block move">
-      <span class="move-num">{moveNum}.</span>
-      <span
-        class="move-red"
-        class:current={currentTurnIndex - 1 === i * 2}
-        on:click={gotoTurn(i * 2 + 1)}>{moveRed}</span
-      >
-      <span
-        class="move-black"
-        class:current={currentTurnIndex - 1 === i * 2 + 1}
-        on:click={gotoTurn((i + 1) * 2)}>{moveBlack}</span
-      >
-    </div>
-  {/each}
-  <div class="panel-block move-end-padding" />
+  {#if moves}
+    <StructuredList>
+      <StructuredListBody>
+        {#each preparedMoves as { moveNum, moveRed, moveBlack }, i}
+          <StructuredListRow>
+            <StructuredListCell>
+              <span class="move-num">{moveNum}.</span>
+              <span
+                bind:this={moveRefs[i]}
+                class="move-red"
+                class:current={currentTurnIndex - 1 === i * 2}
+                on:click={gotoTurn(i * 2 + 1)}>{moveRed}</span
+              >
+              <span
+                class="move-black"
+                class:current={currentTurnIndex - 1 === i * 2 + 1}
+                on:click={gotoTurn((i + 1) * 2)}>{moveBlack}</span
+              >
+            </StructuredListCell>
+          </StructuredListRow>
+        {/each}
+      </StructuredListBody>
+    </StructuredList>
+  {:else}
+    <Loading />
+  {/if}
 </div>
 
 <style lang="scss">
   .move-list {
-    min-height: 525px;
-    height: 525px;
+    min-height: 620px;
+    height: 620px;
+
     overflow-y: scroll;
 
     span.move-num {
@@ -63,9 +87,10 @@
 
     span.move-red,
     span.move-black {
+      padding-right: 8px;
       width: 60px;
 
-      font-family: 'Courier Prime', monospace;
+      font-family: 'IBM Plex Mono', monospace;
       text-align: center;
 
       &:hover {

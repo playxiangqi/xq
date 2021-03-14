@@ -67,7 +67,6 @@
 
   function skipToBeginning() {
     currentTurnIndex = 0;
-    playSound();
     // TODO: reset turn to red, because grabbing pieces while using the
     //       move replay puts things out of sync
   }
@@ -88,7 +87,6 @@
 
   function skipToEnd() {
     currentTurnIndex = maxTurnIndex;
-    playSound();
   }
 
   function gotoTurn(turnIndex: number) {
