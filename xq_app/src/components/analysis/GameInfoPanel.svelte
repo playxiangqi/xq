@@ -5,7 +5,7 @@
   import {
     BLACK,
     Dimensions,
-    Moves,
+    MoveList,
     createBoardState,
     newPoint,
   } from '@xq/core/board';
@@ -13,6 +13,7 @@
   import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
+  // Props
   export let currentTurnIndex = 0;
   export let gameID: number | string;
   export let dimensions: Dimensions;
@@ -33,7 +34,7 @@
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
 
-  let moves: Moves;
+  let moveList: MoveList;
 
   // Utils
   function prepareBoardState() {
@@ -44,6 +45,7 @@
     return { state, prev_point };
   }
 
+  // Event Handlers
   function updateTurn(eventHandler: () => void) {
     let timer: number;
 
@@ -55,7 +57,7 @@
       transitionBoardState(currentTurnIndex);
 
       // Update UI
-      moves.scrollIntoView(currentTurnIndex);
+      moveList.scrollIntoView(currentTurnIndex);
 
       // Debounce engine analysis
       clearTimeout(timer);
@@ -63,7 +65,6 @@
     };
   }
 
-  // Event Handlers
   function skipToBeginning() {
     currentTurnIndex = 0;
     playSound();
@@ -109,8 +110,8 @@
         </AccordionItem>
         <AccordionItem open={true}>
           <h5 slot="title">Moves</h5>
-          <Moves
-            bind:this={moves}
+          <MoveList
+            bind:this={moveList}
             {currentTurnIndex}
             {maxTurnIndex}
             moves={gameInfo.moves}

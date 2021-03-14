@@ -9,11 +9,11 @@
   export function scrollIntoView(turnIndex: number) {
     const clampedIndex = Math.max(0, Math.min(turnIndex, maxTurnIndex - 1));
     const moveIndex = Math.floor((clampedIndex + 1) / 2);
-    movesContainer.children?.[moveIndex].scrollIntoView({ block: 'center' });
+    movesList.children?.[moveIndex].scrollIntoView({ block: 'center' });
   }
 
   // Locals
-  let movesContainer: HTMLDivElement;
+  let movesList: HTMLDivElement;
 
   // Utils
   function prepareMoveNotation(moves: string[]) {
@@ -29,7 +29,7 @@
   }
 </script>
 
-<div class="moves" bind:this={movesContainer}>
+<div class="move-list" bind:this={movesList}>
   {#each prepareMoveNotation(moves) as { moveNum, moveRed, moveBlack }, i}
     <div class="panel-block move">
       <span class="move-num">{moveNum}.</span>
@@ -49,7 +49,7 @@
 </div>
 
 <style lang="scss">
-  .moves {
+  .move-list {
     min-height: 525px;
     height: 525px;
     overflow-y: scroll;
