@@ -4,8 +4,9 @@
   import { operationStore, query } from '@urql/svelte';
   import {
     BLACK,
-    createBoardState,
     Dimensions,
+    Moves,
+    createBoardState,
     newPoint,
   } from '@xq/core/board';
   import GameDetails from '@xq/core/game/GameDetails.svelte';
@@ -16,7 +17,7 @@
   export let gameID: number | string;
   export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
-  export let pushAnalysis = (payload: PhoenixPayload) => {};
+  export let pushAnalysis: (payload: PhoenixPayload) => void;
 
   const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
@@ -32,28 +33,9 @@
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
 
-  let movesContainer: HTMLDivElement;
+  let moves: Moves;
 
   // Utils
-  function prepareMoveNotation(moves: string[]) {
-    let turnNum = 0;
-    let moveStrs = [];
-    for (let i = 0; i < moves.length; i += 2) {
-      moveStrs.push({
-        moveNum: ++turnNum,
-        moveRed: moves[i],
-        moveBlack: moves[i + 1] ?? '',
-      });
-    }
-    return moveStrs;
-  }
-
-  function scrollIntoView(turnIndex: number) {
-    const clampedIndex = Math.max(0, Math.min(turnIndex, maxTurnIndex - 1));
-    const moveIndex = Math.floor((clampedIndex + 1) / 2);
-    movesContainer.children?.[moveIndex].scrollIntoView({ block: 'center' });
-  }
-
   function prepareBoardState() {
     const { facing, activeLayout: al, activeTransition: at } = $store;
     const invertPoint = newPoint(dimensions, facing === BLACK);
@@ -66,9 +48,14 @@
     let timer: number;
 
     return () => {
+      // Run turn-based handler
       eventHandler();
+
+      // Update board state
       transitionBoardState(currentTurnIndex);
-      scrollIntoView(currentTurnIndex);
+
+      // Update UI
+      moves.scrollIntoView(currentTurnIndex);
 
       // Debounce engine analysis
       clearTimeout(timer);
@@ -103,8 +90,10 @@
     playSound();
   }
 
-  function gotoMove(turnIndex: number) {
-    currentTurnIndex = turnIndex;
+  function gotoTurn(turnIndex: number) {
+    return updateTurn(() => {
+      currentTurnIndex = turnIndex;
+    });
   }
 </script>
 
@@ -120,26 +109,13 @@
         </AccordionItem>
         <AccordionItem open={true}>
           <h5 slot="title">Moves</h5>
-          <div class="moves-container" bind:this={movesContainer}>
-            {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
-              <div class="panel-block move">
-                <span class="move-num">{moveNum}.</span>
-                <span
-                  class="move-red"
-                  class:current={currentTurnIndex - 1 === i * 2}
-                  on:click={updateTurn(() => gotoMove(i * 2 + 1))}
-                  >{moveRed}</span
-                >
-                <span
-                  class="move-black"
-                  class:current={currentTurnIndex - 1 === i * 2 + 1}
-                  on:click={updateTurn(() => gotoMove((i + 1) * 2))}
-                  >{moveBlack}</span
-                >
-              </div>
-            {/each}
-            <div class="panel-block move-end-padding" />
-          </div>
+          <Moves
+            bind:this={moves}
+            {currentTurnIndex}
+            {maxTurnIndex}
+            moves={gameInfo.moves}
+            {gotoTurn}
+          />
         </AccordionItem>
       </Accordion>
     {/if}
@@ -180,35 +156,6 @@
 
     .game-details-container {
       max-height: 600px;
-    }
-
-    .moves-container {
-      min-height: 525px;
-      height: 525px;
-      overflow-y: scroll;
-
-      span.move-num {
-        width: 40px;
-
-        margin-right: 10px;
-        text-align: right;
-      }
-
-      span.move-red,
-      span.move-black {
-        width: 60px;
-
-        font-family: 'Courier Prime', monospace;
-        text-align: center;
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
-
-      span.current {
-        background-color: #ededed;
-      }
     }
 
     .move-buttons {
