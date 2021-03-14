@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { Accordion, AccordionItem, Tile } from 'carbon-components-svelte';
+  import { Accordion, AccordionItem } from 'carbon-components-svelte';
   import { operationStore, query } from '@urql/svelte';
   import {
     BLACK,
@@ -109,38 +109,41 @@
 </script>
 
 <div class="game-info-panel">
-  {#if $resp.fetching}
-    <Accordion skeleton count={2} />
-  {:else}
-    <Accordion>
-      <AccordionItem open={true}>
-        <h5 slot="title">Game Details</h5>
-        <GameDetails {gameInfo} />
-      </AccordionItem>
-      <AccordionItem open={true}>
-        <h5 slot="title">Moves</h5>
-        <div class="moves-container" bind:this={movesContainer}>
-          {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
-            <div class="panel-block move">
-              <span class="move-num">{moveNum}.</span>
-              <span
-                class="move-red"
-                class:current={currentTurnIndex - 1 === i * 2}
-                on:click={updateTurn(() => gotoMove(i * 2 + 1))}>{moveRed}</span
-              >
-              <span
-                class="move-black"
-                class:current={currentTurnIndex - 1 === i * 2 + 1}
-                on:click={updateTurn(() => gotoMove((i + 1) * 2))}
-                >{moveBlack}</span
-              >
-            </div>
-          {/each}
-          <div class="panel-block move-end-padding" />
-        </div>
-      </AccordionItem>
-    </Accordion>
-  {/if}
+  <div class="game-details-container">
+    {#if $resp.fetching}
+      <Accordion skeleton count={2} />
+    {:else}
+      <Accordion>
+        <AccordionItem open={true}>
+          <h5 slot="title">Game Details</h5>
+          <GameDetails {gameInfo} />
+        </AccordionItem>
+        <AccordionItem open={true}>
+          <h5 slot="title">Moves</h5>
+          <div class="moves-container" bind:this={movesContainer}>
+            {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
+              <div class="panel-block move">
+                <span class="move-num">{moveNum}.</span>
+                <span
+                  class="move-red"
+                  class:current={currentTurnIndex - 1 === i * 2}
+                  on:click={updateTurn(() => gotoMove(i * 2 + 1))}
+                  >{moveRed}</span
+                >
+                <span
+                  class="move-black"
+                  class:current={currentTurnIndex - 1 === i * 2 + 1}
+                  on:click={updateTurn(() => gotoMove((i + 1) * 2))}
+                  >{moveBlack}</span
+                >
+              </div>
+            {/each}
+            <div class="panel-block move-end-padding" />
+          </div>
+        </AccordionItem>
+      </Accordion>
+    {/if}
+  </div>
   <div class="panel-block move-buttons">
     <button class="button" on:click={flipBoard}>
       <span class="icon">
@@ -172,12 +175,16 @@
 
 <style lang="scss">
   .game-info-panel {
-    height: 750px;
-    max-height: 750px;
+    position: relative;
+    height: 100%;
+
+    .game-details-container {
+      max-height: 600px;
+    }
 
     .moves-container {
-      min-height: 560px;
-      height: 560px;
+      min-height: 525px;
+      height: 525px;
       overflow-y: scroll;
 
       span.move-num {
@@ -205,6 +212,9 @@
     }
 
     .move-buttons {
+      position: absolute;
+      bottom: 0px;
+
       .button:disabled {
         cursor: default;
       }

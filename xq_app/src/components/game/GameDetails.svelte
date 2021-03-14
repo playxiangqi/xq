@@ -42,20 +42,6 @@
   {/each}
 </div>
 
-<!-- <div class="game-info-section px-4 py-3">
-      <div class="players">
-        {gameInfo.redPlayer} vs. {gameInfo.blackPlayer} — {gameInfo.result}
-      </div>
-      <div class="venue">
-        {gameInfo.event}
-      </div>
-      <div class="date">
-        {new Date(gameInfo.date).toDateString()}
-      </div>
-      <div class="opening-name">
-        {gameInfo.openingCode}: {gameInfo.openingName}
-      </div>
-    </div> -->
 <style lang="scss">
   .detail-key {
     font-weight: bold;
