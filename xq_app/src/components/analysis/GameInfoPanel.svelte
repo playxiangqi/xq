@@ -20,17 +20,17 @@
   export let boardState: ReturnType<typeof createBoardState>;
   export let pushAnalysis: (payload: PhoenixPayload) => void;
 
+  // Initialization
   const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
-  opStore.subscribe((store) => {
-    if (!store.fetching && !store.stale) {
-      loadBoardState(store.data?.game?.boards);
-    }
-  });
 
+  // Reactive
+  $: if (!$opStore.fetching && !$opStore.stale) {
+    loadBoardState($opStore.data?.game?.boards);
+  }
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
 
