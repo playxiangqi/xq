@@ -66,7 +66,7 @@
     margin-top: 10px;
 
     display: grid;
-    grid-template-columns: 1fr 1.4fr 1fr;
+    grid-template-columns: 1fr 1.5fr 1fr;
 
     .col-2 {
       display: flex;

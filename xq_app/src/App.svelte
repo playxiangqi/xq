@@ -88,4 +88,9 @@
       height: 100%;
     }
   }
+
+  // Carbon overrides - move to separate file if accumulates
+  .bx--accordion__content {
+    padding: 0.5rem 2rem 0.5rem 1rem;
+  }
 </style>

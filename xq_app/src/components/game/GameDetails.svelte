@@ -48,6 +48,6 @@
 
 <style lang="scss">
   .detail-key {
-    font-weight: bold;
+    font-weight: 600;
   }
 </style>

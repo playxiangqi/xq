@@ -6,6 +6,8 @@
     StructuredListBody,
     StructuredListRow,
   } from 'carbon-components-svelte';
+  import MoveCell from './MoveCell.svelte';
+  import type { Move } from './MoveCell.svelte';
 
   // Props
   export let currentTurnIndex: number;
@@ -14,7 +16,7 @@
   export let gotoTurn: (turnIndex: number) => () => void;
 
   // Initialization
-  const preparedMoves = prepareMoveNotation(moves);
+  const preparedMoves = prepareMoves(moves);
   const moveRefs = [] as HTMLSpanElement[];
 
   // API
@@ -29,13 +31,13 @@
   let movesList: HTMLDivElement;
 
   // Utils
-  function prepareMoveNotation(moves: string[]) {
+  function prepareMoves(moves: string[]): Move[] {
     let moveStrs = [];
     for (let i = 0; i < moves.length; i += 2) {
       moveStrs.push({
-        moveNum: i / 2 + 1,
-        moveRed: moves[i],
-        moveBlack: moves[i + 1] ?? '',
+        num: i / 2 + 1,
+        red: moves[i],
+        black: moves[i + 1] ?? '',
       });
     }
     return moveStrs;
@@ -46,21 +48,17 @@
   {#if moves}
     <StructuredList>
       <StructuredListBody>
-        {#each preparedMoves as { moveNum, moveRed, moveBlack }, i}
+        {#each preparedMoves as move, i}
           <StructuredListRow>
-            <StructuredListCell>
-              <span class="move-num">{moveNum}.</span>
-              <span
-                bind:this={moveRefs[i]}
-                class="move-red"
-                class:current={currentTurnIndex - 1 === i * 2}
-                on:click={gotoTurn(i * 2 + 1)}>{moveRed}</span
-              >
-              <span
-                class="move-black"
-                class:current={currentTurnIndex - 1 === i * 2 + 1}
-                on:click={gotoTurn((i + 1) * 2)}>{moveBlack}</span
-              >
+            <StructuredListCell class="move-list-cell">
+              <MoveCell
+                bind:moveRef={moveRefs[i]}
+                {move}
+                isRedCurrent={currentTurnIndex - 1 === i * 2}
+                isBlackCurrent={currentTurnIndex - 1 === i * 2 + 1}
+                onRedClick={gotoTurn(i * 2 + 1)}
+                onBlackClick={gotoTurn((i + 1) * 2)}
+              />
             </StructuredListCell>
           </StructuredListRow>
         {/each}
@@ -73,33 +71,13 @@
 
 <style lang="scss">
   .move-list {
-    min-height: 620px;
-    height: 620px;
+    min-height: 560px;
+    height: 560px;
 
     overflow-y: scroll;
 
-    span.move-num {
-      width: 40px;
-
-      margin-right: 10px;
-      text-align: right;
-    }
-
-    span.move-red,
-    span.move-black {
-      padding-right: 8px;
-      width: 60px;
-
-      font-family: 'IBM Plex Mono', monospace;
-      text-align: center;
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
-
-    span.current {
-      background-color: #ededed;
+    :global(div.move-list-cell) {
+      padding: 0.5rem;
     }
   }
 </style>

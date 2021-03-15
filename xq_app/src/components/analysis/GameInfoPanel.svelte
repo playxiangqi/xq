@@ -5,11 +5,10 @@
   import {
     BLACK,
     Dimensions,
-    MoveList,
     createBoardState,
     newPoint,
   } from '@xq/core/board';
-  import { GameDetails } from '@xq/core/game';
+  import { GameDetails, MoveList } from '@xq/core/game';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
