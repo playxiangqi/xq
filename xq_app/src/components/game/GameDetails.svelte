@@ -12,18 +12,26 @@
     openingCode,
     openingName,
     event,
+    date,
   } = gameInfo;
 
   const details: { className: string; key: string; value: string }[] = [
     {
       className: 'players',
       key: 'Result',
-      value: `${formatResult(result)} — ${redPlayer} — ${blackPlayer}`,
+      value: `${formatResult(
+        result,
+      )} — ${redPlayer} — ${blackPlayer} — ${result}`,
     },
     {
       className: 'opening',
       key: 'Opening',
       value: `${openingCode}: ${openingName}`,
+    },
+    {
+      className: 'date',
+      key: 'Date',
+      value: `${date.split('T')[0]}`,
     },
   ];
 
