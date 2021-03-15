@@ -33,7 +33,7 @@
 
   // Utils
   function prepareMoves(moves: string[]): Move[] {
-    return Enum.range(0, moves.length, 2).map((i) => ({
+    return Enum.range(0, moves.length - 1, 2).map((i) => ({
       num: i / 2 + 1,
       red: moves[i],
       black: moves[i + 1] ?? '',

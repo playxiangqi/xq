@@ -8,7 +8,7 @@
 
 <script lang="ts">
   export let move: Move;
-  export let moveRef: HTMLElement;
+  export let moveRef: HTMLElement | null = null;
   export let isRedCurrent: boolean;
   export let isBlackCurrent: boolean;
   export let onRedClick: () => void;
