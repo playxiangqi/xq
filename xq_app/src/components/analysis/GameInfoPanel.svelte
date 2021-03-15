@@ -1,57 +1,41 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import { Accordion, AccordionItem } from 'carbon-components-svelte';
   import { operationStore, query } from '@urql/svelte';
   import {
     BLACK,
-    createBoardState,
     Dimensions,
+    createBoardState,
     newPoint,
   } from '@xq/core/board';
+  import { GameDetails, MoveList } from '@xq/core/game';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
 
+  // Props
   export let currentTurnIndex = 0;
   export let gameID: number | string;
   export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
-  export let pushAnalysis = (payload: PhoenixPayload) => {};
+  export let pushAnalysis: (payload: PhoenixPayload) => void;
 
+  // Initialization
   const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
-  opStore.subscribe((store) => {
-    if (!store.fetching && !store.stale) {
-      loadBoardState(store.data?.game?.boards);
-    }
-  });
 
+  // Reactive
+  $: if (!$opStore.fetching && !$opStore.stale) {
+    loadBoardState($opStore.data?.game?.boards);
+  }
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
 
-  let movesContainer: HTMLDivElement;
+  let moveList: MoveList;
 
   // Utils
-  function prepareMoveNotation(moves: string[]) {
-    let turnNum = 0;
-    let moveStrs = [];
-    for (let i = 0; i < moves.length; i += 2) {
-      moveStrs.push({
-        moveNum: ++turnNum,
-        moveRed: moves[i],
-        moveBlack: moves[i + 1] ?? '',
-      });
-    }
-    return moveStrs;
-  }
-
-  function scrollIntoView(turnIndex: number) {
-    const clampedIndex = Math.max(0, Math.min(turnIndex, maxTurnIndex - 1));
-    const moveIndex = Math.floor((clampedIndex + 1) / 2);
-    movesContainer.children?.[moveIndex].scrollIntoView({ block: 'center' });
-  }
-
   function prepareBoardState() {
     const { facing, activeLayout: al, activeTransition: at } = $store;
     const invertPoint = newPoint(dimensions, facing === BLACK);
@@ -60,13 +44,19 @@
     return { state, prev_point };
   }
 
+  // Event Handlers
   function updateTurn(eventHandler: () => void) {
     let timer: number;
 
     return () => {
+      // Run turn-based handler
       eventHandler();
+
+      // Update board state
       transitionBoardState(currentTurnIndex);
-      scrollIntoView(currentTurnIndex);
+
+      // Update UI
+      moveList.scrollIntoView(currentTurnIndex);
 
       // Debounce engine analysis
       clearTimeout(timer);
@@ -74,10 +64,8 @@
     };
   }
 
-  // Event Handlers
   function skipToBeginning() {
     currentTurnIndex = 0;
-    playSound();
     // TODO: reset turn to red, because grabbing pieces while using the
     //       move replay puts things out of sync
   }
@@ -98,53 +86,38 @@
 
   function skipToEnd() {
     currentTurnIndex = maxTurnIndex;
-    playSound();
   }
 
-  function gotoMove(turnIndex: number) {
-    currentTurnIndex = turnIndex;
+  function gotoTurn(turnIndex: number) {
+    return updateTurn(() => {
+      currentTurnIndex = turnIndex;
+    });
   }
 </script>
 
-<div class="panel game-info-panel">
-  <p class="panel-heading">Details</p>
-  {#if $resp.fetching}
-    <div class="game-info-section loading p-5">Loading Game...</div>
-    <div class="moves-container loading" />
-  {:else}
-    <div class="game-info-section px-4 py-3">
-      <div class="players">
-        {gameInfo.redPlayer} vs. {gameInfo.blackPlayer} — {gameInfo.result}
-      </div>
-      <div class="venue">
-        {gameInfo.event}
-      </div>
-      <div class="date">
-        {new Date(gameInfo.date).toDateString()}
-      </div>
-      <div class="opening-name">
-        {gameInfo.openingCode}: {gameInfo.openingName}
-      </div>
-    </div>
-    <div class="moves-container" bind:this={movesContainer}>
-      {#each prepareMoveNotation(gameInfo.moves) as { moveNum, moveRed, moveBlack }, i}
-        <div class="panel-block move">
-          <span class="move-num">{moveNum}.</span>
-          <span
-            class="move-red"
-            class:current={currentTurnIndex - 1 === i * 2}
-            on:click={updateTurn(() => gotoMove(i * 2 + 1))}>{moveRed}</span
-          >
-          <span
-            class="move-black"
-            class:current={currentTurnIndex - 1 === i * 2 + 1}
-            on:click={updateTurn(() => gotoMove((i + 1) * 2))}>{moveBlack}</span
-          >
-        </div>
-      {/each}
-      <div class="panel-block move-end-padding" />
-    </div>
-  {/if}
+<div class="game-info-panel">
+  <div class="game-details-container">
+    {#if $resp.fetching}
+      <Accordion skeleton count={2} />
+    {:else}
+      <Accordion>
+        <AccordionItem open={true}>
+          <h5 slot="title">Game Details</h5>
+          <GameDetails {gameInfo} />
+        </AccordionItem>
+        <AccordionItem open={true}>
+          <h5 slot="title">Moves</h5>
+          <MoveList
+            bind:this={moveList}
+            {currentTurnIndex}
+            {maxTurnIndex}
+            moves={gameInfo.moves}
+            {gotoTurn}
+          />
+        </AccordionItem>
+      </Accordion>
+    {/if}
+  </div>
   <div class="panel-block move-buttons">
     <button class="button" on:click={flipBoard}>
       <span class="icon">
@@ -176,42 +149,17 @@
 
 <style lang="scss">
   .game-info-panel {
-    margin-right: 50px;
+    position: relative;
+    height: 100%;
 
-    .game-info-section {
-      min-height: 120px;
-    }
-
-    .moves-container {
-      min-height: 560px;
-      height: 560px;
-      overflow-y: scroll;
-
-      span.move-num {
-        width: 40px;
-
-        margin-right: 10px;
-        text-align: right;
-      }
-
-      span.move-red,
-      span.move-black {
-        width: 60px;
-
-        font-family: 'Courier Prime', monospace;
-        text-align: center;
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
-
-      span.current {
-        background-color: #ededed;
-      }
+    .game-details-container {
+      max-height: 600px;
     }
 
     .move-buttons {
+      position: absolute;
+      bottom: 0px;
+
       .button:disabled {
         cursor: default;
       }
