@@ -6,6 +6,7 @@
     StructuredListBody,
     StructuredListRow,
   } from 'carbon-components-svelte';
+  import Enum from '@xq/utils/enum';
   import MoveCell from './MoveCell.svelte';
   import type { Move } from './MoveCell.svelte';
 
@@ -32,15 +33,11 @@
 
   // Utils
   function prepareMoves(moves: string[]): Move[] {
-    let moveStrs = [];
-    for (let i = 0; i < moves.length; i += 2) {
-      moveStrs.push({
-        num: i / 2 + 1,
-        red: moves[i],
-        black: moves[i + 1] ?? '',
-      });
-    }
-    return moveStrs;
+    return Enum.range(0, moves.length, 2).map((i) => ({
+      num: i / 2 + 1,
+      red: moves[i],
+      black: moves[i + 1] ?? '',
+    }));
   }
 </script>
 
