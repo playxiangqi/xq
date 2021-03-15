@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { Accordion, AccordionItem } from 'carbon-components-svelte';
+  import { Accordion, AccordionItem, Button } from 'carbon-components-svelte';
   import { operationStore, query } from '@urql/svelte';
   import {
     BLACK,
@@ -11,6 +11,7 @@
   import { GameDetails, MoveList } from '@xq/core/game';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
+  import { SettingsAdjust16 } from 'carbon-icons-svelte';
 
   // Props
   export let currentTurnIndex = 0;
@@ -32,7 +33,40 @@
   }
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
+  $: buttons = [
+    {
+      icon: '🔃',
+      iconDescription: 'Flip Board',
+      disabled: false,
+      onClick: flipBoard,
+    },
+    {
+      icon: '⏮',
+      iconDescription: 'Skip to Beginning',
+      disabled: currentTurnIndex <= 0,
+      onClick: updateTurn(skipToBeginning),
+    },
+    {
+      icon: '◀',
+      iconDescription: 'Previous Move',
+      disabled: currentTurnIndex <= 0,
+      onClick: updateTurn(previousMove),
+    },
+    {
+      icon: '▶️',
+      iconDescription: 'Next Move',
+      disabled: currentTurnIndex >= maxTurnIndex,
+      onClick: updateTurn(nextMove),
+    },
+    {
+      icon: '⏭️',
+      iconDescription: 'Skip to End',
+      disabled: currentTurnIndex >= maxTurnIndex,
+      onClick: updateTurn(skipToEnd),
+    },
+  ];
 
+  // Locals
   let moveList: MoveList;
 
   // Utils
@@ -118,32 +152,25 @@
       </Accordion>
     {/if}
   </div>
-  <div class="panel-block move-buttons">
-    <button class="button" on:click={flipBoard}>
-      <span class="icon">
-        <i class="fas fa-repeat" />
-      </span>
-    </button>
-    <button
-      class="button"
-      on:click={updateTurn(skipToBeginning)}
-      disabled={currentTurnIndex <= 0}>{'⏮'}</button
-    >
-    <button
-      class="button"
-      on:click={updateTurn(previousMove)}
-      disabled={currentTurnIndex <= 0}>{'◀️'}</button
-    >
-    <button
-      class="button"
-      on:click={updateTurn(nextMove)}
-      disabled={currentTurnIndex >= maxTurnIndex}>{'▶️'}</button
-    >
-    <button
-      class="button"
-      on:click={updateTurn(skipToEnd)}
-      disabled={currentTurnIndex >= maxTurnIndex}>{'⏭️'}</button
-    >
+  <div class="move-buttons">
+    {#each buttons as { icon, iconDescription, onClick, disabled }}
+      <Button
+        class="move-button"
+        kind="tertiary"
+        {iconDescription}
+        tooltipPosition="top"
+        {disabled}
+        on:click={onClick}>{icon}</Button
+      >
+    {/each}
+    <Button
+      class="move-button"
+      kind="tertiary"
+      hasIconOnly
+      icon={SettingsAdjust16}
+      iconDescription="Settings"
+      tooltipPosition="top"
+    />
   </div>
 </div>
 
@@ -157,11 +184,14 @@
     }
 
     .move-buttons {
+      /* max-width: 100%; */
+
       position: absolute;
       bottom: 0px;
 
-      .button:disabled {
-        cursor: default;
+      :global(.move-button.bx--btn.bx--btn--tertiary) {
+        padding-left: 20px;
+        padding-right: 20px;
       }
     }
   }
