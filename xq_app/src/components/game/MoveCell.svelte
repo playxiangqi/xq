@@ -1,4 +1,6 @@
 <script context="module" lang="ts">
+  import { userSettingsStore } from '@xq/services/UserSettings.svelte';
+
   export type Move = {
     num: number;
     red: string;
@@ -7,6 +9,8 @@
 </script>
 
 <script lang="ts">
+  import { toHanzi } from '../board';
+
   export let move: Move;
   export let moveRef: HTMLElement | null = null;
   export let isRedCurrent: boolean;
@@ -15,6 +19,17 @@
   export let onBlackClick: () => void;
 
   const { num, red, black } = move;
+
+  $: ({ gameSettings } = $userSettingsStore);
+
+  function formatMove(move: string) {
+    switch (gameSettings.pieceNotation) {
+      default:
+        return move;
+      case 'traditional':
+        return move.replace(/[AaRrCcBbKkNnPp]/g, (substr) => toHanzi[substr]);
+    }
+  }
 </script>
 
 <div class="move">
@@ -23,12 +38,12 @@
     bind:this={moveRef}
     class="move-red"
     class:current={isRedCurrent}
-    on:click={onRedClick}>{red}</span
+    on:click={onRedClick}>{formatMove(red)}</span
   >
   <span
     class="move-black"
     class:current={isBlackCurrent}
-    on:click={onBlackClick}>{black}</span
+    on:click={onBlackClick}>{formatMove(black)}</span
   >
 </div>
 

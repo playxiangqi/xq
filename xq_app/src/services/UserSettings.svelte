@@ -27,6 +27,8 @@
       gameSettings,
     }));
   };
+
+  // TODO: Implement getters
 </script>
 
 <script lang="ts">
