@@ -12,6 +12,7 @@
     AccordionItem,
     Button,
     ButtonSet,
+    Form,
     FormGroup,
     Modal,
     RadioButton,
@@ -43,11 +44,11 @@
   export let boardState: ReturnType<typeof createBoardState>;
   export let pushAnalysis: (payload: PhoenixPayload) => void;
   export let gameSettings: GameSettings;
+  export let updateGameSettings: (gameSettings: GameSettings) => void;
 
   // Initialization
   const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
-  const { moveNotation, pieceNotation } = gameSettings;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
@@ -101,6 +102,7 @@
   //       Need to figure out if it should be categorized/placed in
   //       game/analysis/board
   let settingsModalOpen = false;
+  let { moveNotation, pieceNotation } = gameSettings;
 
   // Utils
   function prepareBoardState() {
@@ -161,8 +163,9 @@
     });
   }
 
-  function saveSettings() {
+  function saveGameSettings() {
     settingsModalOpen = false;
+    updateGameSettings({ moveNotation, pieceNotation });
   }
 </script>
 
@@ -212,24 +215,29 @@
   modalHeading="Settings"
   primaryButtonText="Save"
   secondaryButtonText="Cancel"
-  on:submit={saveSettings}
+  hasForm
+  on:submit={saveGameSettings}
   on:click:button--secondary={() => (settingsModalOpen = false)}
   on:open
   on:close
+  on:submit
+  shouldSubmitOnEnter={false}
 >
   <!-- TODO: Enumerate options based on type union -->
-  <FormGroup>
-    <RadioButtonGroup legendText="Move Notation" selected={moveNotation}>
-      <RadioButton labelText="AXF" value="axf" />
-    </RadioButtonGroup>
-  </FormGroup>
-  <FormGroup>
-    <RadioButtonGroup legendText="Piece Notation" selected={pieceNotation}>
-      <RadioButton labelText="Alphabetic" value="alphabetic" />
-      <RadioButton labelText="Figurine" value="figurine" />
-      <RadioButton labelText="Traditional" value="traditional" />
-    </RadioButtonGroup>
-  </FormGroup>
+  <Form>
+    <FormGroup legendText="Move Notation">
+      <RadioButtonGroup bind:selected={moveNotation}>
+        <RadioButton labelText="AXF" value="axf" />
+      </RadioButtonGroup>
+    </FormGroup>
+    <FormGroup legendText="Piece Notation">
+      <RadioButtonGroup bind:selected={pieceNotation}>
+        <RadioButton labelText="Alphabetic" value="alphabetic" />
+        <RadioButton labelText="Figurine" value="figurine" />
+        <RadioButton labelText="Traditional" value="traditional" />
+      </RadioButtonGroup>
+    </FormGroup>
+  </Form>
 </Modal>
 
 <style lang="scss">

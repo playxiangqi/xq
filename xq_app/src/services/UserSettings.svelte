@@ -21,6 +21,12 @@
   };
 
   export const userSettingsStore = writable(DEFAULT_SETTINGS);
+  export const updateGameSettings = function (gameSettings: GameSettings) {
+    userSettingsStore.update((state) => ({
+      ...state,
+      gameSettings,
+    }));
+  };
 </script>
 
 <script lang="ts">
