@@ -7,6 +7,7 @@
     HeaderNavMenu,
     SkipToContent,
   } from 'carbon-components-svelte';
+  import { UserSettings, userSettingsStore } from '@xq/services/user';
 
   // GraphQL Client
   import { initClient, dedupExchange, fetchExchange } from '@urql/svelte';
@@ -20,19 +21,21 @@
   import { Router } from '@roxi/routify';
   import { routes } from '../.routify/routes';
 
-  let theme = 'white';
-  let isSideNavOpen = false;
-
+  // Reactive
+  $: ({
+    uiSettings: { theme },
+    gameSettings,
+  } = $userSettingsStore);
   $: document.documentElement.setAttribute('theme', theme);
 </script>
 
+<UserSettings />
 <div class="app">
   <div class="nav-container" role="navigation" aria-label="main navigation">
     <Header
       platformName="Play XiangQi"
       uiShellAriaLabel="main navigation header"
       href="https://github.com/playxiangqi"
-      bind:isSideNavOpen
     >
       <div slot="skip-to-content">
         <SkipToContent />

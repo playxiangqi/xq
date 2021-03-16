@@ -1,6 +1,23 @@
+<script context="module" lang="ts">
+  export type GameSettings = {
+    moveNotation: 'axf';
+    pieceNotation: 'alphabetic' | 'figurine' | 'traditional';
+  };
+</script>
+
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { Accordion, AccordionItem } from 'carbon-components-svelte';
+  import {
+    Accordion,
+    AccordionItem,
+    Button,
+    ButtonSet,
+    Form,
+    FormGroup,
+    Modal,
+    RadioButton,
+    RadioButtonGroup,
+  } from 'carbon-components-svelte';
   import { operationStore, query } from '@urql/svelte';
   import {
     BLACK,
@@ -11,6 +28,14 @@
   import { GameDetails, MoveList } from '@xq/core/game';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
+  import {
+    Rotate16,
+    SettingsAdjust16,
+    SkipBack16,
+    SkipBackFilled16,
+    SkipForward16,
+    SkipForwardFilled16,
+  } from 'carbon-icons-svelte';
 
   // Props
   export let currentTurnIndex = 0;
@@ -18,6 +43,8 @@
   export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
   export let pushAnalysis: (payload: PhoenixPayload) => void;
+  export let gameSettings: GameSettings;
+  export let updateGameSettings: (gameSettings: GameSettings) => void;
 
   // Initialization
   const { playSound } = getContext('audio');
@@ -32,8 +59,50 @@
   }
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
+  $: buttons = [
+    {
+      icon: Rotate16,
+      iconDescription: 'Flip Board',
+      onClick: flipBoard,
+    },
+    {
+      icon: SkipBack16,
+      iconDescription: 'Skip to Beginning',
+      disabled: currentTurnIndex <= 0,
+      onClick: updateTurn(skipToBeginning),
+    },
+    {
+      icon: SkipBackFilled16,
+      iconDescription: 'Previous Move',
+      disabled: currentTurnIndex <= 0,
+      onClick: updateTurn(previousMove),
+    },
+    {
+      icon: SkipForwardFilled16,
+      iconDescription: 'Next Move',
+      disabled: currentTurnIndex >= maxTurnIndex,
+      onClick: updateTurn(nextMove),
+    },
+    {
+      icon: SkipForward16,
+      iconDescription: 'Skip to End',
+      disabled: currentTurnIndex >= maxTurnIndex,
+      onClick: updateTurn(skipToEnd),
+    },
+    {
+      icon: SettingsAdjust16,
+      iconDescription: 'Settings',
+      onClick: () => (settingsModalOpen = true),
+    },
+  ];
 
+  // Locals
   let moveList: MoveList;
+  // TODO: Move board controls and modal to a separate component(s)
+  //       Need to figure out if it should be categorized/placed in
+  //       game/analysis/board
+  let settingsModalOpen = false;
+  let { moveNotation, pieceNotation } = gameSettings;
 
   // Utils
   function prepareBoardState() {
@@ -93,6 +162,11 @@
       currentTurnIndex = turnIndex;
     });
   }
+
+  function saveGameSettings() {
+    settingsModalOpen = false;
+    updateGameSettings({ moveNotation, pieceNotation });
+  }
 </script>
 
 <div class="game-info-panel">
@@ -118,34 +192,53 @@
       </Accordion>
     {/if}
   </div>
-  <div class="panel-block move-buttons">
-    <button class="button" on:click={flipBoard}>
-      <span class="icon">
-        <i class="fas fa-repeat" />
-      </span>
-    </button>
-    <button
-      class="button"
-      on:click={updateTurn(skipToBeginning)}
-      disabled={currentTurnIndex <= 0}>{'⏮'}</button
-    >
-    <button
-      class="button"
-      on:click={updateTurn(previousMove)}
-      disabled={currentTurnIndex <= 0}>{'◀️'}</button
-    >
-    <button
-      class="button"
-      on:click={updateTurn(nextMove)}
-      disabled={currentTurnIndex >= maxTurnIndex}>{'▶️'}</button
-    >
-    <button
-      class="button"
-      on:click={updateTurn(skipToEnd)}
-      disabled={currentTurnIndex >= maxTurnIndex}>{'⏭️'}</button
-    >
+  <div class="move-buttons">
+    <ButtonSet>
+      {#each buttons as { icon, iconDescription, onClick, disabled }}
+        <Button
+          class="move-button"
+          kind="tertiary"
+          tooltipPosition="top"
+          hasIconOnly
+          {icon}
+          {iconDescription}
+          {disabled}
+          on:click={onClick}
+        />
+      {/each}
+    </ButtonSet>
   </div>
 </div>
+
+<Modal
+  bind:open={settingsModalOpen}
+  modalHeading="Settings"
+  primaryButtonText="Save"
+  secondaryButtonText="Cancel"
+  hasForm
+  on:submit={saveGameSettings}
+  on:click:button--secondary={() => (settingsModalOpen = false)}
+  on:open
+  on:close
+  on:submit
+  shouldSubmitOnEnter={false}
+>
+  <!-- TODO: Enumerate options based on type union -->
+  <Form>
+    <FormGroup legendText="Move Notation">
+      <RadioButtonGroup bind:selected={moveNotation}>
+        <RadioButton labelText="AXF" value="axf" />
+      </RadioButtonGroup>
+    </FormGroup>
+    <FormGroup legendText="Piece Notation">
+      <RadioButtonGroup bind:selected={pieceNotation}>
+        <RadioButton labelText="Alphabetic" value="alphabetic" />
+        <RadioButton labelText="Figurine" value="figurine" />
+        <RadioButton labelText="Traditional" value="traditional" />
+      </RadioButtonGroup>
+    </FormGroup>
+  </Form>
+</Modal>
 
 <style lang="scss">
   .game-info-panel {
@@ -157,11 +250,16 @@
     }
 
     .move-buttons {
+      /* max-width: 100%; */
+
       position: absolute;
       bottom: 0px;
 
-      .button:disabled {
-        cursor: default;
+      :global(.move-button.bx--btn.bx--btn--tertiary) {
+        width: 60px;
+
+        padding-left: 20px;
+        padding-right: 20px;
       }
     }
   }

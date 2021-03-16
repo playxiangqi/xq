@@ -1,4 +1,6 @@
 <script context="module" lang="ts">
+  import { userSettingsStore } from '@xq/services/user';
+
   export type Move = {
     num: number;
     red: string;
@@ -7,6 +9,9 @@
 </script>
 
 <script lang="ts">
+  import type { GameSettings } from '../analysis/GameInfoPanel.svelte';
+  import { toHanzi } from '../board';
+
   export let move: Move;
   export let moveRef: HTMLElement | null = null;
   export let isRedCurrent: boolean;
@@ -15,6 +20,19 @@
   export let onBlackClick: () => void;
 
   const { num, red, black } = move;
+
+  $: ({ gameSettings } = $userSettingsStore);
+  $: redMove = formatMove(red, gameSettings);
+  $: blackMove = formatMove(black, gameSettings);
+
+  function formatMove(move: string, gameSettings: GameSettings) {
+    switch (gameSettings?.pieceNotation) {
+      default:
+        return move;
+      case 'traditional':
+        return move.replace(/[AaRrCcBbKkNnPp]/g, (substr) => toHanzi[substr]);
+    }
+  }
 </script>
 
 <div class="move">
@@ -23,12 +41,12 @@
     bind:this={moveRef}
     class="move-red"
     class:current={isRedCurrent}
-    on:click={onRedClick}>{red}</span
+    on:click={onRedClick}>{redMove}</span
   >
   <span
     class="move-black"
     class:current={isBlackCurrent}
-    on:click={onBlackClick}>{black}</span
+    on:click={onBlackClick}>{blackMove}</span
   >
 </div>
 
@@ -36,23 +54,23 @@
   .move {
     display: flex;
 
+    text-align: right;
+
     span.move-num {
       display: inline-block;
 
       width: 40px;
 
       margin-right: 10px;
-      text-align: right;
     }
 
     span.move-red,
     span.move-black {
       width: 60px;
 
-      margin-left: auto;
-      margin-right: 16px;
+      margin-left: 3rem;
+      margin-right: 5rem;
 
-      text-align: center;
       font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono',
         'Bitstream Vera Sans Mono', 'Courier Prime', Courier, monospace;
 
