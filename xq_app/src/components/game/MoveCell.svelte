@@ -9,6 +9,7 @@
 </script>
 
 <script lang="ts">
+  import type { GameSettings } from '../analysis/GameInfoPanel.svelte';
   import { toHanzi } from '../board';
 
   export let move: Move;
@@ -21,9 +22,11 @@
   const { num, red, black } = move;
 
   $: ({ gameSettings } = $userSettingsStore);
+  $: redMove = formatMove(red, gameSettings);
+  $: blackMove = formatMove(black, gameSettings);
 
-  function formatMove(move: string) {
-    switch (gameSettings.pieceNotation) {
+  function formatMove(move: string, gameSettings: GameSettings) {
+    switch (gameSettings?.pieceNotation) {
       default:
         return move;
       case 'traditional':
@@ -38,12 +41,12 @@
     bind:this={moveRef}
     class="move-red"
     class:current={isRedCurrent}
-    on:click={onRedClick}>{formatMove(red)}</span
+    on:click={onRedClick}>{redMove}</span
   >
   <span
     class="move-black"
     class:current={isBlackCurrent}
-    on:click={onBlackClick}>{formatMove(black)}</span
+    on:click={onBlackClick}>{blackMove}</span
   >
 </div>
 
