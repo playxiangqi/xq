@@ -54,23 +54,23 @@
   .move {
     display: flex;
 
+    text-align: right;
+
     span.move-num {
       display: inline-block;
 
       width: 40px;
 
       margin-right: 10px;
-      text-align: right;
     }
 
     span.move-red,
     span.move-black {
       width: 60px;
 
-      margin-left: auto;
-      margin-right: 16px;
+      margin-left: 3rem;
+      margin-right: 5rem;
 
-      text-align: center;
       font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono',
         'Bitstream Vera Sans Mono', 'Courier Prime', Courier, monospace;
 
