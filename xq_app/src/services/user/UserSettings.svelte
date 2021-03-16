@@ -1,5 +1,7 @@
 <script context="module" lang="ts">
   import { writable } from 'svelte/store';
+  // TODO: Move to a better location to prevent circular imports
+  //       e.g. dedicated module
   import type { GameSettings } from '@xq/core/analysis/GameInfoPanel.svelte';
 
   // TODO: Define these types and import from elsewhere
@@ -21,12 +23,12 @@
   };
 
   export const userSettingsStore = writable(DEFAULT_SETTINGS);
-  export const updateGameSettings = function (gameSettings: GameSettings) {
+  export function updateGameSettings(gameSettings: GameSettings) {
     userSettingsStore.update((state) => ({
       ...state,
       gameSettings,
     }));
-  };
+  }
 
   // TODO: Implement getters
 </script>
