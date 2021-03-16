@@ -1,3 +1,10 @@
+<script context="module" lang="ts">
+  export type GameSettings = {
+    moveNotation: 'axf';
+    pieceNotation: 'alphabetic' | 'figurine' | 'traditional';
+  };
+</script>
+
 <script lang="ts">
   import { getContext } from 'svelte';
   import {
@@ -35,10 +42,12 @@
   export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
   export let pushAnalysis: (payload: PhoenixPayload) => void;
+  export let gameSettings: GameSettings;
 
   // Initialization
   const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
+  const { moveNotation, pieceNotation } = gameSettings;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
@@ -208,13 +217,14 @@
   on:open
   on:close
 >
+  <!-- TODO: Enumerate options based on type union -->
   <FormGroup>
-    <RadioButtonGroup legendText="Move Notation" selected="axf">
+    <RadioButtonGroup legendText="Move Notation" selected={moveNotation}>
       <RadioButton labelText="AXF" value="axf" />
     </RadioButtonGroup>
   </FormGroup>
   <FormGroup>
-    <RadioButtonGroup legendText="Piece Notation" selected="alphabetic">
+    <RadioButtonGroup legendText="Piece Notation" selected={pieceNotation}>
       <RadioButton labelText="Alphabetic" value="alphabetic" />
       <RadioButton labelText="Figurine" value="figurine" />
       <RadioButton labelText="Traditional" value="traditional" />
@@ -238,7 +248,7 @@
       bottom: 0px;
 
       :global(.move-button.bx--btn.bx--btn--tertiary) {
-        width: 56px;
+        width: 60px;
 
         padding-left: 20px;
         padding-right: 20px;

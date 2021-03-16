@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
   import { createBoardState, Dimensions, Board } from '@xq/core/board';
   import { createAuthStore } from '@xq/services/auth/store';
+  import { userSettingsStore } from '@xq/services/UserSettings.svelte';
 
   // TODO: Derive dimensions and scale from viewport and set globally
   const DEFAULT_SCALE = 1.0;
@@ -25,6 +26,8 @@
     audio.play();
   }
   setContext('audio', { playSound });
+
+  $: ({ gameSettings } = $userSettingsStore);
 </script>
 
 <div class="game-review">
@@ -50,6 +53,7 @@
   <div class="col-3">
     <GameInfoPanel
       bind:currentTurnIndex
+      bind:gameSettings
       {gameID}
       {dimensions}
       {boardState}
