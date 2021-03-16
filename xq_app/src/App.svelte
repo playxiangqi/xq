@@ -7,9 +7,7 @@
     HeaderNavMenu,
     SkipToContent,
   } from 'carbon-components-svelte';
-  import UserSettings, {
-    userSettingsStore,
-  } from '@xq/services/UserSettings.svelte';
+  import { UserSettings, userSettingsStore } from '@xq/services/user';
 
   // GraphQL Client
   import { initClient, dedupExchange, fetchExchange } from '@urql/svelte';

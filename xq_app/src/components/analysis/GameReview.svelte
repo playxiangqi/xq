@@ -1,10 +1,7 @@
 <script context="module" lang="ts">
   import { createBoardState, Dimensions, Board } from '@xq/core/board';
   import { createAuthStore } from '@xq/services/auth/store';
-  import {
-    userSettingsStore,
-    updateGameSettings,
-  } from '@xq/services/UserSettings.svelte';
+  import { userSettingsStore, updateGameSettings } from '@xq/services/user';
 
   // TODO: Derive dimensions and scale from viewport and set globally
   const DEFAULT_SCALE = 1.0;

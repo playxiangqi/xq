@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import { userSettingsStore } from '@xq/services/UserSettings.svelte';
+  import { userSettingsStore } from '@xq/services/user';
 
   export type Move = {
     num: number;
