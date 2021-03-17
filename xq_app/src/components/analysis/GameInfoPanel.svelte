@@ -26,7 +26,6 @@
     newPoint,
   } from '@xq/core/board';
   import { GameDetails, MoveList } from '@xq/core/game';
-  import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
   import {
     Rotate16,
@@ -42,17 +41,15 @@
   export let gameID: number | string;
   export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
-  export let pushAnalysis: (payload: PhoenixPayload) => void;
   export let gameSettings: GameSettings;
 
   // Initialization
+  const dispatch = createEventDispatcher();
   const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
-
-  const dispatch = createEventDispatcher();
 
   // Reactive
   $: if (!$opStore.fetching && !$opStore.stale) {
@@ -117,6 +114,7 @@
 
   // Event Handlers
   function updateTurn(eventHandler: () => void) {
+    const DEBOUNCE_DELAY = 500;
     let timer: number;
 
     return () => {
@@ -131,7 +129,10 @@
 
       // Debounce engine analysis
       clearTimeout(timer);
-      timer = setTimeout(() => pushAnalysis(prepareBoardState()), 500);
+      timer = setTimeout(
+        () => dispatch('update:turn', prepareBoardState()),
+        DEBOUNCE_DELAY,
+      );
     };
   }
 

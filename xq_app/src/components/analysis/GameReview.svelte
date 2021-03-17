@@ -25,11 +25,12 @@
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
   import GameInfoPanel from './GameInfoPanel.svelte';
   import type { GameSettings } from './GameInfoPanel.svelte';
+  import type { PhoenixPayload } from '@xq/utils/channel';
 
   export let gameID: number | string;
 
   let currentTurnIndex = 0;
-  let pushAnalysis = () => {};
+  let pushAnalysis = (_: PhoenixPayload) => {};
 
   let audio: HTMLAudioElement;
   function playSound() {
@@ -47,6 +48,10 @@
 
   function handleSaveGameSettings(event: CustomEvent<GameSettings>) {
     updateGameSettings(event.detail);
+  }
+
+  function handleUpdateTurn(event: CustomEvent<any>) {
+    pushAnalysis(event.detail);
   }
 </script>
 
@@ -75,11 +80,11 @@
       bind:currentTurnIndex
       on:receipt:board-states={handleReceiptBoardStates}
       on:save:game-settings={handleSaveGameSettings}
+      on:update:turn={handleUpdateTurn}
       {gameSettings}
       {gameID}
       {dimensions}
       {boardState}
-      {pushAnalysis}
     />
   </div>
 </div>
