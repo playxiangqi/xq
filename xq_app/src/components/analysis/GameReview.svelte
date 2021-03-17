@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
-  import { createBoardState, Dimensions, Board } from '@xq/core/board';
   import { createAuthStore } from '@xq/services/auth/store';
+  import { createBoardState, Dimensions, Board } from '@xq/core/board';
+  import { createGameStore } from '@xq/core/game';
   import { userSettingsStore, updateGameSettings } from '@xq/services/user';
 
   // TODO: Derive dimensions and scale from viewport and set globally
@@ -8,16 +9,19 @@
   const dimensions = new Dimensions(DEFAULT_SCALE);
   const boardState = createBoardState(dimensions);
   const { store: authStore } = createAuthStore();
+
+  const { gameStore, loadGameLayouts } = createGameStore();
+  const { boardStore } = createBoardStore(gameStore, dimensions);
 </script>
 
 <script lang="ts">
   import { setContext } from 'svelte';
+  import { createBoardStore } from '../board/store.svelte';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
   import GameInfoPanel from './GameInfoPanel.svelte';
 
   export let gameID: number | string;
 
-  let currentTurnIndex = 0;
   let pushAnalysis = () => {};
 
   let audio: HTMLAudioElement;
@@ -28,6 +32,7 @@
   setContext('audio', { playSound });
 
   $: ({ gameSettings } = $userSettingsStore);
+  $: ({ currentTurnIndex } = $gameStore);
 </script>
 
 <div class="game-review">
@@ -53,6 +58,9 @@
   <div class="col-3">
     <GameInfoPanel
       bind:currentTurnIndex
+      on:data={(e) => {
+        console.log(e);
+      }}
       {gameSettings}
       {gameID}
       {dimensions}

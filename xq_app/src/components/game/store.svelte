@@ -13,13 +13,21 @@
     layouts: [{ points: DEFAULT_POINTS }],
   };
 
-  export const gameStore = writable<GameState>(DEFAULT_GAME_STATE);
+  export function createGameStore() {
+    const gameStore = writable<GameState>(DEFAULT_GAME_STATE);
 
-  export function loadGameLayouts(layouts: Layout<Point>[]) {
-    gameStore.update((state) => ({ ...state, layouts }));
-  }
+    function loadGameLayouts(layouts: Layout<Point>[]) {
+      gameStore.update((state) => ({ ...state, layouts }));
+    }
 
-  export function transition(turnIndex: number) {
-    gameStore.update((state) => ({ ...state, currentTurnIndex: turnIndex }));
+    function transition(turnIndex: number) {
+      gameStore.update((state) => ({ ...state, currentTurnIndex: turnIndex }));
+    }
+
+    return {
+      gameStore,
+      loadGameLayouts,
+      transition,
+    };
   }
 </script>

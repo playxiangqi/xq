@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import {
     Accordion,
     AccordionItem,
@@ -53,9 +53,12 @@
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
 
+  const dispatch = createEventDispatcher();
+
   // Reactive
   $: if (!$opStore.fetching && !$opStore.stale) {
     loadBoardState($opStore.data?.game?.boards);
+    dispatch('data', { data: $opStore.data?.game?.boards });
   }
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
