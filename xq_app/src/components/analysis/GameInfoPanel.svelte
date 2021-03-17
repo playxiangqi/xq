@@ -39,7 +39,6 @@
   // Props
   export let currentTurnIndex = 0;
   export let gameID: number | string;
-  export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
   export let gameSettings: GameSettings;
 
@@ -47,6 +46,7 @@
   const dispatch = createEventDispatcher();
   const { playSound } = getContext('audio');
   const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
+  const dimensions: Dimensions = getContext('dimensions');
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);

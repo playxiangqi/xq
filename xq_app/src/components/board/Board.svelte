@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
   import { createBoardState } from './store';
 
-  export let dimensions: Dimensions;
   export let boardState: ReturnType<typeof createBoardState>;
 
-  // Dimensions
+  // Initialization
+  const { playSound } = getContext('audio');
   const {
     height,
     width,
@@ -23,7 +24,7 @@
     fileSpacing,
     pieceSize,
     pieceOuterRadius,
-  } = dimensions;
+  }: Dimensions = getContext('dimensions');
 
   const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
   $: ({ prevPoint, nextPoint } = $store.activeTransition);
@@ -97,11 +98,14 @@
           {position}
           nextPosition={nextPoint?.position}
           {grabbing}
-          {dimensions}
-          {dropPiece}
-          {focusPiece}
-          {grabPiece}
-          {movePiece}
+          on:piecedrop={(e) => {
+            if (dropPiece(e.detail.index, e.detail.side)) {
+              playSound();
+            }
+          }}
+          on:piecefocus={(e) => focusPiece(e.detail)}
+          on:piecegrab={(e) => grabPiece(e.detail)}
+          on:piecemove={(e) => movePiece(e.detail.index, e.detail.point)}
         />
       {/each}
     </g>

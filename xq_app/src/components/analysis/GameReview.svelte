@@ -38,6 +38,7 @@
     audio.play();
   }
   setContext('audio', { playSound });
+  setContext('dimensions', dimensions);
 
   $: ({ gameSettings } = $userSettingsStore);
   // $: ({ currentTurnIndex } = $gameStore);
@@ -73,7 +74,7 @@
       hidden
       loop={false}
     />
-    <Board {dimensions} {boardState} />
+    <Board {boardState} />
   </div>
   <div class="col-3">
     <GameInfoPanel
@@ -83,7 +84,6 @@
       on:update:turn={handleUpdateTurn}
       {gameSettings}
       {gameID}
-      {dimensions}
       {boardState}
     />
   </div>
