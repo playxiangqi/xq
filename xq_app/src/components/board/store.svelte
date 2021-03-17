@@ -19,6 +19,8 @@
 
   // const DEFAULT_BOARD_STATE = (dimensions: Dimensions) =>
 
+  // TODO: Maybe composition should go in reverse
+  // e.g. boardState -> gameState
   export function createBoardStore(
     gameStore: Writable<GameState>,
     dimensions: Dimensions,
@@ -28,13 +30,22 @@
       flipped: true,
     });
 
+    // TODO: can we store positions in pieceStore
+    //       and selectively determine which to update from?
+    //       e.g. if grabbing, then use position/prevPosition from pieceStore
+    //       e.g. if !grabbing, then use rank/file from gameStore!!!
+    //       note: grabbing meaning if any piece is in grabbing
+    //             so should have a simple local state to cover all cases
+    //       does grabbing even need to be on a per-piece basis? need object
+    //       w/ keys or just a single boolean? can cheat this way, no?
     const boardStore = derived<
       [Writable<GameState>, typeof pieceStore],
       BoardState
-    >([gameStore, pieceStore], ([gameState, { grabbing, flipped }]) => {
-      const { points, nextPoint, prevPoint } = gameState.layouts[
-        gameState.currentTurnIndex
+    >([gameStore, pieceStore], ([$gameStore, $pieceStore]) => {
+      const { points, nextPoint, prevPoint } = $gameStore.layouts[
+        $gameStore.currentTurnIndex
       ];
+      const { grabbing, flipped } = $pieceStore;
 
       return {
         activeLayout: {

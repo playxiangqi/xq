@@ -1,6 +1,11 @@
 <script context="module" lang="ts">
   import { createAuthStore } from '@xq/services/auth/store';
-  import { createBoardState, Dimensions, Board } from '@xq/core/board';
+  import {
+    createBoardState,
+    createBoardStore,
+    Dimensions,
+    Board,
+  } from '@xq/core/board';
   import { createGameStore } from '@xq/core/game';
   import { userSettingsStore, updateGameSettings } from '@xq/services/user';
 
@@ -16,12 +21,14 @@
 
 <script lang="ts">
   import { setContext } from 'svelte';
-  import { createBoardStore } from '../board/store.svelte';
+  import type { LayoutWithTransitions } from '@xq/core/board';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
   import GameInfoPanel from './GameInfoPanel.svelte';
+  import type { GameSettings } from './GameInfoPanel.svelte';
 
   export let gameID: number | string;
 
+  let currentTurnIndex = 0;
   let pushAnalysis = () => {};
 
   let audio: HTMLAudioElement;
@@ -32,7 +39,15 @@
   setContext('audio', { playSound });
 
   $: ({ gameSettings } = $userSettingsStore);
-  $: ({ currentTurnIndex } = $gameStore);
+  // $: ({ currentTurnIndex } = $gameStore);
+
+  function handleReceiptBoardStates(event: CustomEvent<LayoutWithTransitions>) {
+    console.log('data: ', event.detail);
+  }
+
+  function handleSaveGameSettings(event: CustomEvent<GameSettings>) {
+    updateGameSettings(event.detail);
+  }
 </script>
 
 <div class="game-review">
@@ -58,15 +73,13 @@
   <div class="col-3">
     <GameInfoPanel
       bind:currentTurnIndex
-      on:data={(e) => {
-        console.log(e);
-      }}
+      on:receipt:board-states={handleReceiptBoardStates}
+      on:save:game-settings={handleSaveGameSettings}
       {gameSettings}
       {gameID}
       {dimensions}
       {boardState}
       {pushAnalysis}
-      {updateGameSettings}
     />
   </div>
 </div>

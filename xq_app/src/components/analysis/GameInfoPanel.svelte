@@ -44,7 +44,6 @@
   export let boardState: ReturnType<typeof createBoardState>;
   export let pushAnalysis: (payload: PhoenixPayload) => void;
   export let gameSettings: GameSettings;
-  export let updateGameSettings: (gameSettings: GameSettings) => void;
 
   // Initialization
   const { playSound } = getContext('audio');
@@ -58,7 +57,7 @@
   // Reactive
   $: if (!$opStore.fetching && !$opStore.stale) {
     loadBoardState($opStore.data?.game?.boards);
-    dispatch('data', { data: $opStore.data?.game?.boards });
+    dispatch('receipt:board-states', $opStore.data?.game?.boards);
   }
   $: maxTurnIndex = $store.layouts.length - 1;
   $: gameInfo = $resp.data?.game?.info;
@@ -168,7 +167,7 @@
 
   function saveGameSettings() {
     settingsModalOpen = false;
-    updateGameSettings({ moveNotation, pieceNotation });
+    dispatch('save:game-settings', { moveNotation, pieceNotation });
   }
 </script>
 
