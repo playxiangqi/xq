@@ -68,8 +68,8 @@
     span.move-black {
       width: 60px;
 
-      margin-left: 3rem;
-      margin-right: 5rem;
+      margin-left: 4rem;
+      margin-right: 3rem;
 
       font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono',
         'Bitstream Vera Sans Mono', 'Courier Prime', Courier, monospace;
