@@ -1,84 +1,89 @@
 <script context="module" lang="ts">
-  import { derived, writable } from 'svelte/store';
-  import type { Writable } from 'svelte/store';
-  import type { GameState } from '@xq/core/game';
+  import { writable } from 'svelte/store';
+  import type { Readable } from 'svelte/store';
   import { DEFAULT_POINTS } from '@xq/utils/xq';
   import { FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
   // import type { Dimensions } from '@xq/utils/dimensions';
   import type { CartesianPoint, Layout, Point } from '@xq/utils/xq';
   import type { Dimensions } from './dimensions';
 
-  export type PieceState = {
-    grabbing: { [key: string]: boolean };
-    flipped: boolean;
-  };
+  export type EnrichedCartesianPoint = CartesianPoint & { grabbed: boolean };
 
   export type BoardState = {
-    activeLayout: Layout<CartesianPoint>;
-  } & PieceState;
+    flipped: boolean;
+    workingLayout: Layout<EnrichedCartesianPoint>;
+  };
 
-  // const DEFAULT_BOARD_STATE = (dimensions: Dimensions) =>
+  // TODO: Use immer's produce as middleware
+  //       to improve Updater function conciseness
+  export interface BoardStore extends Readable<BoardState> {
+    flipBoard: () => void;
+    focusPiece: (index: number) => void;
+    grabPiece: (index: number) => void;
+    movePiece: (index: number, position: [number, number]) => void;
+  }
 
-  // TODO: Maybe composition should go in reverse
-  // e.g. boardState -> gameState
-  export function createBoardStore(
-    gameStore: Writable<GameState>,
-    dimensions: Dimensions,
-  ) {
-    const pieceStore = writable<PieceState>({
-      grabbing: {},
-      flipped: true,
+  export function createBoardStore(dimensions: Dimensions): BoardStore {
+    const store = writable<BoardState>({
+      flipped: false,
+      workingLayout: {
+        points: DEFAULT_POINTS.map((p) => enrichPoints(p, dimensions)),
+      },
     });
-
-    // TODO: can we store positions in pieceStore
-    //       and selectively determine which to update from?
-    //       e.g. if grabbing, then use position/prevPosition from pieceStore
-    //       e.g. if !grabbing, then use rank/file from gameStore!!!
-    //       note: grabbing meaning if any piece is in grabbing
-    //             so should have a simple local state to cover all cases
-    //       does grabbing even need to be on a per-piece basis? need object
-    //       w/ keys or just a single boolean? can cheat this way, no?
-    const boardStore = derived<
-      [Writable<GameState>, typeof pieceStore],
-      BoardState
-    >([gameStore, pieceStore], ([$gameStore, $pieceStore]) => {
-      const { points, nextPoint, prevPoint } = $gameStore.layouts[
-        $gameStore.currentTurnIndex
-      ];
-      const { grabbing, flipped } = $pieceStore;
-
-      return {
-        activeLayout: {
-          points: points.map((p) => pointToCartesian(p, dimensions, flipped)),
-          nextPoint: nextPoint ? invert(nextPoint, flipped) : nextPoint,
-          prevPoint: prevPoint ? invert(prevPoint, flipped) : nextPoint,
-        },
-        grabbing,
-        flipped,
-      };
-    });
+    const { subscribe } = store;
 
     function flipBoard() {
-      pieceStore.update((state) => ({ ...state, flipped: !state.flipped }));
+      store.update((state) => ({ ...state, flipped: !state.flipped }));
+    }
+
+    function focusPiece(index: number) {
+      store.update(({ workingLayout: { points, ...rest }, ...state }) => {
+        const lastIndex = points.length - 1;
+        [points[index], points[lastIndex]] = [points[lastIndex], points[index]];
+        return {
+          ...state,
+          workingLayout: {
+            ...rest,
+            points,
+          },
+        };
+      });
+    }
+
+    function grabPiece(index: number) {
+      store.update((state) => {
+        state.workingLayout.points[index].grabbed = true;
+        return state;
+      });
+    }
+
+    function movePiece(index: number, position: [number, number]) {
+      store.update((state) => {
+        state.workingLayout.points[index].position = position;
+        return state;
+      });
     }
 
     return {
-      boardStore,
+      subscribe,
       flipBoard,
+      focusPiece,
+      grabPiece,
+      movePiece,
     };
   }
 
-  // TODO: Move to utils
-  function pointToCartesian(
+  function enrichPoints(
     point: Point,
     dimensions: Dimensions,
     shouldInvert = false,
-  ): CartesianPoint {
+  ): EnrichedCartesianPoint {
     const newPoint = invert(point, shouldInvert);
     return {
       ...newPoint,
       position: dimensions.coordsToPoint(newPoint.rank, newPoint.file),
-    } as CartesianPoint;
+      grabbed: false,
+    } as EnrichedCartesianPoint;
   }
 
   function invert(point: Point, shouldInvert: boolean): Point {

@@ -16,7 +16,6 @@
   const { store: authStore } = createAuthStore();
 
   const { gameStore, loadGameLayouts } = createGameStore();
-  const { boardStore } = createBoardStore(gameStore, dimensions);
 </script>
 
 <script lang="ts">
