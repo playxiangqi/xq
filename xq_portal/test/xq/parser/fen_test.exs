@@ -7,7 +7,7 @@ defmodule XQ.Parser.FENTest do
   describe "produce/1" do
     test "produce FEN from internal board representation" do
       board = %Board{
-        state: [
+        points: [
           %{ch: :general, side: :black, rank: 0, file: 4},
           %{ch: :advisor, side: :black, rank: 0, file: 5},
           %{ch: :chariot, side: :red, rank: 0, file: 6},

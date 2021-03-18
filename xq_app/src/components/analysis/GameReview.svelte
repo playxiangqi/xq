@@ -1,30 +1,25 @@
 <script context="module" lang="ts">
   import { createAuthStore } from '@xq/services/auth/store';
-  import {
-    createBoardState,
-    createBoardStore,
-    Dimensions,
-    Board,
-  } from '@xq/core/board';
-  import { createGameStore } from '@xq/core/game';
+  import { createBoardStore, Board } from '@xq/core/board';
   import { userSettingsStore, updateGameSettings } from '@xq/services/user';
+  import { Dimensions } from '@xq/utils/dimensions';
+  import { createAnalysisStore } from './store.svelte';
 
   // TODO: Derive dimensions and scale from viewport and set globally
   const DEFAULT_SCALE = 1.0;
   const dimensions = new Dimensions(DEFAULT_SCALE);
-  const boardState = createBoardState(dimensions);
   const { store: authStore } = createAuthStore();
-
-  const { gameStore, loadGameLayouts } = createGameStore();
+  const analysisStore = createAnalysisStore();
+  const boardStore = createBoardStore(dimensions);
 </script>
 
 <script lang="ts">
   import { setContext } from 'svelte';
-  import type { LayoutWithTransitions } from '@xq/core/board';
+  import type { PhoenixPayload } from '@xq/utils/channel';
+  import type { Layout, Point } from '@xq/utils/xq';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
   import GameInfoPanel from './GameInfoPanel.svelte';
   import type { GameSettings } from './GameInfoPanel.svelte';
-  import type { PhoenixPayload } from '@xq/utils/channel';
 
   export let gameID: number | string;
 
@@ -40,9 +35,9 @@
   setContext('dimensions', dimensions);
 
   $: ({ gameSettings } = $userSettingsStore);
-  // $: ({ currentTurnIndex } = $gameStore);
+  $: ({ currentTurnIndex } = $analysisStore);
 
-  function handleReceiptBoardStates(event: CustomEvent<LayoutWithTransitions>) {
+  function handleReceiptBoardStates(event: CustomEvent<Layout<Point>>) {
     console.log('data: ', event.detail);
   }
 
@@ -73,7 +68,7 @@
       hidden
       loop={false}
     />
-    <Board {boardState} />
+    <Board {boardStore} />
   </div>
   <div class="col-3">
     <GameInfoPanel
@@ -83,7 +78,8 @@
       on:update:turn={handleUpdateTurn}
       {gameSettings}
       {gameID}
-      {boardState}
+      {analysisStore}
+      {boardStore}
     />
   </div>
 </div>

@@ -30,12 +30,12 @@ export interface CartesianPoint extends Point {
   prevPosition?: [number, number];
 }
 
-export type Transition = {
-  prevPoint?: Point;
-  nextPoint?: Point;
+export type Transition<T extends Point> = {
+  prevPoint?: T;
+  nextPoint?: T;
 };
 
-export type Layout<T extends Point> = { points: T[] } & Transition;
+export type Layout<T extends Point> = { points: T[] } & Transition<T>;
 
 export const DEFAULT_POINTS: Point[] = [
   { side: BLACK, ch: CHARIOT, rank: 0, file: 0 },

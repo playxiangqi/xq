@@ -1,11 +1,11 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
-  import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
-  import { createBoardState } from './store';
+  import { createBoardStore } from './store.svelte';
 
-  export let boardState: ReturnType<typeof createBoardState>;
+  export let boardStore: ReturnType<typeof createBoardStore>;
 
   // Initialization
   const { playSound } = getContext('audio');
@@ -26,8 +26,8 @@
     pieceOuterRadius,
   }: Dimensions = getContext('dimensions');
 
-  const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
-  $: ({ prevPoint, nextPoint } = $store.activeTransition);
+  const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
+  $: ({ prevPoint, nextPoint } = $boardStore.workingLayout);
 
   // Utils
   function generateLinePath(
@@ -90,14 +90,14 @@
           prevPosition={prevPoint.position}
         />
       {/if}
-      {#each $store.activeLayout as { side, ch, grabbing, position }, index}
+      {#each $boardStore.workingLayout.points as { side, ch, grabbed, position }, index}
         <Piece
           {index}
           {side}
           {ch}
           {position}
           nextPosition={nextPoint?.position}
-          {grabbing}
+          {grabbed}
           on:piecedrop={(e) => {
             if (dropPiece(e.detail.index, e.detail.side)) {
               playSound();

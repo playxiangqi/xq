@@ -4,15 +4,15 @@ defmodule XQ.Parser.FEN do
   def parse(_notation) do
   end
 
-  def produce(%Board{state: state, prev_point: prev_point}) do
-    points_grouped_by_rank =
-      state
+  def produce(%Board{points: points, prev_point: prev_point}) do
+    grouped_by_rank =
+      points
       |> Enum.sort(&Point.by_rank/2)
       |> Enum.group_by(&Map.get(&1, :rank))
 
     0..Point.max_rank()
     |> Map.new(&{&1, []})
-    |> Map.merge(points_grouped_by_rank)
+    |> Map.merge(grouped_by_rank)
     |> Enum.map(fn {_rank, points} -> Enum.sort(points, &Point.by_file/2) end)
     |> Enum.map(fn points ->
       %{curr_file: curr_file, fen: fen} =

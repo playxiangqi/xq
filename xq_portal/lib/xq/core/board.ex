@@ -1,10 +1,10 @@
 defmodule XQ.Core.Board do
   alias XQ.Core.{Point, Move}
 
-  defstruct [:state, :prev_point, :next_point]
+  defstruct [:points, :prev_point, :next_point]
 
   @type t :: %__MODULE__{
-          state: list(Point),
+          points: list(Point),
           prev_point: Point | nil,
           next_point: Point | nil
         }

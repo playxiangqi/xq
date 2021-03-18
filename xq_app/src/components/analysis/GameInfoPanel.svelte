@@ -19,12 +19,7 @@
     RadioButtonGroup,
   } from 'carbon-components-svelte';
   import { operationStore, query } from '@urql/svelte';
-  import {
-    BLACK,
-    Dimensions,
-    createBoardState,
-    newPoint,
-  } from '@xq/core/board';
+  import { createBoardStore } from '@xq/core/board';
   import { GameDetails, MoveList } from '@xq/core/game';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
   import {
@@ -35,28 +30,30 @@
     SkipForward16,
     SkipForwardFilled16,
   } from 'carbon-icons-svelte';
+  import { createAnalysisStore } from './store.svelte';
 
   // Props
   export let currentTurnIndex = 0;
   export let gameID: number | string;
-  export let boardState: ReturnType<typeof createBoardState>;
+  export let analysisStore: ReturnType<typeof createAnalysisStore>;
+  export let boardStore: ReturnType<typeof createBoardStore>;
   export let gameSettings: GameSettings;
 
   // Initialization
   const dispatch = createEventDispatcher();
   const { playSound } = getContext('audio');
-  const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
-  const dimensions: Dimensions = getContext('dimensions');
+  const { loadLine, transition } = analysisStore;
+  const { flipBoard } = boardStore;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
 
   // Reactive
   $: if (!$opStore.fetching && !$opStore.stale) {
-    loadBoardState($opStore.data?.game?.boards);
+    loadLine($opStore.data?.game?.boards);
     dispatch('receipt:board-states', $opStore.data?.game?.boards);
   }
-  $: maxTurnIndex = $store.layouts.length - 1;
+  $: maxTurnIndex = $analysisStore.primaryLine.length - 1;
   $: gameInfo = $resp.data?.game?.info;
   $: buttons = [
     {
@@ -103,15 +100,6 @@
   let settingsModalOpen = false;
   let { moveNotation, pieceNotation } = gameSettings;
 
-  // Utils
-  function prepareBoardState() {
-    const { facing, activeLayout: al, activeTransition: at } = $store;
-    const invertPoint = newPoint(dimensions, facing === BLACK);
-    const state = al.map((l) => invertPoint(l));
-    const prev_point = at.prevPoint ? invertPoint(at.prevPoint) : null;
-    return { state, prev_point };
-  }
-
   // Event Handlers
   function updateTurn(eventHandler: () => void) {
     const DEBOUNCE_DELAY = 500;
@@ -122,7 +110,7 @@
       eventHandler();
 
       // Update board state
-      transitionBoardState(currentTurnIndex);
+      transition(currentTurnIndex);
 
       // Update UI
       moveList.scrollIntoView(currentTurnIndex);
@@ -130,7 +118,7 @@
       // Debounce engine analysis
       clearTimeout(timer);
       timer = setTimeout(
-        () => dispatch('update:turn', prepareBoardState()),
+        () => dispatch('update:turn', $boardStore.workingLayout),
         DEBOUNCE_DELAY,
       );
     };

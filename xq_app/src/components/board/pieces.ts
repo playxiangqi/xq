@@ -1,4 +1,4 @@
-import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
+import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
 import {
   TRAD_HORSE_RED,
   TRAD_CHARIOT_RED,

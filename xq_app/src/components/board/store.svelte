@@ -3,9 +3,8 @@
   import type { Readable } from 'svelte/store';
   import { DEFAULT_POINTS } from '@xq/utils/xq';
   import { FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
-  // import type { Dimensions } from '@xq/utils/dimensions';
-  import type { CartesianPoint, Layout, Point } from '@xq/utils/xq';
-  import type { Dimensions } from './dimensions';
+  import type { Dimensions } from '@xq/utils/dimensions';
+  import type { CartesianPoint, Layout, Point, Side } from '@xq/utils/xq';
 
   export type EnrichedCartesianPoint = CartesianPoint & { grabbed: boolean };
 
@@ -18,6 +17,7 @@
   //       to improve Updater function conciseness
   export interface BoardStore extends Readable<BoardState> {
     flipBoard: () => void;
+    dropPiece: (index: number, side: Side) => boolean;
     focusPiece: (index: number) => void;
     grabPiece: (index: number) => void;
     movePiece: (index: number, position: [number, number]) => void;
@@ -34,6 +34,10 @@
 
     function flipBoard() {
       store.update((state) => ({ ...state, flipped: !state.flipped }));
+    }
+
+    function dropPiece(index: number, side: Side): boolean {
+      return false;
     }
 
     function focusPiece(index: number) {
@@ -66,6 +70,7 @@
 
     return {
       subscribe,
+      dropPiece,
       flipBoard,
       focusPiece,
       grabPiece,
@@ -92,4 +97,42 @@
       : [point.rank, point.file];
     return { ...point, rank, file };
   }
+
+  // const isValidMove = (movingSide: Side, turn: Side) => {
+  //   return movingSide === turn;
+  // };
+
+  //   const dropPiece = (index: number, side: Side): boolean => {
+  //     let movedFromPrev = false;
+
+  //     update(({ activeLayout, moves, turn, ...state }) => {
+  //       activeLayout[index].grabbing = false;
+
+  //       // Track if piece was moved
+  //       movedFromPrev = !Enum.strictEquals(
+  //         activeLayout[index].position,
+  //         activeLayout[index].prevPosition,
+  //       );
+
+  //       // Confirm drop by updating prevPosition
+  //       if (isValidMove(side, turn) && movedFromPrev) {
+  //         // Update position
+  //         activeLayout[index].prevPosition = activeLayout[index].position;
+
+  //         const { side, ch, position, prevPosition } = activeLayout[index];
+  //         const [rank, file] = dimensions.coordsToPoint(position[0], position[1]);
+
+  //         moves = [...moves, { side, ch, rank, file, position, prevPosition }];
+  //         turn = turn === RED ? BLACK : RED;
+  //       } else {
+  //         movedFromPrev = false;
+
+  //         // Return to previous position
+  //         activeLayout[index].position = activeLayout[index].prevPosition;
+  //       }
+  //       return { ...state, activeLayout, moves, turn };
+  //     });
+
+  //     return movedFromPrev;
+  //   };
 </script>

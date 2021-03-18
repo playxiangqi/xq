@@ -12,7 +12,7 @@ export const GET_GAME_BOARD_STATES_QUERY = (gameID: number | string) => `
         moves
       }
       boards {
-        state {
+        points {
           ch
           side
           rank

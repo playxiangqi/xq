@@ -32,10 +32,10 @@ defmodule XQWeb.AnaylsisChannel do
     {:noreply, socket}
   end
 
-  defp unmarshal_board(%{"state" => state, "prev_point" => prev_point}) do
+  defp unmarshal_board(%{"points" => points} = board) do
     %XQ.Core.Board{
-      state: Enum.map(state, &unmarshal_point/1),
-      prev_point: unmarshal_point(prev_point)
+      points: Enum.map(points, &unmarshal_point/1),
+      prev_point: unmarshal_point(Map.get(board, "prevPoint"))
     }
   end
 

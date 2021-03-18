@@ -1,9 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher, getContext } from 'svelte';
+  import { Dimensions } from '@xq/utils/dimensions';
   import Enum from '@xq/utils/enum';
   import { getGlyph } from './pieces';
   import type { Character, Side } from './pieces';
-  import { Dimensions } from './dimensions';
 
   // Piece Props
   export let index: number;
@@ -11,7 +11,7 @@
   export let ch: Character;
   export let position: [number, number];
   export let nextPosition: [number, number] | undefined;
-  export let grabbing: boolean;
+  export let grabbed: boolean;
 
   // Initialization
   const dispatch = createEventDispatcher();
@@ -54,7 +54,7 @@
     const [y, x] = [e.clientY - bbox.top, e.clientX - bbox.left];
     const [derivedY, derivedX] = [posY - (offset.y - y), posX - (offset.x - x)];
     const [toRank, toFile] = dimensions.clampCoords(derivedY, derivedX);
-    if (grabbing) {
+    if (grabbed) {
       dispatch('piecemove', { index, point: [toRank, toFile] });
     }
   }
@@ -68,7 +68,7 @@
 
 <svg
   class="piece"
-  class:grabbing
+  class:grabbed
   height={size}
   width={size}
   y={posY}
@@ -107,7 +107,7 @@
   svg.piece {
     cursor: grab;
 
-    &.grabbing {
+    &.grabbed {
       cursor: grabbing;
     }
 
