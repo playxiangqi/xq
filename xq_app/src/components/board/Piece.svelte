@@ -21,9 +21,9 @@
     pieceInnerRadius: innerRadius,
     pieceStrokeWidth: strokeWidth,
   } = dimensions;
-  const { ch, side, position, grabbed } = point;
 
   // Reactive
+  $: ({ ch, side, position, grabbed } = point);
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';

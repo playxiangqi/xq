@@ -1,10 +1,9 @@
 <script context="module" lang="ts">
   import { writable } from 'svelte/store';
   import type { Readable } from 'svelte/store';
-  import { DEFAULT_POINTS } from '@xq/utils/xq';
-  import { FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
   import type { Dimensions } from '@xq/utils/dimensions';
-  import type { CartesianPoint, Layout, Point, Side } from '@xq/utils/xq';
+  import { DEFAULT_POINTS, enrichPoint } from '@xq/utils/xq';
+  import type { CartesianPoint, Layout, Side } from '@xq/utils/xq';
 
   export type EnrichedCartesianPoint = CartesianPoint & { grabbed: boolean };
 
@@ -27,7 +26,10 @@
     const store = writable<BoardState>({
       flipped: false,
       workingLayout: {
-        points: DEFAULT_POINTS.map((p) => enrichPoints(p, dimensions)),
+        points: DEFAULT_POINTS.map((p) => ({
+          ...enrichPoint(p, dimensions),
+          grabbed: false,
+        })),
       },
     });
     const { subscribe } = store;
@@ -76,26 +78,6 @@
       grabPiece,
       movePiece,
     };
-  }
-
-  function enrichPoints(
-    point: Point,
-    dimensions: Dimensions,
-    shouldInvert = false,
-  ): EnrichedCartesianPoint {
-    const newPoint = invert(point, shouldInvert);
-    return {
-      ...newPoint,
-      position: dimensions.coordsToPoint(newPoint.rank, newPoint.file),
-      grabbed: false,
-    } as EnrichedCartesianPoint;
-  }
-
-  function invert(point: Point, shouldInvert: boolean): Point {
-    const [rank, file] = shouldInvert
-      ? [RANK_MAX - point.rank, FILE_MAX - point.file]
-      : [point.rank, point.file];
-    return { ...point, rank, file };
   }
 
   // const isValidMove = (movingSide: Side, turn: Side) => {

@@ -1,8 +1,11 @@
 <script context="module" lang="ts">
+  import { derived } from 'svelte/store';
   import { createAuthStore } from '@xq/services/auth/store';
   import { createBoardStore, Board } from '@xq/core/board';
+  import type { EnrichedCartesianPoint } from '@xq/core/board';
   import { userSettingsStore, updateGameSettings } from '@xq/services/user';
   import { Dimensions } from '@xq/utils/dimensions';
+  import { enrichPoint } from '@xq/utils/xq';
   import { createAnalysisStore } from './store.svelte';
 
   // TODO: Derive dimensions and scale from viewport and set globally
@@ -11,6 +14,32 @@
   const { store: authStore } = createAuthStore();
   const analysisStore = createAnalysisStore();
   const boardStore = createBoardStore(dimensions);
+  const renderedStore = derived(
+    [analysisStore, boardStore],
+    ([$analysisStore, $boardStore]) => {
+      console.log('currentTurnIndex: ', $analysisStore.currentTurnIndex);
+      const { points, prevPoint, nextPoint } = $analysisStore.primaryLine[
+        $analysisStore.currentTurnIndex
+      ];
+      const { flipped } = $boardStore;
+
+      const activeLayout = {
+        points: points.map((p) => ({
+          ...enrichPoint(p, dimensions, flipped),
+          grabbed: false,
+        })),
+        prevPoint: prevPoint
+          ? enrichPoint(prevPoint, dimensions, flipped)
+          : prevPoint,
+        nextPoint: nextPoint
+          ? enrichPoint(nextPoint, dimensions, flipped)
+          : nextPoint,
+      } as Layout<EnrichedCartesianPoint>;
+
+      console.log('activeLayout: ', activeLayout);
+      return activeLayout;
+    },
+  );
 </script>
 
 <script lang="ts">
@@ -23,6 +52,10 @@
 
   export let gameID: number | string;
 
+  // Initialization
+  const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
+
+  // Locals
   let currentTurnIndex = 0;
   let pushAnalysis = (_: PhoenixPayload) => {};
 
@@ -34,9 +67,11 @@
   setContext('audio', { playSound });
   setContext('dimensions', dimensions);
 
+  // Reactive
   $: ({ gameSettings } = $userSettingsStore);
   $: ({ currentTurnIndex } = $analysisStore);
 
+  // Event Handlers
   function handleReceiptBoardStates(event: CustomEvent<Layout<Point>>) {
     console.log('data: ', event.detail);
   }
@@ -68,7 +103,17 @@
       hidden
       loop={false}
     />
-    <Board {boardStore} />
+    <Board
+      {renderedStore}
+      on:piecedrop={(e) => {
+        if (dropPiece(e.detail.index, e.detail.side)) {
+          playSound();
+        }
+      }}
+      on:piecefocus={(e) => focusPiece(e.detail)}
+      on:piecegrab={(e) => grabPiece(e.detail)}
+      on:piecemove={(e) => movePiece(e.detail.index, e.detail.point)}
+    />
   </div>
   <div class="col-3">
     <GameInfoPanel

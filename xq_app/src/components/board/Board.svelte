@@ -1,14 +1,15 @@
 <script lang="ts">
   import { getContext } from 'svelte';
+  import type { Readable } from 'svelte/store';
   import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
+  import type { Layout } from '@xq/utils/xq';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
-  import { createBoardStore } from './store.svelte';
+  import type { EnrichedCartesianPoint } from './store.svelte';
 
-  export let boardStore: ReturnType<typeof createBoardStore>;
+  export let renderedStore: Readable<Layout<EnrichedCartesianPoint>>;
 
   // Initialization
-  const { playSound } = getContext('audio');
   const {
     height,
     width,
@@ -26,8 +27,10 @@
     pieceOuterRadius,
   }: Dimensions = getContext('dimensions');
 
-  const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
-  $: ({ prevPoint, nextPoint } = $boardStore.workingLayout);
+  $: ({ prevPoint, nextPoint } = $renderedStore);
+  $: {
+    console.log('points: ', $renderedStore.points);
+  }
 
   // Utils
   function generateLinePath(
@@ -90,19 +93,15 @@
           prevPosition={prevPoint.position}
         />
       {/if}
-      {#each $boardStore.workingLayout.points as point, index}
+      {#each $renderedStore.points as point, index}
         <Piece
           {index}
           {point}
           nextPosition={nextPoint?.position}
-          on:piecedrop={(e) => {
-            if (dropPiece(e.detail.index, e.detail.side)) {
-              playSound();
-            }
-          }}
-          on:piecefocus={(e) => focusPiece(e.detail)}
-          on:piecegrab={(e) => grabPiece(e.detail)}
-          on:piecemove={(e) => movePiece(e.detail.index, e.detail.point)}
+          on:piecedrop
+          on:piecefocus
+          on:piecegrab
+          on:piecemove
         />
       {/each}
     </g>
