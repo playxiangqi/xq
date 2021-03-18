@@ -90,14 +90,11 @@
           prevPosition={prevPoint.position}
         />
       {/if}
-      {#each $boardStore.workingLayout.points as { side, ch, grabbed, position }, index}
+      {#each $boardStore.workingLayout.points as point, index}
         <Piece
           {index}
-          {side}
-          {ch}
-          {position}
+          {point}
           nextPosition={nextPoint?.position}
-          {grabbed}
           on:piecedrop={(e) => {
             if (dropPiece(e.detail.index, e.detail.side)) {
               playSound();

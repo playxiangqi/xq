@@ -2,16 +2,13 @@
   import { createEventDispatcher, getContext } from 'svelte';
   import { Dimensions } from '@xq/utils/dimensions';
   import Enum from '@xq/utils/enum';
+  import type { EnrichedCartesianPoint } from './store.svelte';
   import { getGlyph } from './pieces';
-  import type { Character, Side } from './pieces';
 
   // Piece Props
   export let index: number;
-  export let side: Side;
-  export let ch: Character;
-  export let position: [number, number];
+  export let point: EnrichedCartesianPoint;
   export let nextPosition: [number, number] | undefined;
-  export let grabbed: boolean;
 
   // Initialization
   const dispatch = createEventDispatcher();
@@ -24,6 +21,7 @@
     pieceInnerRadius: innerRadius,
     pieceStrokeWidth: strokeWidth,
   } = dimensions;
+  const { ch, side, position, grabbed } = point;
 
   // Reactive
   $: glyph = getGlyph(side, ch);

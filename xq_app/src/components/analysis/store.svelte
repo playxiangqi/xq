@@ -18,7 +18,7 @@
 
   export interface AnalysisStore extends Readable<AnalysisState> {
     loadLine: (line: Line) => void;
-    transition: (turnIndex: number) => void;
+    transitionMoveWithinLine: (turnIndex: number) => void;
   }
 
   export function createAnalysisStore(): AnalysisStore {
@@ -29,10 +29,10 @@
       store.update((state) => ({ ...state, primaryLine: line }));
     }
 
-    function transition(turnIndex: number) {
+    function transitionMoveWithinLine(turnIndex: number) {
       store.update((state) => ({ ...state, currentTurnIndex: turnIndex }));
     }
 
-    return { subscribe, loadLine, transition };
+    return { subscribe, loadLine, transitionMoveWithinLine };
   }
 </script>

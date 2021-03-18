@@ -42,7 +42,7 @@
   // Initialization
   const dispatch = createEventDispatcher();
   const { playSound } = getContext('audio');
-  const { loadLine, transition } = analysisStore;
+  const { loadLine, transitionMoveWithinLine } = analysisStore;
   const { flipBoard } = boardStore;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
@@ -109,10 +109,8 @@
       // Run turn-based handler
       eventHandler();
 
-      // Update board state
-      transition(currentTurnIndex);
-
       // Update UI
+      transitionMoveWithinLine(currentTurnIndex);
       moveList.scrollIntoView(currentTurnIndex);
 
       // Debounce engine analysis
