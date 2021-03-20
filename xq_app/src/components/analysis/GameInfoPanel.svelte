@@ -42,7 +42,7 @@
   // Initialization
   const dispatch = createEventDispatcher();
   const { playSound } = getContext('audio');
-  const { loadLine, transitionMoveWithinLine } = analysisStore;
+  const { transitionMoveWithinLine } = analysisStore;
   const { flipBoard } = boardStore;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
@@ -50,7 +50,6 @@
 
   // Reactive
   $: if (!$opStore.fetching && !$opStore.stale) {
-    loadLine($opStore.data?.game?.boards);
     dispatch('receipt:board-states', $opStore.data?.game?.boards);
   }
   $: maxTurnIndex = $analysisStore.primaryLine.length - 1;

@@ -23,7 +23,7 @@
   } = dimensions;
 
   // Reactive
-  $: ({ ch, side, position, grabbed } = point);
+  $: ({ ch, side, position, grabbing } = point);
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
@@ -52,7 +52,7 @@
     const [y, x] = [e.clientY - bbox.top, e.clientX - bbox.left];
     const [derivedY, derivedX] = [posY - (offset.y - y), posX - (offset.x - x)];
     const [toRank, toFile] = dimensions.clampCoords(derivedY, derivedX);
-    if (grabbed) {
+    if (grabbing) {
       dispatch('piecemove', { index, point: [toRank, toFile] });
     }
   }
@@ -66,7 +66,7 @@
 
 <svg
   class="piece"
-  class:grabbed
+  class:grabbing
   height={size}
   width={size}
   y={posY}
@@ -105,7 +105,7 @@
   svg.piece {
     cursor: grab;
 
-    &.grabbed {
+    &.grabbing {
       cursor: grabbing;
     }
 

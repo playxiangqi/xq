@@ -1,13 +1,11 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import type { Readable } from 'svelte/store';
   import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
-  import type { Layout } from '@xq/utils/xq';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
-  import type { EnrichedCartesianPoint } from './store.svelte';
+  import type { BoardStore } from './store.svelte';
 
-  export let renderedStore: Readable<Layout<EnrichedCartesianPoint>>;
+  export let boardStore: BoardStore;
 
   // Initialization
   const {
@@ -27,10 +25,7 @@
     pieceOuterRadius,
   }: Dimensions = getContext('dimensions');
 
-  $: ({ prevPoint, nextPoint } = $renderedStore);
-  $: {
-    console.log('points: ', $renderedStore.points);
-  }
+  $: ({ points, prevPoint, nextPoint } = $boardStore.workingLayout);
 
   // Utils
   function generateLinePath(
@@ -93,7 +88,7 @@
           prevPosition={prevPoint.position}
         />
       {/if}
-      {#each $renderedStore.points as point, index}
+      {#each points as point, index}
         <Piece
           {index}
           {point}
