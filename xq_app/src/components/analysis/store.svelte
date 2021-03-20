@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
-  import { writable } from 'svelte/store';
   import type { Readable } from 'svelte/store';
+  import { writable } from '@xq/utils/store.svelte';
   import { DEFAULT_POINTS } from '@xq/utils/xq';
   import type { Layout, Point } from '@xq/utils/xq';
 
@@ -23,14 +23,18 @@
 
   export function createAnalysisStore(): AnalysisStore {
     const store = writable<AnalysisState>(DEFAULT_ANALYSIS_STORE);
-    const { subscribe } = store;
+    const { subscribe, update } = store;
 
     function loadLine(line: Line) {
-      store.update((state) => ({ ...state, primaryLine: line }));
+      update(($state) => {
+        $state.primaryLine = line;
+      });
     }
 
     function transitionMoveWithinLine(turnIndex: number) {
-      store.update((state) => ({ ...state, currentTurnIndex: turnIndex }));
+      update(($state) => {
+        $state.currentTurnIndex = turnIndex;
+      });
     }
 
     return { subscribe, loadLine, transitionMoveWithinLine };
