@@ -32,7 +32,8 @@
       state.currentTurnIndex
     ];
     const { flipped } = $boardStore;
-    const activeLayout = {
+
+    $boardStore.workingLayout = {
       points: points.map((p) => ({
         ...enrichPoint(p, dimensions, flipped),
         grabbing: false,
@@ -44,8 +45,6 @@
         ? enrichPoint(nextPoint, dimensions, flipped)
         : nextPoint,
     } as Layout<EnrichedCartesianPoint>;
-
-    $boardStore.workingLayout = activeLayout;
   });
 
   onDestroy(unsubscribeAnalysis);
@@ -105,7 +104,7 @@
     <Board
       {boardStore}
       on:piecedrop={(e) => {
-        if (dropPiece(e.detail.index, e.detail.side)) {
+        if (dropPiece(e.detail.index, e.detail.movedFromPrev)) {
           playSound();
         }
       }}
