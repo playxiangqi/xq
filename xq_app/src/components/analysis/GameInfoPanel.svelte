@@ -6,7 +6,7 @@
 </script>
 
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
   import {
     Accordion,
     AccordionItem,
@@ -19,14 +19,8 @@
     RadioButtonGroup,
   } from 'carbon-components-svelte';
   import { operationStore, query } from '@urql/svelte';
-  import {
-    BLACK,
-    Dimensions,
-    createBoardState,
-    newPoint,
-  } from '@xq/core/board';
+  import { createBoardStore } from '@xq/core/board';
   import { GameDetails, MoveList } from '@xq/core/game';
-  import type { PhoenixPayload } from '@xq/utils/channel';
   import { GET_GAME_BOARD_STATES_QUERY } from './queries';
   import {
     Rotate16,
@@ -36,28 +30,29 @@
     SkipForward16,
     SkipForwardFilled16,
   } from 'carbon-icons-svelte';
+  import { createAnalysisStore } from './store.svelte';
 
   // Props
   export let currentTurnIndex = 0;
   export let gameID: number | string;
-  export let dimensions: Dimensions;
-  export let boardState: ReturnType<typeof createBoardState>;
-  export let pushAnalysis: (payload: PhoenixPayload) => void;
+  export let analysisStore: ReturnType<typeof createAnalysisStore>;
+  export let boardStore: ReturnType<typeof createBoardStore>;
   export let gameSettings: GameSettings;
-  export let updateGameSettings: (gameSettings: GameSettings) => void;
 
   // Initialization
+  const dispatch = createEventDispatcher();
   const { playSound } = getContext('audio');
-  const { store, loadBoardState, transitionBoardState, flipBoard } = boardState;
+  const { transitionMoveWithinLine } = analysisStore;
+  const { flipBoard } = boardStore;
 
   const opStore = operationStore(GET_GAME_BOARD_STATES_QUERY(gameID));
   const resp = query(opStore);
 
   // Reactive
   $: if (!$opStore.fetching && !$opStore.stale) {
-    loadBoardState($opStore.data?.game?.boards);
+    dispatch('receipt:board-states', $opStore.data?.game?.boards);
   }
-  $: maxTurnIndex = $store.layouts.length - 1;
+  $: maxTurnIndex = $analysisStore.primaryLine.length - 1;
   $: gameInfo = $resp.data?.game?.info;
   $: buttons = [
     {
@@ -104,32 +99,25 @@
   let settingsModalOpen = false;
   let { moveNotation, pieceNotation } = gameSettings;
 
-  // Utils
-  function prepareBoardState() {
-    const { facing, activeLayout: al, activeTransition: at } = $store;
-    const invertPoint = newPoint(dimensions, facing === BLACK);
-    const state = al.map((l) => invertPoint(l));
-    const prev_point = at.prevPoint ? invertPoint(at.prevPoint) : null;
-    return { state, prev_point };
-  }
-
   // Event Handlers
   function updateTurn(eventHandler: () => void) {
+    const DEBOUNCE_DELAY = 500;
     let timer: number;
 
     return () => {
       // Run turn-based handler
       eventHandler();
 
-      // Update board state
-      transitionBoardState(currentTurnIndex);
-
       // Update UI
+      transitionMoveWithinLine(currentTurnIndex);
       moveList.scrollIntoView(currentTurnIndex);
 
       // Debounce engine analysis
       clearTimeout(timer);
-      timer = setTimeout(() => pushAnalysis(prepareBoardState()), 500);
+      timer = setTimeout(
+        () => dispatch('update:turn', $boardStore.workingLayout),
+        DEBOUNCE_DELAY,
+      );
     };
   }
 
@@ -165,7 +153,7 @@
 
   function saveGameSettings() {
     settingsModalOpen = false;
-    updateGameSettings({ moveNotation, pieceNotation });
+    dispatch('save:game-settings', { moveNotation, pieceNotation });
   }
 </script>
 

@@ -28,7 +28,7 @@ defmodule XQWeb.Schema.Game.Types do
   end
 
   object :board do
-    field :state, non_null(list_of(:point))
+    field :points, non_null(list_of(:point))
     field :prev_point, :point
     field :next_point, :point
   end

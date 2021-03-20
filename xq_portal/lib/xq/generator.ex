@@ -4,7 +4,7 @@ defmodule XQ.Generator do
   alias XQ.Core.{Board, Move, Point}
 
   @starting_state %Board{
-    state: [
+    points: [
       %{ch: :chariot, side: :black, rank: 1, file: 1},
       %{ch: :horse, side: :black, rank: 1, file: 2},
       %{ch: :elephant, side: :black, rank: 1, file: 3},
@@ -77,22 +77,22 @@ defmodule XQ.Generator do
     [next_board | prev_boards]
   end
 
-  defp compute_next_state(%{state: prev_state}, %Move{} = move) do
+  defp compute_next_state(%{points: prev_state}, %Move{} = move) do
     # TODO: Can lift all board-level funcs to generate_board func
     case Board.find_point(prev_state, move) do
+      {nil, _} ->
+        raise RuntimeError,
+          message: "attempted to move a non-existent piece: #{inspect(move)}"
+
       {prev_point, index} ->
         next_point = Move.next(move, prev_point)
         updated_state = Board.update(prev_state, next_point, index)
 
         %Board{
-          state: [next_point | updated_state],
+          points: [next_point | updated_state],
           prev_point: prev_point,
           next_point: next_point
         }
-
-      nil ->
-        raise RuntimeError,
-          message: "attempted to move a non-existent piece: #{inspect(move)}"
     end
   end
 end

@@ -1,20 +1,18 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { createEventDispatcher, getContext } from 'svelte';
+  import { Dimensions } from '@xq/utils/dimensions';
   import Enum from '@xq/utils/enum';
-  import { Dimensions } from './dimensions';
+  import type { EnrichedCartesianPoint } from './store.svelte';
   import { getGlyph } from './pieces';
-  import type { Character, Side } from './pieces';
 
   // Piece Props
   export let index: number;
-  export let side: Side;
-  export let ch: Character;
-  export let position: [number, number];
+  export let point: EnrichedCartesianPoint;
   export let nextPosition: [number, number] | undefined;
-  export let grabbing: boolean;
-  export let dimensions: Dimensions;
 
-  const { playSound } = getContext('audio');
+  // Initialization
+  const dispatch = createEventDispatcher();
+  const dimensions: Dimensions = getContext('dimensions');
   const {
     pieceScale: scale,
     pieceSize: size,
@@ -24,20 +22,17 @@
     pieceStrokeWidth: strokeWidth,
   } = dimensions;
 
-  let offset = { y: 0, x: 0 };
   // Reactive
+  $: ({ ch, side, position, grabbing } = point);
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
   $: moved = nextPosition && Enum.strictEquals(nextPosition, position);
 
-  // Event Props
-  export let dropPiece: (index: number, side: Side) => boolean;
-  export let focusPiece: (index: number) => void;
-  export let grabPiece: (index: number) => void;
-  export let movePiece: (index: number, position: [number, number]) => void;
+  // Locals
+  let offset = { y: 0, x: 0 };
 
-  // Events
+  // Event Handlers
   type Event = PointerEvent & { currentTarget: EventTarget & SVGSVGElement };
 
   function onPointerDown(e: Event) {
@@ -45,11 +40,11 @@
     const bbox = el.getBoundingClientRect();
     el.setPointerCapture(e.pointerId);
     offset = { y: e.clientY - bbox.top, x: e.clientX - bbox.left };
-    grabPiece(index);
+    dispatch('piecegrab', index);
   }
 
   function onPointerEnter() {
-    focusPiece(index);
+    dispatch('piecefocus', index);
   }
 
   function onPointerMove(e: Event) {
@@ -58,16 +53,14 @@
     const [derivedY, derivedX] = [posY - (offset.y - y), posX - (offset.x - x)];
     const [toRank, toFile] = dimensions.clampCoords(derivedY, derivedX);
     if (grabbing) {
-      movePiece(index, [toRank, toFile]);
+      dispatch('piecemove', { index, point: [toRank, toFile] });
     }
   }
 
   function onPointerUp() {
     const [y, x] = dimensions.snapCoords(posY, posX);
-    movePiece(index, [y, x]);
-    if (dropPiece(index, side)) {
-      playSound();
-    }
+    dispatch('piecemove', { index, point: [y, x] });
+    dispatch('piecedrop', { index, side });
   }
 </script>
 

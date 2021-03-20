@@ -1,13 +1,13 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+  import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
-  import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
-  import { createBoardState } from './store';
+  import type { BoardStore } from './store.svelte';
 
-  export let dimensions: Dimensions;
-  export let boardState: ReturnType<typeof createBoardState>;
+  export let boardStore: BoardStore;
 
-  // Dimensions
+  // Initialization
   const {
     height,
     width,
@@ -23,10 +23,9 @@
     fileSpacing,
     pieceSize,
     pieceOuterRadius,
-  } = dimensions;
+  }: Dimensions = getContext('dimensions');
 
-  const { store, dropPiece, focusPiece, grabPiece, movePiece } = boardState;
-  $: ({ prevPoint, nextPoint } = $store.activeTransition);
+  $: ({ points, prevPoint, nextPoint } = $boardStore.workingLayout);
 
   // Utils
   function generateLinePath(
@@ -89,19 +88,15 @@
           prevPosition={prevPoint.position}
         />
       {/if}
-      {#each $store.activeLayout as { side, ch, grabbing, position }, index}
+      {#each points as point, index}
         <Piece
           {index}
-          {side}
-          {ch}
-          {position}
+          {point}
           nextPosition={nextPoint?.position}
-          {grabbing}
-          {dimensions}
-          {dropPiece}
-          {focusPiece}
-          {grabPiece}
-          {movePiece}
+          on:piecedrop
+          on:piecefocus
+          on:piecegrab
+          on:piecemove
         />
       {/each}
     </g>

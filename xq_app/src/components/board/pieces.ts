@@ -1,4 +1,15 @@
-import { Dimensions, FILE_MAX, RANK_MAX } from './dimensions';
+import {
+  RED,
+  BLACK,
+  ADVISOR,
+  CANNON,
+  CHARIOT,
+  GENERAL,
+  ELEPHANT,
+  HORSE,
+  SOLDIER,
+} from '@xq/utils/xq';
+import type { Side, Character } from '@xq/utils/xq';
 import {
   TRAD_HORSE_RED,
   TRAD_CHARIOT_RED,
@@ -16,27 +27,6 @@ import {
   TRAD_GENERAL_BLACK,
 } from './glyphs';
 
-// Piece
-export const RED = 'red';
-export const BLACK = 'black';
-export type Side = typeof RED | typeof BLACK;
-
-export const CHARIOT = 'chariot';
-export const HORSE = 'horse';
-export const ELEPHANT = 'elephant';
-export const ADVISOR = 'advisor';
-export const GENERAL = 'general';
-export const CANNON = 'cannon';
-export const SOLDIER = 'soldier';
-export type Character =
-  | typeof CHARIOT
-  | typeof HORSE
-  | typeof ELEPHANT
-  | typeof ADVISOR
-  | typeof GENERAL
-  | typeof CANNON
-  | typeof SOLDIER;
-
 export const toHanzi: { [letter: string]: string } = {
   A: '仕',
   a: '士',
@@ -53,86 +43,6 @@ export const toHanzi: { [letter: string]: string } = {
   P: '',
   p: '',
 };
-
-export type Point = {
-  side: Side;
-  ch: Character;
-  rank: number;
-  file: number;
-  position: [number, number];
-  prevPosition: [number, number];
-  grabbing: boolean;
-};
-
-export function newPoint(dimensions: Dimensions, shouldInvert = false) {
-  return (point: Point) => {
-    const [rank, file] = shouldInvert
-      ? [RANK_MAX - point.rank, FILE_MAX - point.file]
-      : [point.rank, point.file];
-    const position = dimensions.pointToCoords(rank, file) as [number, number];
-    return {
-      ...point,
-      rank,
-      file,
-      position,
-      prevPosition: position,
-      grabbing: false,
-    };
-  };
-}
-
-export type Move = Omit<Point, 'grabbing'>;
-
-// TODO: eventually load as parseFEN
-export function createInitialLayout(dimensions: Dimensions): Point[] {
-  const layout: [Side, Character, number, number][] = [
-    [BLACK, CHARIOT, 0, 0],
-    [BLACK, HORSE, 0, 1],
-    [BLACK, ELEPHANT, 0, 2],
-    [BLACK, ADVISOR, 0, 3],
-    [BLACK, GENERAL, 0, 4],
-    [BLACK, ADVISOR, 0, 5],
-    [BLACK, ELEPHANT, 0, 6],
-    [BLACK, HORSE, 0, 7],
-    [BLACK, CHARIOT, 0, 8],
-    [BLACK, CANNON, 2, 1],
-    [BLACK, CANNON, 2, 7],
-    [BLACK, SOLDIER, 3, 0],
-    [BLACK, SOLDIER, 3, 2],
-    [BLACK, SOLDIER, 3, 4],
-    [BLACK, SOLDIER, 3, 6],
-    [BLACK, SOLDIER, 3, 8],
-    [RED, SOLDIER, 6, 0],
-    [RED, SOLDIER, 6, 2],
-    [RED, SOLDIER, 6, 4],
-    [RED, SOLDIER, 6, 6],
-    [RED, SOLDIER, 6, 8],
-    [RED, CANNON, 7, 1],
-    [RED, CANNON, 7, 7],
-    [RED, CHARIOT, 9, 0],
-    [RED, HORSE, 9, 1],
-    [RED, ELEPHANT, 9, 2],
-    [RED, ADVISOR, 9, 3],
-    [RED, GENERAL, 9, 4],
-    [RED, ADVISOR, 9, 5],
-    [RED, ELEPHANT, 9, 6],
-    [RED, HORSE, 9, 7],
-    [RED, CHARIOT, 9, 8],
-  ];
-
-  return layout.map(([side, ch, rank, file]) => {
-    const position = dimensions.pointToCoords(rank, file);
-    return {
-      side,
-      ch,
-      position,
-      rank,
-      file,
-      prevPosition: position,
-      grabbing: false,
-    } as Point;
-  });
-}
 
 // Glyph
 export const TRADITIONAL = 'traditional';
