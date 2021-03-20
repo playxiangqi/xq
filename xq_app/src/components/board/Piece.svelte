@@ -2,11 +2,13 @@
   import { createEventDispatcher, getContext } from 'svelte';
   import { Dimensions } from '@xq/utils/dimensions';
   import Enum from '@xq/utils/enum';
-  import type { EnrichedCartesianPoint } from './store.svelte';
+  import type { Side } from '@xq/utils/xq';
   import { getGlyph } from './pieces';
+  import type { EnrichedCartesianPoint } from './store.svelte';
 
   // Piece Props
   export let index: number;
+  export let turn: Side;
   export let point: EnrichedCartesianPoint;
   export let nextPosition: [number, number] | undefined;
 
@@ -23,7 +25,7 @@
   } = dimensions;
 
   // Reactive
-  $: ({ ch, side, position, grabbing } = point);
+  $: ({ ch, side, position, prevPosition, grabbing } = point);
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
   $: computedColor = side === 'red' ? '#cc0000' : 'black';
@@ -60,7 +62,20 @@
   function onPointerUp() {
     const [y, x] = dimensions.snapCoords(posY, posX);
     dispatch('piecemove', { index, point: [y, x] });
-    dispatch('piecedrop', { index, side });
+
+    const isValidMove = (movingSide: Side, turn: Side) => {
+      return movingSide === turn;
+    };
+
+    const movedFromPrev =
+      isValidMove(side, turn) && !Enum.strictEquals(position, prevPosition);
+    console.log('movingSide: ', side);
+    console.log('turn: ', turn);
+    console.log('position: ', position);
+    console.log('prevPosition: ', prevPosition);
+    console.log('movedFromPrev: ', movedFromPrev);
+
+    dispatch('piecedrop', { index, movedFromPrev });
   }
 </script>
 

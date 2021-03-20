@@ -25,6 +25,7 @@
     pieceOuterRadius,
   }: Dimensions = getContext('dimensions');
 
+  $: ({ turn } = $boardStore);
   $: ({ points, prevPoint, nextPoint } = $boardStore.workingLayout);
 
   // Utils
@@ -91,6 +92,7 @@
       {#each points as point, index}
         <Piece
           {index}
+          {turn}
           {point}
           nextPosition={nextPoint?.position}
           on:piecedrop

@@ -30,7 +30,7 @@ export type Point = {
 
 export interface CartesianPoint extends Point {
   position: [number, number];
-  prevPosition?: [number, number];
+  prevPosition: [number, number];
 }
 
 export type Transition<T extends Point> = {
@@ -81,9 +81,11 @@ export function enrichPoint(
   shouldInvert = false,
 ): CartesianPoint {
   const newPoint = invert(point, shouldInvert);
+  const position = dimensions.pointToCoords(newPoint.rank, newPoint.file);
   return {
     ...newPoint,
-    position: dimensions.pointToCoords(newPoint.rank, newPoint.file),
+    position,
+    prevPosition: position,
   } as CartesianPoint;
 }
 
