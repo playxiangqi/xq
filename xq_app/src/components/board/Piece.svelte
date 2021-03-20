@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { Dimensions } from '@xq/utils/dimensions';
   import Enum from '@xq/utils/enum';
   import type { Side } from '@xq/utils/xq';
@@ -8,13 +8,13 @@
 
   // Piece Props
   export let index: number;
+  export let dimensions: Dimensions; // Should be a store
   export let turn: Side;
   export let point: EnrichedCartesianPoint;
   export let nextPosition: [number, number] | undefined;
 
   // Initialization
   const dispatch = createEventDispatcher();
-  const dimensions: Dimensions = getContext('dimensions');
   const {
     pieceScale: scale,
     pieceSize: size,

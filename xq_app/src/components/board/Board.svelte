@@ -1,16 +1,23 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
   import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
+  import { createBoardStore } from '@xq/core/board';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
-  import type { BoardStore } from './store.svelte';
+  import { getContext } from 'svelte';
 
-  export let boardStore: BoardStore;
+  export let boardStore: ReturnType<typeof createBoardStore>;
+  export let dimensions: Dimensions;
+
+  let height = 800;
+  let width = 800;
+
+  dimensions = new Dimensions(height, width);
+  boardStore = createBoardStore(dimensions);
+  const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
+  const { playSound } = getContext('audio');
 
   // Initialization
   const {
-    height,
-    width,
     frameHeight,
     frameWidth,
     innerFrameHeight,
@@ -23,7 +30,7 @@
     fileSpacing,
     pieceSize,
     pieceOuterRadius,
-  }: Dimensions = getContext('dimensions');
+  } = dimensions;
 
   $: ({ turn } = $boardStore);
   $: ({ points, prevPoint, nextPoint } = $boardStore.workingLayout);
@@ -47,7 +54,11 @@
   }
 </script>
 
-<div class="board-container">
+<div
+  class="board-container"
+  bind:clientHeight={height}
+  bind:clientWidth={width}
+>
   <svg class="board" {height} {width}>
     <!-- Frame -->
     <rect
@@ -92,13 +103,18 @@
       {#each points as point, index}
         <Piece
           {index}
+          {dimensions}
           {turn}
           {point}
           nextPosition={nextPoint?.position}
-          on:piecedrop
-          on:piecefocus
-          on:piecegrab
-          on:piecemove
+          on:piecedrop={(e) => {
+            if (dropPiece(e.detail.index, e.detail.movedFromPrev)) {
+              playSound();
+            }
+          }}
+          on:piecefocus={(e) => focusPiece(e.detail)}
+          on:piecegrab={(e) => grabPiece(e.detail)}
+          on:piecemove={(e) => movePiece(e.detail.index, e.detail.point)}
         />
       {/each}
     </g>

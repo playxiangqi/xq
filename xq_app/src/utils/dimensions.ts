@@ -1,14 +1,10 @@
-const ASPECT_RATIO = 1.1;
 const FRAME_RATIO = 0.975;
-const INNER_FRAME_RATIO = 0.85;
+const INNER_FRAME_RATIO = 0.825;
 
 export const [FILE_MAX, RANK_MAX] = [8, 9];
 
 export class Dimensions {
   // Board
-  height: number;
-  width: number;
-
   frameHeight: number;
   frameWidth: number;
   innerFrameHeight: number;
@@ -38,10 +34,11 @@ export class Dimensions {
   pieceOffsetY: number;
   pieceOffsetX: number;
 
-  constructor(public readonly scale: number = 1.0) {
-    this.height = 800 * this.scale;
-    this.width = this.height / ASPECT_RATIO;
-
+  constructor(
+    public height: number,
+    public width: number,
+    public readonly scale: number = 1.0,
+  ) {
     this.frameHeight = this.height * FRAME_RATIO;
     this.frameWidth = this.width * FRAME_RATIO;
     this.innerFrameHeight = this.height * INNER_FRAME_RATIO;
