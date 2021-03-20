@@ -177,6 +177,9 @@
             {gotoTurn}
           />
         </AccordionItem>
+        <AccordionItem>
+          <h5 slot="title">Board Setup</h5>
+        </AccordionItem>
       </Accordion>
     {/if}
   </div>

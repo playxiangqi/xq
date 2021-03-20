@@ -95,6 +95,9 @@
           <SkeletonText paragraph />
         {/if}
       </AccordionItem>
+      <AccordionItem>
+        <h5 slot="title">Engine Settings</h5>
+      </AccordionItem>
     </Accordion>
   </div>
 </div>
