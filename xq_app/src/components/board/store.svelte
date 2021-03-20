@@ -32,10 +32,9 @@
         })),
       },
     });
-    const { update } = store;
 
     function flipBoard() {
-      update(({ workingLayout, flipped, ...state }) => {
+      store.update(({ workingLayout, flipped, ...state }) => {
         const { points, prevPoint, nextPoint } = workingLayout;
         workingLayout = {
           points: points.map((p) => ({
@@ -55,7 +54,7 @@
     }
 
     function dropPiece(index: number, movedFromPrev: boolean): boolean {
-      update(({ workingLayout: wl, turn, ...state }) => {
+      store.update(({ workingLayout: wl, turn, ...state }) => {
         const destPosition = wl.points[index].position;
         const prevPosition = wl.points[index].prevPosition;
 
@@ -77,7 +76,7 @@
     }
 
     function focusPiece(index: number) {
-      update(({ workingLayout: { points, ...rest }, ...state }) => {
+      store.update(({ workingLayout: { points, ...rest }, ...state }) => {
         const lastIndex = points.length - 1;
         [points[index], points[lastIndex]] = [points[lastIndex], points[index]];
         return {
@@ -91,14 +90,14 @@
     }
 
     function grabPiece(index: number) {
-      update((state) => {
+      store.update((state) => {
         state.workingLayout.points[index].grabbing = true;
         return state;
       });
     }
 
     function movePiece(index: number, position: [number, number]) {
-      update((state) => {
+      store.update((state) => {
         state.workingLayout.points[index].position = position;
         return state;
       });
