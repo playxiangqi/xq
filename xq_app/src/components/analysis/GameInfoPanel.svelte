@@ -160,9 +160,9 @@
 <div class="game-info-panel">
   <div class="game-details-container">
     {#if $resp.fetching}
-      <Accordion skeleton count={2} />
+      <Accordion skeleton count={3} size="sm" />
     {:else}
-      <Accordion>
+      <Accordion size="sm">
         <AccordionItem open={true}>
           <h5 slot="title">Game Details</h5>
           <GameDetails {gameInfo} />
@@ -176,6 +176,9 @@
             moves={gameInfo.moves}
             {gotoTurn}
           />
+        </AccordionItem>
+        <AccordionItem>
+          <h5 slot="title">Board Setup</h5>
         </AccordionItem>
       </Accordion>
     {/if}

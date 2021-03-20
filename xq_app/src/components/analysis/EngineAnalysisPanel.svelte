@@ -1,5 +1,10 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import {
+    Accordion,
+    AccordionItem,
+    SkeletonText,
+  } from 'carbon-components-svelte';
   import Channel from '@xq/utils/channel';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import type { EngineResults } from './types';
@@ -62,39 +67,38 @@
   }
 </script>
 
-<div class="panel engine-analysis-panel">
-  <div class="panel-heading">Engine Analysis</div>
-  <div class="panel-tabs">
-    <!-- svelte-ignore a11y-missing-attribute -->
-    <a class="is-active">Evaluation</a>
-    <!-- svelte-ignore a11y-missing-attribute -->
-    <a>Engine Settings</a>
-    <!-- svelte-ignore a11y-missing-attribute -->
-    <a>Board Setup</a>
-  </div>
+<div class="engine-analysis-panel">
   <div class="content-container">
-    <div class="engine panel-block">
-      Fairy-Stockfish 11.2 LB 64 by Fabian Fichter
-    </div>
-    <div class="top-metadata panel-block">depth={depth} knps={knps}</div>
-    {#if lines}
-      {#each lines as line, i}
-        <div class="top-results panel-block">
-          <span
-            class={`score tag ${cpScoreClassName(metadata[i].scorecp)} mr-2`}
-            >{formatCPScore(metadata[i].scorecp)}</span
-          >
-          <p class="line">
-            {#each line as [redMove, blackMove], j}
-              {moveIndex + j + 1}. {redMove}
-              {blackMove ?? ''}{' '}
-            {/each}
-          </p>
-        </div>
-      {/each}
-    {:else}
-      <div class="panel-block">Waiting for engine...</div>
-    {/if}
+    <Accordion size="sm">
+      <AccordionItem open={true}>
+        <h5 slot="title">Engine Analysis - Fairy-Stockfish</h5>
+        <p class="engine-metadata">
+          depth={depth}/15 knps={knps}
+        </p>
+        {#if lines}
+          {#each lines as line, i}
+            <div class="top-results panel-block">
+              <span
+                class={`score tag ${cpScoreClassName(
+                  metadata[i].scorecp,
+                )} mr-2`}>{formatCPScore(metadata[i].scorecp)}</span
+              >
+              <p class="line">
+                {#each line as [redMove, blackMove], j}
+                  {moveIndex + j + 1}. {redMove}
+                  {blackMove ?? ''}{' '}
+                {/each}
+              </p>
+            </div>
+          {/each}
+        {:else}
+          <SkeletonText paragraph />
+        {/if}
+      </AccordionItem>
+      <AccordionItem>
+        <h5 slot="title">Engine Settings</h5>
+      </AccordionItem>
+    </Accordion>
   </div>
 </div>
 
@@ -109,14 +113,6 @@
       .score {
         font-weight: bold;
       }
-
-      /* .line {
-        max-width: 400px;
-
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      } */
     }
   }
 </style>
