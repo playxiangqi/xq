@@ -104,8 +104,6 @@
 
 <style lang="scss">
   .engine-analysis-panel {
-    margin-left: 50px;
-
     .content-container {
       min-height: 700px;
       height: 700px;

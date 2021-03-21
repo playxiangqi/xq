@@ -1,30 +1,37 @@
 <script context="module" lang="ts">
   import { createAuthStore } from '@xq/services/auth/store';
-  import { createBoardStore, Board } from '@xq/core/board';
+  import { Board } from '@xq/core/board';
   import type { EnrichedCartesianPoint } from '@xq/core/board';
   import { userSettingsStore, updateGameSettings } from '@xq/services/user';
-  import { Dimensions } from '@xq/utils/dimensions';
   import { enrichPoint } from '@xq/utils/xq';
   import { createAnalysisStore } from './store.svelte';
   import type { Line } from './store.svelte';
 
-  // TODO: Derive dimensions and scale from viewport and set globally
-  const DEFAULT_SCALE = 1.0;
-  const dimensions = new Dimensions(DEFAULT_SCALE);
   const { store: authStore } = createAuthStore();
   const analysisStore = createAnalysisStore();
-  const boardStore = createBoardStore(dimensions);
 </script>
 
 <script lang="ts">
   import { setContext, onDestroy } from 'svelte';
+  import { createBoardStore, createDimensionStore } from '@xq/core/board';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import type { Layout } from '@xq/utils/xq';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
   import GameInfoPanel from './GameInfoPanel.svelte';
   import type { GameSettings } from './GameInfoPanel.svelte';
+  import { AspectRatio } from 'carbon-components-svelte';
 
   export let gameID: number | string;
+
+  // Initialization
+  const { loadLine } = analysisStore;
+  let boardHeight = 800;
+  const dimensions = createDimensionStore();
+  const { pointToCoords } = dimensions;
+  $: {
+    dimensions.set(boardHeight);
+  }
+  let boardStore = createBoardStore(dimensions);
 
   // Lifecycle
   const unsubscribeAnalysis = analysisStore.subscribe((state) => {
@@ -35,23 +42,19 @@
 
     $boardStore.workingLayout = {
       points: points.map((p) => ({
-        ...enrichPoint(p, dimensions, flipped),
+        ...enrichPoint(p, pointToCoords, flipped),
         grabbing: false,
       })),
       prevPoint: prevPoint
-        ? enrichPoint(prevPoint, dimensions, flipped)
+        ? enrichPoint(prevPoint, pointToCoords, flipped)
         : prevPoint,
       nextPoint: nextPoint
-        ? enrichPoint(nextPoint, dimensions, flipped)
+        ? enrichPoint(nextPoint, pointToCoords, flipped)
         : nextPoint,
     } as Layout<EnrichedCartesianPoint>;
   });
 
   onDestroy(unsubscribeAnalysis);
-
-  // Initialization
-  const { loadLine } = analysisStore;
-  const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
 
   // Locals
   let currentTurnIndex = 0;
@@ -63,7 +66,6 @@
     audio.play();
   }
   setContext('audio', { playSound });
-  setContext('dimensions', dimensions);
 
   // Reactive
   $: ({ gameSettings } = $userSettingsStore);
@@ -101,17 +103,11 @@
       hidden
       loop={false}
     />
-    <Board
-      {boardStore}
-      on:piecedrop={(e) => {
-        if (dropPiece(e.detail.index, e.detail.movedFromPrev)) {
-          playSound();
-        }
-      }}
-      on:piecefocus={(e) => focusPiece(e.detail)}
-      on:piecegrab={(e) => grabPiece(e.detail)}
-      on:piecemove={(e) => movePiece(e.detail.index, e.detail.point)}
-    />
+    <AspectRatio ratio="1x1">
+      <div class="dimension-container" bind:clientHeight={boardHeight}>
+        <Board {boardStore} {dimensions} />
+      </div>
+    </AspectRatio>
   </div>
   <div class="col-3">
     <GameInfoPanel
@@ -138,9 +134,12 @@
     grid-template-columns: 1fr 1.5fr 1fr;
 
     .col-2 {
-      display: flex;
+      display: block;
 
-      padding-left: 2%;
+      .dimension-container {
+        height: 100%;
+        width: 100%;
+      }
     }
   }
 </style>

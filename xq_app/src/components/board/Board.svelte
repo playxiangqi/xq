@@ -1,14 +1,19 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
-  import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
+  import { createBoardStore } from '@xq/core/board';
+  import { FILE_MAX, RANK_MAX } from '@xq/utils/xq';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
-  import type { BoardStore } from './store.svelte';
+  import { getContext } from 'svelte';
+  import type { Dimensions, DimensionStore } from './dimensions.svelte';
 
-  export let boardStore: BoardStore;
+  export let boardStore: ReturnType<typeof createBoardStore>;
+  export let dimensions: DimensionStore;
+
+  const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
+  const { playSound } = getContext('audio');
 
   // Initialization
-  const {
+  $: ({
     height,
     width,
     frameHeight,
@@ -19,17 +24,26 @@
     frameOffsetX,
     innerFrameOffsetY,
     innerFrameOffsetX,
-    rankSpacing,
-    fileSpacing,
     pieceSize,
     pieceOuterRadius,
-  }: Dimensions = getContext('dimensions');
-
+  } = $dimensions);
   $: ({ turn } = $boardStore);
   $: ({ points, prevPoint, nextPoint } = $boardStore.workingLayout);
+  // $: {
+  //   console.log('height: ', height);
+  //   console.log('width: ', width);
+  //   console.log('innerFrameHeight: ', innerFrameHeight);
+  //   console.log('innerFrameWidth: ', innerFrameWidth);
+  // }
 
   // Utils
   function generateLinePath(
+    {
+      innerFrameOffsetX,
+      innerFrameOffsetY,
+      rankSpacing,
+      fileSpacing,
+    }: Dimensions,
     [fromRank, fromFile]: [number, number],
     [toRank, toFile]: [number, number],
   ): string {
@@ -66,19 +80,27 @@
     />
     <g class="lines">
       <!-- Palace -->
-      <path d={generateLinePath([0, 3], [2, 5])} />
-      <path d={generateLinePath([0, 5], [2, 3])} />
-      <path d={generateLinePath([RANK_MAX, 3], [RANK_MAX - 2, 5])} />
-      <path d={generateLinePath([RANK_MAX, 5], [RANK_MAX - 2, 3])} />
+      <path d={generateLinePath($dimensions, [0, 3], [2, 5])} />
+      <path d={generateLinePath($dimensions, [0, 5], [2, 3])} />
+      <path
+        d={generateLinePath($dimensions, [RANK_MAX, 3], [RANK_MAX - 2, 5])}
+      />
+      <path
+        d={generateLinePath($dimensions, [RANK_MAX, 5], [RANK_MAX - 2, 3])}
+      />
 
       <!-- Ranks & Files -->
       {#each Array(RANK_MAX - 1) as _, i}
-        <path d={generateLinePath([i + 1, 0], [i + 1, FILE_MAX])} />
+        <path
+          d={generateLinePath($dimensions, [i + 1, 0], [i + 1, FILE_MAX])}
+        />
       {/each}
       {#each Array(FILE_MAX - 1) as _, i}
         <!-- River disconnected -->
-        <path d={generateLinePath([0, i + 1], [4, i + 1])} />
-        <path d={generateLinePath([RANK_MAX, i + 1], [5, i + 1])} />
+        <path d={generateLinePath($dimensions, [0, i + 1], [4, i + 1])} />
+        <path
+          d={generateLinePath($dimensions, [RANK_MAX, i + 1], [5, i + 1])}
+        />
       {/each}
     </g>
     <g class="layout">
@@ -92,13 +114,18 @@
       {#each points as point, index}
         <Piece
           {index}
+          {dimensions}
           {turn}
           {point}
           nextPosition={nextPoint?.position}
-          on:piecedrop
-          on:piecefocus
-          on:piecegrab
-          on:piecemove
+          on:piecedrop={(e) => {
+            if (dropPiece(e.detail.index, e.detail.movedFromPrev)) {
+              playSound();
+            }
+          }}
+          on:piecefocus={(e) => focusPiece(e.detail)}
+          on:piecegrab={(e) => grabPiece(e.detail)}
+          on:piecemove={(e) => movePiece(e.detail.index, e.detail.point)}
         />
       {/each}
     </g>
@@ -111,6 +138,7 @@
 
     display: flex;
     align-items: center;
+    justify-content: center;
 
     * {
       position: absolute;

@@ -1,9 +1,9 @@
 <script context="module" lang="ts">
   import { writable } from 'svelte/store';
   import type { Writable } from 'svelte/store';
-  import type { Dimensions } from '@xq/utils/dimensions';
   import { BLACK, DEFAULT_POINTS, RED, enrichPoint } from '@xq/utils/xq';
   import type { CartesianPoint, Layout, Side } from '@xq/utils/xq';
+  import type { DimensionStore } from './dimensions.svelte';
 
   export type EnrichedCartesianPoint = CartesianPoint & { grabbing: boolean };
 
@@ -21,13 +21,15 @@
     movePiece: (index: number, position: [number, number]) => void;
   }
 
-  export function createBoardStore(dimensions: Dimensions): BoardStore {
+  export function createBoardStore(dimensions: DimensionStore): BoardStore {
+    const { pointToCoords } = dimensions;
+
     const store = writable<BoardState>({
       flipped: false,
       turn: RED,
       workingLayout: {
         points: DEFAULT_POINTS.map((p) => ({
-          ...enrichPoint(p, dimensions),
+          ...enrichPoint(p, pointToCoords),
           grabbing: false,
         })),
       },
@@ -38,14 +40,14 @@
         const { points, prevPoint, nextPoint } = workingLayout;
         workingLayout = {
           points: points.map((p) => ({
-            ...enrichPoint(p, dimensions, true),
+            ...enrichPoint(p, pointToCoords, true),
             grabbing: false,
           })),
           prevPoint: prevPoint
-            ? enrichPoint(prevPoint, dimensions, true)
+            ? enrichPoint(prevPoint, pointToCoords, true)
             : prevPoint,
           nextPoint: nextPoint
-            ? enrichPoint(nextPoint, dimensions, true)
+            ? enrichPoint(nextPoint, pointToCoords, true)
             : nextPoint,
         } as Layout<EnrichedCartesianPoint>;
 
