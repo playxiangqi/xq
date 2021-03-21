@@ -9,15 +9,15 @@
   export let dimensions: Dimensions;
 
   let height = 800;
-  let width = 800;
 
-  dimensions = new Dimensions(height, width);
+  dimensions = new Dimensions(height);
   boardStore = createBoardStore(dimensions);
   const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
   const { playSound } = getContext('audio');
 
   // Initialization
   const {
+    width,
     frameHeight,
     frameWidth,
     innerFrameHeight,
@@ -54,11 +54,7 @@
   }
 </script>
 
-<div
-  class="board-container"
-  bind:clientHeight={height}
-  bind:clientWidth={width}
->
+<div class="board-container" bind:clientHeight={height}>
   <svg class="board" {height} {width}>
     <!-- Frame -->
     <rect
@@ -127,6 +123,7 @@
 
     display: flex;
     align-items: center;
+    justify-content: center;
 
     * {
       position: absolute;

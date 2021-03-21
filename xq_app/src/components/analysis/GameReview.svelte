@@ -26,7 +26,8 @@
 
   // Initialization
   const { loadLine } = analysisStore;
-  let dimensions = new Dimensions(800, 800);
+  // TODO: Scale should use / 800 as denominator for reference
+  let dimensions = new Dimensions(800);
   let boardStore = createBoardStore(dimensions);
 
   // Lifecycle
