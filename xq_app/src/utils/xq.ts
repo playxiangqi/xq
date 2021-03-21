@@ -1,5 +1,4 @@
-import { FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
-import type { Dimensions } from '@xq/utils/dimensions';
+export const [FILE_MAX, RANK_MAX] = [8, 9];
 
 export const RED = 'red';
 export const BLACK = 'black';
@@ -77,16 +76,12 @@ export const DEFAULT_POINTS: Point[] = [
 
 export function enrichPoint(
   point: Point,
-  dimensions: Dimensions,
+  pointToCoords: (rank: number, file: number) => [number, number],
   shouldInvert = false,
 ): CartesianPoint {
   const newPoint = invert(point, shouldInvert);
-  const position = dimensions.pointToCoords(newPoint.rank, newPoint.file);
-  return {
-    ...newPoint,
-    position,
-    prevPosition: position,
-  } as CartesianPoint;
+  const position = pointToCoords(newPoint.rank, newPoint.file);
+  return { ...newPoint, position, prevPosition: position };
 }
 
 export function invert(point: Point, shouldInvert: boolean): Point {

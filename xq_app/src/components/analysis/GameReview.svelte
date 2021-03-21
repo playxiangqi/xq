@@ -13,8 +13,7 @@
 
 <script lang="ts">
   import { setContext, onDestroy } from 'svelte';
-  import { createBoardStore } from '@xq/core/board';
-  import { Dimensions } from '@xq/utils/dimensions';
+  import { createBoardStore, createDimensionStore } from '@xq/core/board';
   import type { PhoenixPayload } from '@xq/utils/channel';
   import type { Layout } from '@xq/utils/xq';
   import EngineAnalysisPanel from './EngineAnalysisPanel.svelte';
@@ -26,8 +25,12 @@
 
   // Initialization
   const { loadLine } = analysisStore;
-  // TODO: Scale should use / 800 as denominator for reference
-  let dimensions = new Dimensions(800);
+  let boardHeight = 800;
+  const dimensions = createDimensionStore();
+  const { pointToCoords } = dimensions;
+  $: {
+    dimensions.set(boardHeight);
+  }
   let boardStore = createBoardStore(dimensions);
 
   // Lifecycle
@@ -39,14 +42,14 @@
 
     $boardStore.workingLayout = {
       points: points.map((p) => ({
-        ...enrichPoint(p, dimensions, flipped),
+        ...enrichPoint(p, pointToCoords, flipped),
         grabbing: false,
       })),
       prevPoint: prevPoint
-        ? enrichPoint(prevPoint, dimensions, flipped)
+        ? enrichPoint(prevPoint, pointToCoords, flipped)
         : prevPoint,
       nextPoint: nextPoint
-        ? enrichPoint(nextPoint, dimensions, flipped)
+        ? enrichPoint(nextPoint, pointToCoords, flipped)
         : nextPoint,
     } as Layout<EnrichedCartesianPoint>;
   });
@@ -101,7 +104,9 @@
       loop={false}
     />
     <AspectRatio ratio="1x1">
-      <Board bind:boardStore bind:dimensions />
+      <div class="dimension-container" bind:clientHeight={boardHeight}>
+        <Board {boardStore} {dimensions} />
+      </div>
     </AspectRatio>
   </div>
   <div class="col-3">
@@ -130,6 +135,11 @@
 
     .col-2 {
       display: block;
+
+      .dimension-container {
+        height: 100%;
+        width: 100%;
+      }
     }
   }
 </style>

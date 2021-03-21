@@ -1,22 +1,20 @@
 <script lang="ts">
-  import { Dimensions, FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
+  import { FILE_MAX, RANK_MAX } from '@xq/utils/dimensions';
   import { createBoardStore } from '@xq/core/board';
   import Piece from './Piece.svelte';
   import PieceShadow from './PieceShadow.svelte';
   import { getContext } from 'svelte';
+  import type { DimensionStore } from './dimensions.svelte';
 
   export let boardStore: ReturnType<typeof createBoardStore>;
-  export let dimensions: Dimensions;
+  export let dimensions: DimensionStore;
 
-  let height = 800;
-
-  dimensions = new Dimensions(height);
-  boardStore = createBoardStore(dimensions);
   const { dropPiece, focusPiece, grabPiece, movePiece } = boardStore;
   const { playSound } = getContext('audio');
 
   // Initialization
-  const {
+  $: ({
+    height,
     width,
     frameHeight,
     frameWidth,
@@ -30,8 +28,7 @@
     fileSpacing,
     pieceSize,
     pieceOuterRadius,
-  } = dimensions;
-
+  } = $dimensions);
   $: ({ turn } = $boardStore);
   $: ({ points, prevPoint, nextPoint } = $boardStore.workingLayout);
 
@@ -54,7 +51,7 @@
   }
 </script>
 
-<div class="board-container" bind:clientHeight={height}>
+<div class="board-container">
   <svg class="board" {height} {width}>
     <!-- Frame -->
     <rect

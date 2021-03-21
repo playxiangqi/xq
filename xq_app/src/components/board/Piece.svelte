@@ -1,30 +1,30 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { Dimensions } from '@xq/utils/dimensions';
   import Enum from '@xq/utils/enum';
   import type { Side } from '@xq/utils/xq';
   import { getGlyph } from './pieces';
   import type { EnrichedCartesianPoint } from './store.svelte';
+  import type { DimensionStore } from './dimensions.svelte';
 
   // Piece Props
   export let index: number;
-  export let dimensions: Dimensions; // Should be a store
+  export let dimensions: DimensionStore;
   export let turn: Side;
   export let point: EnrichedCartesianPoint;
   export let nextPosition: [number, number] | undefined;
 
   // Initialization
   const dispatch = createEventDispatcher();
-  const {
-    pieceScale: scale,
-    pieceSize: size,
-    pieceBorderRadius: borderRadius,
-    pieceOuterRadius: outerRadius,
-    pieceInnerRadius: innerRadius,
-    pieceStrokeWidth: strokeWidth,
-  } = dimensions;
 
   // Reactive
+  $: ({
+    pieceScale,
+    pieceSize,
+    pieceBorderRadius,
+    pieceOuterRadius,
+    pieceInnerRadius,
+    pieceStrokeWidth,
+  } = $dimensions);
   $: ({ ch, side, position, prevPosition, grabbing } = point);
   $: glyph = getGlyph(side, ch);
   $: [posY, posX] = position;
@@ -76,8 +76,8 @@
 <svg
   class="piece"
   class:grabbing
-  height={size}
-  width={size}
+  height={pieceSize}
+  width={pieceSize}
   y={posY}
   x={posX}
   on:pointerdown={onPointerDown}
@@ -88,25 +88,27 @@
   <circle
     class="outer"
     class:moved
-    r={outerRadius}
-    cx={borderRadius}
-    cy={borderRadius}
+    r={pieceOuterRadius}
+    cx={pieceBorderRadius}
+    cy={pieceBorderRadius}
     stroke="black"
-    stroke-width={strokeWidth}
+    stroke-width={pieceStrokeWidth}
   />
   <circle
     class="inner"
-    r={innerRadius}
-    cx={borderRadius}
-    cy={borderRadius}
+    r={pieceInnerRadius}
+    cx={pieceBorderRadius}
+    cy={pieceBorderRadius}
     stroke={computedColor}
-    stroke-width={strokeWidth}
+    stroke-width={pieceStrokeWidth}
   />
   <path
     class="glyph"
     fill={computedColor}
     d={glyph}
-    transform={`translate(${15 * scale}, ${14 * scale}) scale(${scale})`}
+    transform={`translate(${15 * pieceScale}, ${
+      14 * pieceScale
+    }) scale(${pieceScale})`}
   />
 </svg>
 
